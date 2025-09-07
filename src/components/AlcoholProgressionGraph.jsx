@@ -160,9 +160,13 @@ const AlcoholProgressionGraph = ({ managers, beerConsumption, shotConsumption, d
   };
 
   const SVGGraph = () => {
-    const width = 900;
-    const height = 400;
-    const margin = { top: 40, right: 100, bottom: 60, left: 60 };
+    // Responsive dimensions
+    const isMobile = window.innerWidth < 768;
+    const width = isMobile ? Math.min(window.innerWidth - 40, 400) : 900;
+    const height = isMobile ? 250 : 400;
+    const margin = isMobile 
+      ? { top: 30, right: 50, bottom: 50, left: 40 }
+      : { top: 40, right: 100, bottom: 60, left: 60 };
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
 
@@ -282,6 +286,23 @@ const AlcoholProgressionGraph = ({ managers, beerConsumption, shotConsumption, d
       
       if (dataIndex >= 0 && dataIndex < historicalData.length) {
         const x = xScale(dataIndex);
+        
+        // Determine icon based on drink type
+        const hasBeers = (event.alexanderChange > 0 && event.beers) || (event.philipChange > 0 && event.beers);
+        const hasShots = (event.shots?.alexander?.shots20 > 0) || (event.shots?.alexander?.shots40 > 0) || 
+                        (event.shots?.philip?.shots20 > 0) || (event.shots?.philip?.shots40 > 0);
+        
+        let icon = '🍺'; // Default beer
+        let iconColor = '#8b5cf6';
+        
+        if (hasShots && !hasBeers) {
+          icon = '🥃';
+          iconColor = '#f59e0b';
+        } else if (hasShots && hasBeers) {
+          icon = '🍻';
+          iconColor = '#10b981';
+        }
+        
         return (
           <g key={i}>
             {/* Event marker line */}
@@ -290,29 +311,30 @@ const AlcoholProgressionGraph = ({ managers, beerConsumption, shotConsumption, d
               y1={0}
               x2={x}
               y2={chartHeight}
-              stroke="#8b5cf6"
-              strokeWidth="2"
+              stroke={iconColor}
+              strokeWidth={isMobile ? "1.5" : "2"}
               strokeDasharray="4,2"
               opacity="0.7"
             />
-            {/* Drink icon */}
+            {/* Drink icon background */}
             <circle
               cx={x}
               cy={-15}
-              r="8"
-              fill="#8b5cf6"
+              r={isMobile ? "6" : "8"}
+              fill={iconColor}
               stroke="white"
               strokeWidth="2"
             />
+            {/* Drink icon */}
             <text
               x={x}
-              y={-10}
+              y={isMobile ? "-12" : "-10"}
               textAnchor="middle"
-              fontSize="10"
+              fontSize={isMobile ? "8" : "10"}
               fill="white"
               className="font-bold"
             >
-              🍺
+              {icon}
             </text>
           </g>
         );
@@ -321,8 +343,8 @@ const AlcoholProgressionGraph = ({ managers, beerConsumption, shotConsumption, d
     });
 
     return (
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-4">
-        <svg width={width} height={height} className="overflow-visible">
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-2 md:p-4 overflow-x-auto">
+        <svg width={width} height={height} className="overflow-visible mx-auto block">
           {/* Background gradient */}
           <defs>
             <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -477,19 +499,47 @@ const AlcoholProgressionGraph = ({ managers, beerConsumption, shotConsumption, d
           </g>
           
           {/* Enhanced Legend */}
-          <g transform={`translate(${width - margin.right + 15}, ${margin.top + 20})`}>
-            <rect x={-10} y={-15} width={80} height={90} fill="white" stroke="#e5e7eb" strokeWidth="2" rx="8" style={{
-              filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
-            }}/>
-            <text x={25} y={-5} textAnchor="middle" fontSize="12" fill="#374151" className="font-bold">Legende</text>
-            <line x1={5} y1={10} x2={20} y2={10} stroke="#3b82f6" strokeWidth="4"/>
-            <text x={25} y={14} fontSize="11" fill="#374151" className="font-medium">Alexander</text>
-            <line x1={5} y1={30} x2={20} y2={30} stroke="#10b981" strokeWidth="4"/>
-            <text x={25} y={34} fontSize="11" fill="#374151" className="font-medium">Philip</text>
-            <line x1={5} y1={50} x2={20} y2={50} stroke="#8b5cf6" strokeWidth="2" strokeDasharray="4,2"/>
-            <text x={25} y={54} fontSize="11" fill="#374151" className="font-medium">Getränke</text>
-          </g>
+          {!isMobile && (
+            <g transform={`translate(${width - margin.right + 15}, ${margin.top + 20})`}>
+              <rect x={-10} y={-15} width={85} height={110} fill="white" stroke="#e5e7eb" strokeWidth="2" rx="8" style={{
+                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
+              }}/>
+              <text x={30} y={-5} textAnchor="middle" fontSize="12" fill="#374151" className="font-bold">Legende</text>
+              <line x1={5} y1={10} x2={20} y2={10} stroke="#3b82f6" strokeWidth="4"/>
+              <text x={25} y={14} fontSize="11" fill="#374151" className="font-medium">Alexander</text>
+              <line x1={5} y1={30} x2={20} y2={30} stroke="#10b981" strokeWidth="4"/>
+              <text x={25} y={34} fontSize="11" fill="#374151" className="font-medium">Philip</text>
+              <line x1={5} y1={50} x2={20} y2={50} stroke="#8b5cf6" strokeWidth="2" strokeDasharray="4,2"/>
+              <text x={25} y={54} fontSize="11" fill="#374151" className="font-medium">🍺 Bier</text>
+              <line x1={5} y1={70} x2={20} y2={70} stroke="#f59e0b" strokeWidth="2" strokeDasharray="4,2"/>
+              <text x={25} y={74} fontSize="11" fill="#374151" className="font-medium">🥃 Shots</text>
+              <line x1={5} y1={90} x2={20} y2={90} stroke="#10b981" strokeWidth="2" strokeDasharray="4,2"/>
+              <text x={25} y={94} fontSize="11" fill="#374151" className="font-medium">🍻 Mix</text>
+            </g>
+          )}
         </svg>
+        
+        {/* Mobile Legend */}
+        {isMobile && (
+          <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-1 bg-blue-500 rounded"></div>
+              <span>Alexander</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-1 bg-green-500 rounded"></div>
+              <span>Philip</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-purple-500">🍺</span>
+              <span>Bier</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-orange-500">🥃</span>
+              <span>Shots</span>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
