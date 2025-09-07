@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
+import AlcoholProgressionGraph from '../AlcoholProgressionGraph.jsx';
 
 export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-line no-unused-vars
   // Load manager data from localStorage (set via TeamSettingsTab)
   const [managers, setManagers] = useState({
-    aek: { name: 'Alexander', age: 30, weight: 100 },
+    aek: { name: 'Alexander', age: 30, weight: 110 },
     real: { name: 'Philip', age: 30, weight: 105 }
   });
   
@@ -274,20 +275,27 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
       </div>
 
       {/* Quick Actions */}
-      <div className="modern-card mb-6">
-        <h3 className="font-bold text-lg mb-4">⚡ Schnell-Aktionen</h3>
+      <div className="modern-card mb-6 bg-gradient-to-r from-blue-50 to-green-50 border-2 border-blue-200">
+        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+          <span className="text-2xl">⚡</span>
+          <span className="bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">
+            Schnell-Aktionen
+          </span>
+        </h3>
         <div className="grid grid-cols-1 gap-3">
           <button
             onClick={addBeerToBoth}
-            className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-6 py-3 rounded-lg transition-all duration-200 font-medium text-lg"
+            className="bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-6 py-4 rounded-xl transition-all duration-200 font-medium text-lg shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center justify-center gap-2"
           >
-            🍻 Beiden ein Bier hinzufügen
+            <span className="text-2xl">🍻</span>
+            <span>Beiden ein Bier hinzufügen</span>
           </button>
           <button
             onClick={resetConsumption}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+            className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-4 py-3 rounded-xl transition-all duration-200 font-medium shadow-md hover:shadow-lg flex items-center justify-center gap-2"
           >
-            🔄 Zurücksetzen
+            <span className="text-xl">🔄</span>
+            <span>Zurücksetzen</span>
           </button>
         </div>
       </div>
@@ -295,32 +303,33 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
       {/* Individual Beer Tracking */}
       <div className="space-y-6">
         {/* Alexander Section */}
-        <div className="modern-card bg-blue-50 border-blue-200">
+        <div className="modern-card bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 shadow-lg">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-lg text-blue-700">
-              🔵 {managers.aek.name} (AEK Manager)
+            <h3 className="font-bold text-lg text-blue-700 flex items-center gap-2">
+              <span className="text-2xl">🔵</span>
+              <span>{managers.aek.name} (AEK Manager)</span>
             </h3>
-            <div className="text-sm text-blue-600">
+            <div className="text-sm text-blue-600 bg-blue-200 px-3 py-1 rounded-full font-medium">
               {managers.aek.weight}kg
             </div>
           </div>
           
-          <div className="grid grid-cols-3 gap-2 mb-4">
+          <div className="grid grid-cols-3 gap-3 mb-4">
             <button
               onClick={() => addBeer('alexander')}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg transition-colors font-medium text-sm"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-3 rounded-xl transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
             >
               🍺 + Bier
             </button>
             <button
               onClick={() => addShot('alexander', 20)}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-2 rounded-lg transition-colors font-medium text-sm"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-3 rounded-xl transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
             >
               🥃 Shot 20%
             </button>
             <button
               onClick={() => addShot('alexander', 40)}
-              className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded-lg transition-colors font-medium text-sm"
+              className="bg-blue-700 hover:bg-blue-800 text-white px-3 py-3 rounded-xl transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
             >
               🥃 Shot 40%
             </button>
@@ -411,32 +420,33 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
         </div>
 
         {/* Philip Section */}
-        <div className="modern-card bg-green-50 border-green-200">
+        <div className="modern-card bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 shadow-lg">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-bold text-lg text-green-700">
-              🟢 {managers.real.name} (Real Manager)
+            <h3 className="font-bold text-lg text-green-700 flex items-center gap-2">
+              <span className="text-2xl">🟢</span>
+              <span>{managers.real.name} (Real Manager)</span>
             </h3>
-            <div className="text-sm text-green-600">
+            <div className="text-sm text-green-600 bg-green-200 px-3 py-1 rounded-full font-medium">
               {managers.real.weight}kg
             </div>
           </div>
           
-          <div className="grid grid-cols-3 gap-2 mb-4">
+          <div className="grid grid-cols-3 gap-3 mb-4">
             <button
               onClick={() => addBeer('philip')}
-              className="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg transition-colors font-medium text-sm"
+              className="bg-green-600 hover:bg-green-700 text-white px-3 py-3 rounded-xl transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
             >
               🍺 + Bier
             </button>
             <button
               onClick={() => addShot('philip', 20)}
-              className="bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors font-medium text-sm"
+              className="bg-green-500 hover:bg-green-600 text-white px-3 py-3 rounded-xl transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
             >
               🥃 Shot 20%
             </button>
             <button
               onClick={() => addShot('philip', 40)}
-              className="bg-green-700 hover:bg-green-800 text-white px-3 py-2 rounded-lg transition-colors font-medium text-sm"
+              className="bg-green-700 hover:bg-green-800 text-white px-3 py-3 rounded-xl transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
             >
               🥃 Shot 40%
             </button>
@@ -559,6 +569,14 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
           </div>
         </div>
       </div>
+
+      {/* Alcohol Progression Graph */}
+      <AlcoholProgressionGraph 
+        managers={managers}
+        beerConsumption={beerConsumption}
+        shotConsumption={shotConsumption}
+        drinkingStartTime={drinkingStartTime}
+      />
 
       {/* Info */}
       <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
