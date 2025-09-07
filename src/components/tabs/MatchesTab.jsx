@@ -4,6 +4,7 @@ import LoadingSpinner from '../LoadingSpinner';
 
 export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-unused-vars
   const [expandedMatches, setExpandedMatches] = useState(new Set());
+  const [filterExpanded, setFilterExpanded] = useState(false);
   const [timeFilter, setTimeFilter] = useState('4weeks'); // '1week', '4weeks', '3months', 'all'
   const [dateFilter, setDateFilter] = useState('');
   const [resultFilter, setResultFilter] = useState('all'); // 'all', 'aek-wins', 'real-wins'
@@ -76,9 +77,9 @@ export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-u
         
         switch (goalFilter) {
           case 'high-scoring':
-            return totalGoals >= 5;
+            return totalGoals > 10; // Many goals: >10
           case 'low-scoring':
-            return totalGoals <= 2;
+            return totalGoals < 5; // Few goals: <5
           default:
             return true;
         }
@@ -203,96 +204,109 @@ export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-u
 
       {/* Enhanced Filter Controls */}
       <div className="mb-6 modern-card">
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-text-primary mb-2">🔍 Filter & Suche</h3>
-          <p className="text-sm text-text-muted">Finde schnell die Spiele, die dich interessieren</p>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Time Period Filter */}
+        <div className="flex justify-between items-center mb-4">
           <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
-              📅 Zeitraum
-            </label>
-            <select
-              value={timeFilter}
-              onChange={(e) => setTimeFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
-            >
-              <option value="1week">Letzte Woche</option>
-              <option value="4weeks">Letzte 4 Wochen</option>
-              <option value="3months">Letzte 3 Monate</option>
-              <option value="all">Alle Spiele</option>
-            </select>
-          </div>
-          
-          {/* Result Filter */}
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
-              🏆 Ergebnis
-            </label>
-            <select
-              value={resultFilter}
-              onChange={(e) => setResultFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
-            >
-              <option value="all">Alle Ergebnisse</option>
-              <option value="aek-wins">🔵 AEK Siege</option>
-              <option value="real-wins">🔴 Real Siege</option>
-            </select>
-          </div>
-          
-          {/* Goal Filter */}
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
-              ⚽ Tore
-            </label>
-            <select
-              value={goalFilter}
-              onChange={(e) => setGoalFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
-            >
-              <option value="all">Alle Spiele</option>
-              <option value="high-scoring">🔥 Torreich (5+ Tore)</option>
-              <option value="low-scoring">🛡️ Torarm (≤2 Tore)</option>
-            </select>
-          </div>
-          
-          {/* Specific Date Filter */}
-          <div>
-            <label className="block text-sm font-medium text-text-primary mb-2">
-              📆 Datum
-            </label>
-            <input
-              type="date"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
-            />
-          </div>
-        </div>
-        
-        {/* Filter Actions */}
-        <div className="mt-4 flex flex-wrap gap-2 items-center justify-between">
-          <div className="text-sm text-text-muted">
-            {(() => {
-              const count = matches.length;
-              const total = allMatches?.length || 0;
-              if (count === total) return `Zeige alle ${count} Spiele`;
-              return `${count} von ${total} Spielen gefiltert`;
-            })()}
+            <h3 className="text-lg font-semibold text-text-primary mb-2">🔍 Filter & Suche</h3>
+            <p className="text-sm text-text-muted">Finde schnell die Spiele, die dich interessieren</p>
           </div>
           <button
-            onClick={() => {
-              setTimeFilter('4weeks');
-              setDateFilter('');
-              setResultFilter('all');
-              setGoalFilter('all');
-            }}
-            className="px-4 py-2 text-sm bg-accent-orange text-white rounded-lg hover:bg-orange-600 transition-colors"
+            onClick={() => setFilterExpanded(!filterExpanded)}
+            className="flex items-center gap-2 px-3 py-2 text-sm bg-bg-secondary hover:bg-bg-tertiary border border-border-light rounded-lg transition-all"
           >
-            🔄 Filter zurücksetzen
+            <span>{filterExpanded ? 'Einklappen' : 'Erweitern'}</span>
+            <span className={`text-lg transition-transform duration-200 ${filterExpanded ? 'rotate-90' : ''}`}>
+              ▶
+            </span>
           </button>
+        </div>
+        
+        <div className={`overflow-hidden transition-all duration-300 ${filterExpanded ? 'max-h-96' : 'max-h-0'}`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Time Period Filter */}
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                📅 Zeitraum
+              </label>
+              <select
+                value={timeFilter}
+                onChange={(e) => setTimeFilter(e.target.value)}
+                className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
+              >
+                <option value="1week">Letzte Woche</option>
+                <option value="4weeks">Letzte 4 Wochen</option>
+                <option value="3months">Letzte 3 Monate</option>
+                <option value="all">Alle Spiele</option>
+              </select>
+            </div>
+            
+            {/* Result Filter */}
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                🏆 Ergebnis
+              </label>
+              <select
+                value={resultFilter}
+                onChange={(e) => setResultFilter(e.target.value)}
+                className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
+              >
+                <option value="all">Alle Ergebnisse</option>
+                <option value="aek-wins">🔵 AEK Siege</option>
+                <option value="real-wins">🔴 Real Siege</option>
+              </select>
+            </div>
+            
+            {/* Goal Filter */}
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                ⚽ Tore
+              </label>
+              <select
+                value={goalFilter}
+                onChange={(e) => setGoalFilter(e.target.value)}
+                className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
+              >
+                <option value="all">Alle Spiele</option>
+                <option value="high-scoring">🔥 Torreich (&gt;10 Tore)</option>
+                <option value="low-scoring">🛡️ Torarm (&lt;5 Tore)</option>
+              </select>
+            </div>
+            
+            {/* Specific Date Filter */}
+            <div>
+              <label className="block text-sm font-medium text-text-primary mb-2">
+                📆 Datum
+              </label>
+              <input
+                type="date"
+                value={dateFilter}
+                onChange={(e) => setDateFilter(e.target.value)}
+                className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
+              />
+            </div>
+          </div>
+          
+          {/* Filter Actions */}
+          <div className="mt-4 flex flex-wrap gap-2 items-center justify-between">
+            <div className="text-sm text-text-muted">
+              {(() => {
+                const count = matches.length;
+                const total = allMatches?.length || 0;
+                if (count === total) return `Zeige alle ${count} Spiele`;
+                return `${count} von ${total} Spielen gefiltert`;
+              })()}
+            </div>
+            <button
+              onClick={() => {
+                setTimeFilter('4weeks');
+                setDateFilter('');
+                setResultFilter('all');
+                setGoalFilter('all');
+              }}
+              className="px-4 py-2 text-sm bg-accent-orange text-white rounded-lg hover:bg-orange-600 transition-colors"
+            >
+              🔄 Filter zurücksetzen
+            </button>
+          </div>
         </div>
       </div>
 

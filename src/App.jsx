@@ -15,6 +15,7 @@ const KaderTab = lazy(() => import('./components/tabs/KaderTab'));
 const BansTab = lazy(() => import('./components/tabs/BansTab'));
 const FinanzenTab = lazy(() => import('./components/tabs/FinanzenTab'));
 const StatsTab = lazy(() => import('./components/tabs/StatsTab'));
+const AlcoholTrackerTab = lazy(() => import('./components/tabs/AlcoholTrackerTab'));
 const AdminTab = lazy(() => import('./components/tabs/AdminTab'));
 
 function App() {
@@ -113,6 +114,8 @@ function App() {
         return <KaderTab {...props} />;
       case 'stats':
         return <StatsTab {...props} />;
+      case 'alcohol':
+        return <AlcoholTrackerTab {...props} />;
       case 'admin':
         return <AdminTab onLogout={handleLogout} {...props} />;
       default:
