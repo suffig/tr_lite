@@ -6,6 +6,7 @@
 export class SofifaIntegration {
     static CACHE_DURATION = 1000 * 60 * 60; // 1 hour cache
     static cache = new Map();
+    static jsonCache = null; // Cache for the local JSON file
     static rateLimit = {
         requests: 0,
         resetTime: 0,
@@ -13,12 +14,117 @@ export class SofifaIntegration {
     };
 
     /**
-     * Attempt to fetch player data from SoFIFA
+     * Load the local JSON file with player data
+     * @returns {Promise<Array|null>} Player data array or null if failed
+     */
+    static async loadLocalJsonFile() {
+        try {
+            if (this.jsonCache) {
+                console.log('📦 Using cached JSON data');
+                return this.jsonCache;
+            }
+
+            console.log('📥 Loading local JSON file: sofifa_my_players_app.json');
+            const response = await fetch('./sofifa_my_players_app.json');
+            
+            if (!response.ok) {
+                throw new Error(`Failed to load JSON: ${response.status}`);
+            }
+
+            const jsonData = await response.json();
+            this.jsonCache = jsonData;
+            console.log(`✅ Loaded ${jsonData.length} players from local JSON file`);
+            return jsonData;
+        } catch (error) {
+            console.warn('⚠️ Failed to load local JSON file:', error.message);
+            return null;
+        }
+    }
+
+    /**
+     * Search for player in local JSON file by name or ID
+     * @param {string} playerName - Player name to search for
+     * @param {string} sofifaId - SoFIFA ID to search for
+     * @returns {Promise<Object|null>} Player data or null if not found
+     */
+    static async searchInLocalJson(playerName, sofifaId) {
+        try {
+            const jsonData = await this.loadLocalJsonFile();
+            if (!jsonData) return null;
+
+            // Search by SoFIFA ID first (most accurate)
+            if (sofifaId) {
+                const playerById = jsonData.find(player => 
+                    player.id === sofifaId || player.id === String(sofifaId)
+                );
+                if (playerById) {
+                    console.log(`🎯 Found player by ID in JSON: ${playerById.name}`);
+                    return this.transformJsonPlayerData(playerById);
+                }
+            }
+
+            // Search by name (fuzzy matching)
+            if (playerName) {
+                const normalizedSearchName = playerName.toLowerCase().trim();
+                const playerByName = jsonData.find(player => {
+                    const normalizedPlayerName = player.name.toLowerCase().trim();
+                    return normalizedPlayerName.includes(normalizedSearchName) || 
+                           normalizedSearchName.includes(normalizedPlayerName);
+                });
+                
+                if (playerByName) {
+                    console.log(`🎯 Found player by name in JSON: ${playerByName.name}`);
+                    return this.transformJsonPlayerData(playerByName);
+                }
+            }
+
+            return null;
+        } catch (error) {
+            console.warn('⚠️ Error searching in local JSON:', error.message);
+            return null;
+        }
+    }
+
+    /**
+     * Transform JSON player data to SoFIFA format
+     * @param {Object} jsonPlayer - Player data from JSON
+     * @returns {Object} Transformed player data
+     */
+    static transformJsonPlayerData(jsonPlayer) {
+        return {
+            overall: jsonPlayer.overall || 75,
+            potential: jsonPlayer.potential || jsonPlayer.overall || 75,
+            source: 'local_json',
+            lastUpdated: new Date().toISOString(),
+            sofifaId: jsonPlayer.id,
+            playerName: jsonPlayer.name,
+            age: jsonPlayer.age,
+            nationality: jsonPlayer.nationality,
+            positions: jsonPlayer.positions,
+            height: jsonPlayer.height_cm,
+            weight: jsonPlayer.weight_kg,
+            preferredFoot: jsonPlayer.preferred_foot,
+            weakFoot: jsonPlayer.weak_foot,
+            skillMoves: jsonPlayer.skill_moves,
+            workRate: jsonPlayer.work_rate,
+            pace: jsonPlayer.main_attributes?.pace || 70,
+            shooting: jsonPlayer.main_attributes?.shooting || 70,
+            passing: jsonPlayer.main_attributes?.passing || 70,
+            dribbling: jsonPlayer.main_attributes?.dribbling || 70,
+            defending: jsonPlayer.main_attributes?.defending || 70,
+            physical: jsonPlayer.main_attributes?.physical || 70,
+            detailedSkills: jsonPlayer.detailed_skills || {}
+        };
+    }
+
+    /**
+     * Attempt to fetch player data from SoFIFA (checks local JSON first)
      * @param {string} sofifaUrl - The SoFIFA URL for the player
      * @param {number} sofifaId - The SoFIFA ID for the player
+     * @param {string} playerName - Player name for searching
      * @returns {Promise<Object|null>} Player data or null if failed
      */
-    static async fetchPlayerData(sofifaUrl, sofifaId) {
+    static async fetchPlayerData(sofifaUrl, sofifaId, playerName = null) {
         try {
             // Check cache first
             const cacheKey = `${sofifaId}`;
@@ -28,13 +134,25 @@ export class SofifaIntegration {
                 return cached.data;
             }
 
-            // Check rate limit
+            // PRIORITY 1: Check local JSON file first
+            console.log(`🔍 Checking local JSON file for player: ${playerName || 'ID:' + sofifaId}`);
+            const jsonResult = await this.searchInLocalJson(playerName, sofifaId);
+            if (jsonResult) {
+                // Cache the result
+                this.cache.set(cacheKey, {
+                    data: jsonResult,
+                    timestamp: Date.now()
+                });
+                return jsonResult;
+            }
+
+            // PRIORITY 2: If not found in JSON, check rate limit for external requests
             if (!this.checkRateLimit()) {
                 console.warn('⚠️ Rate limit exceeded for SoFIFA requests');
                 return null;
             }
 
-            console.log(`🌐 Attempting to fetch data from SoFIFA: ${sofifaUrl}`);
+            console.log(`🌐 Player not found in JSON, attempting external SoFIFA fetch: ${sofifaUrl}`);
 
             // Attempt to fetch using multiple strategies
             const strategies = [
