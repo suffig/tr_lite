@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import AlcoholProgressionGraph from '../AlcoholProgressionGraph.jsx';
 
 export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-line no-unused-vars
+  // Sub-navigation state
+  const [activeSection, setActiveSection] = useState('alcohol');
+  
   // Load manager data from localStorage (set via TeamSettingsTab)
   const [managers, setManagers] = useState({
     aek: { name: 'Alexander', age: 30, weight: 110 },
@@ -19,6 +22,13 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
   });
 
   const [drinkingStartTime, setDrinkingStartTime] = useState(null);
+
+  // Blackjack game state
+  const [blackjackGames, setBlackjackGames] = useState({
+    alexander: { wins: 0, losses: 0, totalEarnings: 0 },
+    philip: { wins: 0, losses: 0, totalEarnings: 0 },
+    gameHistory: []
+  });
 
   // Load saved values on component mount
   useEffect(() => {
@@ -56,6 +66,16 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
     const savedStartTime = localStorage.getItem('drinkingStartTime');
     if (savedStartTime) {
       setDrinkingStartTime(savedStartTime);
+    }
+
+    // Load blackjack game data
+    const savedBlackjack = localStorage.getItem('blackjackGames');
+    if (savedBlackjack) {
+      try {
+        setBlackjackGames(JSON.parse(savedBlackjack));
+      } catch (e) {
+        console.error('Error loading blackjack data:', e);
+      }
     }
 
     // Listen for manager settings changes
@@ -258,21 +278,100 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
     }
   };
 
+  // Blackjack game functions
+  const saveBlackjackData = (newData) => {
+    setBlackjackGames(newData);
+    localStorage.setItem('blackjackGames', JSON.stringify(newData));
+  };
+
+  const recordBlackjackGame = (winner, gameType, earnings) => {
+    const loser = winner === 'alexander' ? 'philip' : 'alexander';
+    const timestamp = new Date().toISOString();
+    
+    const newGameData = {
+      ...blackjackGames,
+      [winner]: {
+        ...blackjackGames[winner],
+        wins: blackjackGames[winner].wins + 1,
+        totalEarnings: blackjackGames[winner].totalEarnings + earnings
+      },
+      [loser]: {
+        ...blackjackGames[loser],
+        losses: blackjackGames[loser].losses + 1,
+        totalEarnings: blackjackGames[loser].totalEarnings - earnings
+      },
+      gameHistory: [
+        ...blackjackGames.gameHistory,
+        {
+          id: Date.now(),
+          timestamp,
+          winner,
+          loser,
+          gameType,
+          earnings,
+          dateText: new Date().toLocaleString('de-DE')
+        }
+      ].slice(-20) // Keep only last 20 games
+    };
+    
+    saveBlackjackData(newGameData);
+  };
+
+  const resetBlackjackData = () => {
+    const resetData = {
+      alexander: { wins: 0, losses: 0, totalEarnings: 0 },
+      philip: { wins: 0, losses: 0, totalEarnings: 0 },
+      gameHistory: []
+    };
+    saveBlackjackData(resetData);
+  };
+
   return (
     <div className="p-4 pb-20">
+      {/* Header */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-text-primary mb-4">
-          🍺 Bier-Tracker (Alexander & Philip)
+          🍺🃏 Alkohol & Blackjack Tracker
         </h2>
         <p className="text-text-muted">
-          Verfolgen Sie den Bierkonsum von Alexander und Philip mit individueller BAK-Berechnung.
+          Alexander vs Philip - Getränke und Kartenspiele verfolgen
         </p>
-        {drinkingStartTime && (
-          <div className="mt-2 text-sm text-text-muted">
-            📅 Trinken gestartet vor: {getTimeSinceDrinking()}
-          </div>
-        )}
       </div>
+
+      {/* Sub-Navigation */}
+      <div className="mb-6">
+        <div className="flex bg-gray-100 rounded-lg p-1">
+          <button
+            onClick={() => setActiveSection('alcohol')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+              activeSection === 'alcohol'
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            🍺 Alkohol-Tracker
+          </button>
+          <button
+            onClick={() => setActiveSection('blackjack')}
+            className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-200 ${
+              activeSection === 'blackjack'
+                ? 'bg-white text-red-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            🃏 Blackjack-Tracker
+          </button>
+        </div>
+      </div>
+
+      {/* Alcohol Section */}
+      {activeSection === 'alcohol' && (
+        <>
+          {drinkingStartTime && (
+            <div className="mb-4 text-sm text-text-muted">
+              📅 Trinken gestartet vor: {getTimeSinceDrinking()}
+            </div>
+          )}
 
       {/* Quick Actions */}
       <div className="modern-card mb-6 bg-gradient-to-r from-blue-50 to-green-50 border-2 border-blue-200">
@@ -590,6 +689,216 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
           <li>• Manager-Daten können unter Admin → Team-Verwaltung angepasst werden</li>
         </ul>
       </div>
+        </>
+      )}
+
+      {/* Blackjack Section */}
+      {activeSection === 'blackjack' && (
+        <>
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold text-text-primary mb-2">
+              🃏 Blackjack Arena: Alexander vs Philip
+            </h3>
+            <p className="text-text-muted text-sm">
+              Grundeinsatz: 5€ pro Spiel • Blackjack: 1,5x Auszahlung (7,50€) • Sieg: 1x Auszahlung (5€)
+            </p>
+          </div>
+
+          {/* Game Statistics */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {/* Alexander Stats */}
+            <div className="modern-card bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-bold text-lg text-blue-700 flex items-center gap-2">
+                  🔵 {managers.aek.name}
+                </h4>
+                <div className="text-xs text-blue-600 bg-blue-200 px-2 py-1 rounded-full">
+                  AEK Manager
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-700">Siege:</span>
+                  <span className="font-bold text-green-600">{blackjackGames.alexander.wins}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-700">Niederlagen:</span>
+                  <span className="font-bold text-red-600">{blackjackGames.alexander.losses}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-700">Bilanz:</span>
+                  <span className={`font-bold ${blackjackGames.alexander.totalEarnings >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {blackjackGames.alexander.totalEarnings >= 0 ? '+' : ''}{blackjackGames.alexander.totalEarnings}€
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-blue-700">Siegesrate:</span>
+                  <span className="font-bold text-blue-700">
+                    {blackjackGames.alexander.wins + blackjackGames.alexander.losses > 0 
+                      ? Math.round((blackjackGames.alexander.wins / (blackjackGames.alexander.wins + blackjackGames.alexander.losses)) * 100)
+                      : 0}%
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Philip Stats */}
+            <div className="modern-card bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="font-bold text-lg text-green-700 flex items-center gap-2">
+                  🟢 {managers.real.name}
+                </h4>
+                <div className="text-xs text-green-600 bg-green-200 px-2 py-1 rounded-full">
+                  Real Manager
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-green-700">Siege:</span>
+                  <span className="font-bold text-green-600">{blackjackGames.philip.wins}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-green-700">Niederlagen:</span>
+                  <span className="font-bold text-red-600">{blackjackGames.philip.losses}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-green-700">Bilanz:</span>
+                  <span className={`font-bold ${blackjackGames.philip.totalEarnings >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {blackjackGames.philip.totalEarnings >= 0 ? '+' : ''}{blackjackGames.philip.totalEarnings}€
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-green-700">Siegesrate:</span>
+                  <span className="font-bold text-green-700">
+                    {blackjackGames.philip.wins + blackjackGames.philip.losses > 0 
+                      ? Math.round((blackjackGames.philip.wins / (blackjackGames.philip.wins + blackjackGames.philip.losses)) * 100)
+                      : 0}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Game Action Buttons */}
+          <div className="modern-card mb-6 bg-gradient-to-r from-red-50 to-yellow-50 border-2 border-red-200">
+            <h4 className="font-bold text-lg mb-4 text-red-700 flex items-center gap-2">
+              🎰 Spiel Ausgang eingeben
+            </h4>
+            
+            <div className="space-y-4">
+              <div className="text-center mb-4">
+                <div className="text-2xl mb-2">🃏 vs 🃏</div>
+                <div className="text-sm text-gray-600">Wer hat gewonnen?</div>
+              </div>
+              
+              {/* Alexander Win Buttons */}
+              <div className="space-y-2">
+                <div className="font-medium text-blue-700 text-center">🔵 {managers.aek.name} gewinnt:</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <button
+                    onClick={() => recordBlackjackGame('alexander', 'Blackjack', 7.5)}
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-4 py-3 rounded-lg transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
+                  >
+                    🃏 Blackjack (+7,50€)
+                  </button>
+                  <button
+                    onClick={() => recordBlackjackGame('alexander', 'Einfacher Sieg', 5)}
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-3 rounded-lg transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
+                  >
+                    🏆 Sieg (+5€)
+                  </button>
+                  <button
+                    onClick={() => recordBlackjackGame('alexander', 'Double/Split', 10)}
+                    className="bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white px-4 py-3 rounded-lg transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
+                  >
+                    💎 Double/Split (+10€)
+                  </button>
+                </div>
+              </div>
+
+              {/* Philip Win Buttons */}
+              <div className="space-y-2">
+                <div className="font-medium text-green-700 text-center">🟢 {managers.real.name} gewinnt:</div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <button
+                    onClick={() => recordBlackjackGame('philip', 'Blackjack', 7.5)}
+                    className="bg-gradient-to-r from-green-600 to-purple-600 hover:from-green-700 hover:to-purple-700 text-white px-4 py-3 rounded-lg transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
+                  >
+                    🃏 Blackjack (+7,50€)
+                  </button>
+                  <button
+                    onClick={() => recordBlackjackGame('philip', 'Einfacher Sieg', 5)}
+                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-4 py-3 rounded-lg transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
+                  >
+                    🏆 Sieg (+5€)
+                  </button>
+                  <button
+                    onClick={() => recordBlackjackGame('philip', 'Double/Split', 10)}
+                    className="bg-gradient-to-r from-green-700 to-emerald-700 hover:from-green-800 hover:to-emerald-800 text-white px-4 py-3 rounded-lg transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg transform hover:scale-105"
+                  >
+                    💎 Double/Split (+10€)
+                  </button>
+                </div>
+              </div>
+
+              {/* Reset Button */}
+              <div className="pt-4 border-t border-gray-200">
+                <button
+                  onClick={resetBlackjackData}
+                  className="w-full bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-4 py-2 rounded-lg transition-all duration-200 font-medium text-sm shadow-md hover:shadow-lg"
+                >
+                  🔄 Statistiken zurücksetzen
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Game History */}
+          {blackjackGames.gameHistory.length > 0 && (
+            <div className="modern-card">
+              <h4 className="font-bold text-lg mb-4 text-gray-700 flex items-center gap-2">
+                📜 Spielverlauf (letzte 20 Spiele)
+              </h4>
+              
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {blackjackGames.gameHistory.slice().reverse().map((game) => (
+                  <div key={game.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <span className={`text-lg ${game.winner === 'alexander' ? 'text-blue-600' : 'text-green-600'}`}>
+                        {game.winner === 'alexander' ? '🔵' : '🟢'}
+                      </span>
+                      <div>
+                        <div className="font-medium">
+                          {game.winner === 'alexander' ? managers.aek.name : managers.real.name} gewinnt
+                        </div>
+                        <div className="text-xs text-gray-500">{game.dateText}</div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold text-green-600">+{game.earnings}€</div>
+                      <div className="text-xs text-gray-500">{game.gameType}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Blackjack Info */}
+          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <h4 className="font-medium text-red-800 mb-2">🃏 Blackjack Regeln</h4>
+            <ul className="text-sm text-red-700 space-y-1">
+              <li>• Grundeinsatz: 5€ pro Spiel</li>
+              <li>• Blackjack (21 mit 2 Karten): 1,5x Auszahlung = 7,50€ Gewinn</li>
+              <li>• Einfacher Sieg: 1x Auszahlung = 5€ Gewinn</li>
+              <li>• Double Down/Split Sieg: 2x Auszahlung = 10€ Gewinn</li>
+              <li>• Der Verlierer zahlt den entsprechenden Betrag</li>
+            </ul>
+          </div>
+        </>
+      )}
     </div>
   );
 }

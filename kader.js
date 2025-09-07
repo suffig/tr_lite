@@ -462,11 +462,11 @@ function renderEhemaligeList(containerId = "ehemalige-players") {
                     <h3 class="card-title">${player.name}</h3>
                     <span class="fifa-indicator" title="Click for FIFA stats">🎮</span>
                 </div>
-                <div class="text-xl font-bold text-gray-600">${marktwert ? marktwert + 'M €' : 'N/A'}</div>
+                <div class="text-xl font-bold text-gray-600">${marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'N/A'}</div>
             </div>
             <div class="card-content">
                 <p class="text-sm text-gray-500">Status: Ehemaliger Spieler</p>
-                <p class="text-sm text-gray-500">Marktwert: ${marktwert ? marktwert + 'M €' : 'Nicht bewertet'}</p>
+                <p class="text-sm text-gray-500">Marktwert: ${marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'Nicht bewertet'}</p>
                 <p class="text-xs text-blue-400 fifa-hint">
                     <i class="fas fa-info-circle"></i>
                     Click to view FIFA statistics
