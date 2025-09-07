@@ -8,6 +8,7 @@ export default function DeleteTab() {
   const [activeSection, setActiveSection] = useState('players');
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedMatches, setSelectedMatches] = useState(new Set());
 
   // Data queries - sorted by newest first
   const { data: players, refetch: refetchPlayers } = useSupabaseQuery('players', '*', {
@@ -30,7 +31,7 @@ export default function DeleteTab() {
 
   const sections = [
     { id: 'players', label: 'Spieler löschen', icon: 'fas fa-users' },
-    { id: 'matches', label: 'Spiele löschen', icon: 'fas fa-futbol' },
+    { id: 'matches', label: 'Spiele löschen (Einzel & Bulk)', icon: 'fas fa-futbol' },
     { id: 'bans', label: 'Sperren löschen', icon: 'fas fa-ban' },
     { id: 'transactions', label: 'Transaktionen löschen', icon: 'fas fa-euro-sign' },
   ];
@@ -39,6 +40,98 @@ export default function DeleteTab() {
   const handleSectionChange = (sectionId) => {
     setActiveSection(sectionId);
     setSearchQuery('');
+    setSelectedMatches(new Set()); // Clear selection when switching sections
+  };
+
+  // Match selection handlers
+  const handleMatchSelection = (matchId, isSelected) => {
+    const newSelection = new Set(selectedMatches);
+    if (isSelected) {
+      newSelection.add(matchId);
+    } else {
+      newSelection.delete(matchId);
+    }
+    setSelectedMatches(newSelection);
+  };
+
+  const handleSelectAllMatches = (matches) => {
+    const filteredMatches = filterMatches(matches);
+    if (selectedMatches.size === filteredMatches.length) {
+      // Deselect all
+      setSelectedMatches(new Set());
+    } else {
+      // Select all
+      setSelectedMatches(new Set(filteredMatches.map(m => m.id)));
+    }
+  };
+
+  const handleBulkDeleteSelected = async () => {
+    if (selectedMatches.size === 0) {
+      toast.error('Keine Spiele ausgewählt');
+      return;
+    }
+
+    const selectedMatchObjects = matches?.filter(m => selectedMatches.has(m.id)) || [];
+    const totalTransactions = selectedMatchObjects.reduce((count, match) => {
+      return count + (transactions?.filter(t => t.match_id === match.id).length || 0);
+    }, 0);
+
+    let confirmMessage = `Sind Sie sicher, dass Sie ${selectedMatches.size} ausgewählte Spiele löschen möchten?`;
+    if (totalTransactions > 0) {
+      confirmMessage += `\n\nAchtung: ${totalTransactions} zugehörige Transaktion(en) werden ebenfalls gelöscht.`;
+    }
+    confirmMessage += '\n\nDieser Vorgang kann nicht rückgängig gemacht werden!';
+
+    if (!confirm(confirmMessage)) return;
+
+    setLoading(true);
+    let deletedCount = 0;
+    let failedCount = 0;
+
+    try {
+      const { deleteMatch } = await import('../../../../matches.js');
+      
+      // Delete matches one by one to handle individual errors
+      for (const matchId of selectedMatches) {
+        try {
+          console.log(`Deleting match ${matchId}`);
+          await deleteMatch(matchId);
+          deletedCount++;
+        } catch (error) {
+          console.error(`Failed to delete match ${matchId}:`, error);
+          failedCount++;
+        }
+      }
+
+      // Clear selection after operation
+      setSelectedMatches(new Set());
+
+      // Show results
+      if (deletedCount > 0 && failedCount === 0) {
+        toast.success(`Alle ${deletedCount} Spiele erfolgreich gelöscht`);
+      } else if (deletedCount > 0 && failedCount > 0) {
+        toast.success(`${deletedCount} Spiele gelöscht, ${failedCount} fehlgeschlagen`);
+      } else {
+        toast.error(`Alle ${failedCount} Löschvorgänge fehlgeschlagen`);
+      }
+
+      // Refresh data
+      refetchMatches();
+      refetchTransactions();
+      
+      // Force refresh after delay
+      setTimeout(() => {
+        refetchMatches();
+        refetchTransactions();
+      }, 1000);
+
+    } catch (error) {
+      console.error('Bulk delete error:', error);
+      toast.error('Fehler beim Bulk-Löschen: ' + error.message);
+      setSelectedMatches(new Set());
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Get counts for current section
@@ -113,16 +206,40 @@ export default function DeleteTab() {
     
     setLoading(true);
     try {
-      // Use the existing deleteMatch function from matches.js
+      // Use the comprehensive deleteMatch function from matches.js
       const { deleteMatch } = await import('../../../../matches.js');
+      console.log(`Attempting to delete match ${match.id}`);
       await deleteMatch(match.id);
+      console.log(`Successfully deleted match ${match.id}`);
       toast.success('Spiel erfolgreich gelöscht');
+      
+      // Refresh all data to ensure UI is updated
       refetchMatches();
-      if (relatedTransactions.length > 0) {
-        refetchTransactions(); // Refresh transactions in case they were deleted
-      }
+      refetchTransactions();
+      
+      // Also refresh other data that might be affected
+      setTimeout(() => {
+        // Force a full data refresh after a short delay to ensure all changes are reflected
+        refetchMatches();
+        refetchTransactions();
+      }, 1000);
+      
     } catch (error) {
-      toast.error('Fehler beim Löschen des Spiels: ' + error.message);
+      console.error('Error deleting match:', error);
+      
+      // Provide more specific error messages based on the error type
+      let errorMessage = 'Fehler beim Löschen des Spiels: ';
+      if (error.message.includes('not found')) {
+        errorMessage += `Spiel mit ID ${match.id} wurde nicht in der Datenbank gefunden. Möglicherweise wurde es bereits gelöscht.`;
+      } else if (error.message.includes('Invalid match ID')) {
+        errorMessage += `Ungültige Spiel-ID: ${match.id}`;
+      } else if (error.message.includes('fetch failed') || error.message.includes('network')) {
+        errorMessage += 'Netzwerkfehler. Bitte überprüfen Sie Ihre Internetverbindung.';
+      } else {
+        errorMessage += error.message;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -281,34 +398,87 @@ export default function DeleteTab() {
       </p>;
     }
 
+    const allSelected = filteredMatches.length > 0 && filteredMatches.every(match => selectedMatches.has(match.id));
+    const someSelected = selectedMatches.size > 0;
+
     return (
-      <div className="space-y-2">
-        {filteredMatches.map((match) => (
-          <div key={match.id} className="flex items-center justify-between p-3 bg-bg-tertiary rounded-lg">
-            <div>
-              <h4 className="font-medium text-text-primary">
-                {new Date(match.date).toLocaleDateString('de-DE')}
-              </h4>
-              <p className="text-sm text-text-muted">
-                AEK {match.goalsa || 0} - {match.goalsb || 0} Real
-              </p>
-              {match.manofthematch && (
-                <p className="text-xs text-text-muted mt-1">
-                  <i className="fas fa-star mr-1"></i>
-                  SdS: {match.manofthematch}
-                </p>
-              )}
-            </div>
+      <div className="space-y-4">
+        {/* Bulk actions header */}
+        <div className="flex items-center justify-between p-3 bg-bg-secondary rounded-lg border">
+          <div className="flex items-center space-x-3">
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={allSelected}
+                onChange={() => handleSelectAllMatches(matches)}
+                className="w-4 h-4 text-accent-primary focus:ring-accent-primary border-gray-300 rounded"
+              />
+              <span className="text-sm text-text-primary">
+                {allSelected ? 'Alle abwählen' : 'Alle auswählen'} ({filteredMatches.length})
+              </span>
+            </label>
+            {selectedMatches.size > 0 && (
+              <span className="text-sm text-accent-primary font-medium">
+                {selectedMatches.size} ausgewählt
+              </span>
+            )}
+          </div>
+          
+          {someSelected && (
             <button
-              onClick={() => handleDeleteMatch(match)}
+              onClick={handleBulkDeleteSelected}
               disabled={loading}
-              className="btn-secondary btn-sm text-accent-red hover:bg-red-50 disabled:opacity-50"
+              className="btn-primary btn-sm bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
             >
               <i className="fas fa-trash mr-1"></i>
-              Löschen
+              {selectedMatches.size} Spiele löschen
             </button>
-          </div>
-        ))}
+          )}
+        </div>
+
+        {/* Matches list */}
+        <div className="space-y-2">
+          {filteredMatches.map((match) => (
+            <div key={match.id} className="flex items-center space-x-3 p-3 bg-bg-tertiary rounded-lg">
+              <label className="flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={selectedMatches.has(match.id)}
+                  onChange={(e) => handleMatchSelection(match.id, e.target.checked)}
+                  className="w-4 h-4 text-accent-primary focus:ring-accent-primary border-gray-300 rounded"
+                />
+              </label>
+              
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-text-primary">
+                      ID {match.id} • {new Date(match.date).toLocaleDateString('de-DE')}
+                    </h4>
+                    <p className="text-sm text-text-muted">
+                      AEK {match.goalsa || 0} - {match.goalsb || 0} Real
+                    </p>
+                    {match.manofthematch && (
+                      <p className="text-xs text-text-muted mt-1">
+                        <i className="fas fa-star mr-1"></i>
+                        SdS: {match.manofthematch}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <button
+                    onClick={() => handleDeleteMatch(match)}
+                    disabled={loading}
+                    className="btn-secondary btn-sm text-accent-red hover:bg-red-50 disabled:opacity-50"
+                  >
+                    <i className="fas fa-trash mr-1"></i>
+                    Einzeln löschen
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   };
