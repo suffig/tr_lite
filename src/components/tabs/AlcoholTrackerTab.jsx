@@ -4,7 +4,6 @@ import LoadingSpinner from '../LoadingSpinner';
 import { 
   loadCalculatorValues, 
   updateCalculatorValues, 
-  setDrinkingStartTime,
   getHoursSinceDrinkingStarted,
   updateCumulativeShotsFromMatches
 } from '../../utils/alcoholCalculatorPersistence';
@@ -16,7 +15,16 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
     mode: 'automatic',
     aekGoals: 0,
     realGoals: 0,
-    beerCount: 0
+    beerCount: 0,
+    // Individual tracking for Alexander and Philip
+    alexanderShots: {
+      cl40: 0, // 2cl shots at 40% alcohol
+      cl20: 0  // 2cl shots at 20% alcohol
+    },
+    philipShots: {
+      cl40: 0, // 2cl shots at 40% alcohol
+      cl20: 0  // 2cl shots at 20% alcohol
+    }
   });
   
   const { data: matches, loading } = useSupabaseQuery(
@@ -40,6 +48,23 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
     const newValues = { ...calculatorValues, [key]: value };
     setCalculatorValues(newValues);
     updateCalculatorValues(newValues);
+  };
+
+  // Function to add shots for specific person
+  const addShotForPerson = (person, shotType) => {
+    const newValues = { ...calculatorValues };
+    newValues[`${person}Shots`][shotType] += 1;
+    setCalculatorValues(newValues);
+    updateCalculatorValues(newValues);
+  };
+
+  // Function to calculate individual alcohol consumption
+  const calculatePersonAlcohol = (personShots) => {
+    // 2cl at 40% = 2 * 0.4 = 0.8cl pure alcohol
+    // 2cl at 20% = 2 * 0.2 = 0.4cl pure alcohol
+    const alcohol40 = personShots.cl40 * 2 * 0.4;
+    const alcohol20 = personShots.cl20 * 2 * 0.2;
+    return alcohol40 + alcohol20;
   };
 
   // Helper function to get recent matches (last two days)
@@ -230,6 +255,63 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
         </div>
       </div>
 
+      {/* Individual Schnaps Tracking for Alexander and Philip */}
+      <div className="modern-card mb-6">
+        <h3 className="font-bold text-lg mb-4">👨‍🍻 Individuelle Schnaps-Tracker</h3>
+        
+        {/* Alexander Section */}
+        <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <h4 className="font-semibold text-blue-700 mb-3">🔵 Alexander</h4>
+          <div className="grid grid-cols-2 gap-4 mb-3">
+            <button
+              onClick={() => addShotForPerson('alexander', 'cl40')}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+            >
+              + 2cl (40%)
+            </button>
+            <button
+              onClick={() => addShotForPerson('alexander', 'cl20')}
+              className="bg-blue-400 hover:bg-blue-500 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+            >
+              + 2cl (20%)
+            </button>
+          </div>
+          <div className="text-sm text-blue-700">
+            <div>40% Shots: {calculatorValues.alexanderShots.cl40} × 2cl</div>
+            <div>20% Shots: {calculatorValues.alexanderShots.cl20} × 2cl</div>
+            <div className="font-semibold mt-1">
+              Gesamt: {calculatePersonAlcohol(calculatorValues.alexanderShots).toFixed(1)}cl reiner Alkohol
+            </div>
+          </div>
+        </div>
+
+        {/* Philip Section */}
+        <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+          <h4 className="font-semibold text-green-700 mb-3">🟢 Philip</h4>
+          <div className="grid grid-cols-2 gap-4 mb-3">
+            <button
+              onClick={() => addShotForPerson('philip', 'cl40')}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+            >
+              + 2cl (40%)
+            </button>
+            <button
+              onClick={() => addShotForPerson('philip', 'cl20')}
+              className="bg-green-400 hover:bg-green-500 text-white px-4 py-2 rounded-lg transition-colors font-medium"
+            >
+              + 2cl (20%)
+            </button>
+          </div>
+          <div className="text-sm text-green-700">
+            <div>40% Shots: {calculatorValues.philipShots.cl40} × 2cl</div>
+            <div>20% Shots: {calculatorValues.philipShots.cl20} × 2cl</div>
+            <div className="font-semibold mt-1">
+              Gesamt: {calculatePersonAlcohol(calculatorValues.philipShots).toFixed(1)}cl reiner Alkohol
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* BAC Calculator */}
       <div className="modern-card">
         <h3 className="font-bold text-lg mb-4">🩸 Blutalkohol-Rechner (BAK)</h3>
@@ -285,27 +367,6 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
               Geschätzte Blutalkoholkonzentration
             </div>
           </div>
-        </div>
-
-        <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <div className="text-sm text-yellow-800">
-            <strong>Hinweis:</strong> BAK-Berechnung ist eine Näherung (Widmark-Formel) mit Alkoholabbau (~0.15‰/h). 
-            Exakte Werte können abweichen. Automatischer Modus berücksichtigt Zeit seit letztem Spiel.
-          </div>
-        </div>
-
-        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <div className="text-sm text-red-800">
-            <strong>Wichtig:</strong> Dies ist nur eine grobe Orientierung. Individuelle Faktoren können stark abweichen. 
-            Bei hohen Werten bitte medizinische Hilfe suchen!
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-6 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <div className="text-sm text-yellow-800">
-          <strong>Regeln:</strong> Für jedes zweite Tor muss der Gegner 2cl Schnaps (40%) trinken. 
-          0,5L Bier (5% Alkohol) entspricht 2,5cl reinem Alkohol.
         </div>
       </div>
     </div>
