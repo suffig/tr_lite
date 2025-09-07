@@ -260,7 +260,7 @@ export class FIFADataService {
         if (mockData && options.useLiveData && mockData.sofifaUrl) {
             try {
                 console.log('🌐 Attempting to fetch live data from SoFIFA...');
-                const liveData = await SofifaIntegration.fetchPlayerData(mockData.sofifaUrl, mockData.sofifaId);
+                const liveData = await SofifaIntegration.fetchPlayerData(mockData.sofifaUrl, mockData.sofifaId, cleanPlayerName);
                 
                 if (liveData) {
                     // Merge live data with mock data (live data takes precedence)
@@ -572,7 +572,8 @@ export class FIFADataService {
             const startTime = Date.now();
             const result = await SofifaIntegration.fetchPlayerData(
                 playerData.sofifaUrl, 
-                playerData.sofifaId
+                playerData.sofifaId,
+                playerData.name
             );
             const endTime = Date.now();
 
