@@ -160,12 +160,12 @@ const AlcoholProgressionGraph = ({ managers, beerConsumption, shotConsumption, d
   };
 
   const SVGGraph = () => {
-    // Responsive dimensions
+    // Enhanced responsive dimensions for better mobile experience
     const isMobile = window.innerWidth < 768;
-    const width = isMobile ? Math.min(window.innerWidth - 40, 400) : 900;
-    const height = isMobile ? 250 : 400;
+    const width = isMobile ? Math.min(window.innerWidth - 32, 450) : 900;
+    const height = isMobile ? 280 : 400;
     const margin = isMobile 
-      ? { top: 30, right: 50, bottom: 50, left: 40 }
+      ? { top: 35, right: 45, bottom: 55, left: 45 }
       : { top: 40, right: 100, bottom: 60, left: 60 };
     const chartWidth = width - margin.left - margin.right;
     const chartHeight = height - margin.top - margin.bottom;
@@ -320,19 +320,25 @@ const AlcoholProgressionGraph = ({ managers, beerConsumption, shotConsumption, d
             <circle
               cx={x}
               cy={-15}
-              r={isMobile ? "6" : "8"}
+              r={isMobile ? "8" : "10"}
               fill={iconColor}
               stroke="white"
-              strokeWidth="2"
+              strokeWidth={isMobile ? "2" : "3"}
+              style={{
+                filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))'
+              }}
             />
             {/* Drink icon */}
             <text
               x={x}
-              y={isMobile ? "-12" : "-10"}
+              y={isMobile ? "-10" : "-7"}
               textAnchor="middle"
-              fontSize={isMobile ? "8" : "10"}
+              fontSize={isMobile ? "11" : "13"}
               fill="white"
               className="font-bold"
+              style={{
+                filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+              }}
             >
               {icon}
             </text>
@@ -343,8 +349,10 @@ const AlcoholProgressionGraph = ({ managers, beerConsumption, shotConsumption, d
     });
 
     return (
-      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-2 md:p-4 overflow-x-auto">
-        <svg width={width} height={height} className="overflow-visible mx-auto block">
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-3 md:p-4 overflow-x-auto">
+        <svg width={width} height={height} className="overflow-visible mx-auto block"
+             viewBox={isMobile ? `0 0 ${width} ${height}` : undefined}
+             style={isMobile ? { maxWidth: '100%', height: 'auto' } : {}}>
           {/* Background gradient */}
           <defs>
             <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -519,24 +527,27 @@ const AlcoholProgressionGraph = ({ managers, beerConsumption, shotConsumption, d
           )}
         </svg>
         
-        {/* Mobile Legend */}
+        {/* Enhanced Mobile Legend */}
         {isMobile && (
-          <div className="mt-4 grid grid-cols-2 gap-2 text-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-1 bg-blue-500 rounded"></div>
-              <span>Alexander</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-1 bg-green-500 rounded"></div>
-              <span>Philip</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-purple-500">🍺</span>
-              <span>Bier</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-orange-500">🥃</span>
-              <span>Shots</span>
+          <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+            <div className="text-sm font-medium text-gray-700 mb-2 text-center">Legende</div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex items-center gap-2 justify-center">
+                <div className="w-5 h-2 bg-blue-500 rounded-full"></div>
+                <span className="text-sm">Alexander</span>
+              </div>
+              <div className="flex items-center gap-2 justify-center">
+                <div className="w-5 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-sm">Philip</span>
+              </div>
+              <div className="flex items-center gap-2 justify-center">
+                <span className="text-lg">🍺</span>
+                <span className="text-sm">Bier</span>
+              </div>
+              <div className="flex items-center gap-2 justify-center">
+                <span className="text-lg">🥃</span>
+                <span className="text-sm">Shots</span>
+              </div>
             </div>
           </div>
         )}
@@ -623,21 +634,65 @@ const AlcoholProgressionGraph = ({ managers, beerConsumption, shotConsumption, d
             </div>
           </div>
 
-          {/* Drink Events Timeline */}
+          {/* Enhanced Drink Events Timeline with Icons */}
           {drinkEvents.length > 0 && (
             <div className="mt-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
-              <div className="font-medium text-purple-800 mb-2">🍺 Getränke-Timeline</div>
-              <div className="text-purple-700 text-sm space-y-1 max-h-24 overflow-y-auto">
-                {drinkEvents.slice(-5).reverse().map((event, i) => (
-                  <div key={i} className="flex justify-between">
-                    <span>{new Date(event.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}</span>
-                    <span>
-                      {event.alexanderChange > 0 && `Alexander: +${event.alexanderChange}`}
-                      {event.alexanderChange > 0 && event.philipChange > 0 && ', '}
-                      {event.philipChange > 0 && `Philip: +${event.philipChange}`}
-                    </span>
-                  </div>
-                ))}
+              <div className="font-medium text-purple-800 mb-3 flex items-center gap-2">
+                <span className="text-lg">🍺</span>
+                <span>Getränke-Timeline (letzte 5)</span>
+              </div>
+              <div className="space-y-2 max-h-32 overflow-y-auto custom-scrollbar">
+                {drinkEvents.slice(-5).reverse().map((event, i) => {
+                  // Determine what drinks were consumed
+                  const alexanderBeers = event.beers?.alexander || 0;
+                  const philipBeers = event.beers?.philip || 0;
+                  const alexanderShots = (event.shots?.alexander?.shots20 || 0) + (event.shots?.alexander?.shots40 || 0);
+                  const philipShots = (event.shots?.philip?.shots20 || 0) + (event.shots?.philip?.shots40 || 0);
+                  
+                  return (
+                    <div key={i} className="flex justify-between items-center p-2 bg-white rounded-md border border-purple-100">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-purple-600 font-mono">
+                          {new Date(event.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {/* Alexander's drinks */}
+                        {event.alexanderChange > 0 && (
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-blue-600 font-medium">Alex:</span>
+                            {alexanderBeers > 0 && (
+                              <span className="flex items-center text-sm">
+                                🍺<span className="text-xs text-blue-600 ml-0.5">+{event.alexanderChange}</span>
+                              </span>
+                            )}
+                            {alexanderShots > 0 && (
+                              <span className="flex items-center text-sm">
+                                🥃<span className="text-xs text-blue-600 ml-0.5">+{event.alexanderChange}</span>
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        {/* Philip's drinks */}
+                        {event.philipChange > 0 && (
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-green-600 font-medium">Phil:</span>
+                            {philipBeers > 0 && (
+                              <span className="flex items-center text-sm">
+                                🍺<span className="text-xs text-green-600 ml-0.5">+{event.philipChange}</span>
+                              </span>
+                            )}
+                            {philipShots > 0 && (
+                              <span className="flex items-center text-sm">
+                                🥃<span className="text-xs text-green-600 ml-0.5">+{event.philipChange}</span>
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
