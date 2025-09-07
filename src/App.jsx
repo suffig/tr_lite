@@ -2,7 +2,6 @@ import { useState, Suspense, lazy, useEffect } from 'react';
 import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './hooks/useAuth';
-import useTouchGestures from './hooks/useTouchGestures';
 import { OfflineIndicator } from './hooks/useOfflineManager.jsx';
 import Login from './components/Login';
 import BottomNavigation from './components/BottomNavigation';
@@ -64,9 +63,6 @@ function App() {
       }, 300);
     }
   };
-
-  // Enable touch gestures for mobile navigation
-  useTouchGestures(handleTabChange, activeTab);
 
   // Global search shortcut and event listener
   useEffect(() => {

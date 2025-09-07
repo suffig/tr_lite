@@ -6,7 +6,7 @@ export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-u
   const [expandedMatches, setExpandedMatches] = useState(new Set());
   const [timeFilter, setTimeFilter] = useState('4weeks'); // '1week', '4weeks', '3months', 'all'
   const [dateFilter, setDateFilter] = useState('');
-  const [resultFilter, setResultFilter] = useState('all'); // 'all', 'aek-wins', 'real-wins', 'draws'
+  const [resultFilter, setResultFilter] = useState('all'); // 'all', 'aek-wins', 'real-wins'
   const [goalFilter, setGoalFilter] = useState('all'); // 'all', 'high-scoring', 'low-scoring'
   
   const { data: allMatches, loading, error, refetch } = useSupabaseQuery(
@@ -63,8 +63,6 @@ export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-u
             return aekGoals > realGoals;
           case 'real-wins':
             return realGoals > aekGoals;
-          case 'draws':
-            return aekGoals === realGoals;
           default:
             return true;
         }
@@ -241,7 +239,6 @@ export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-u
               <option value="all">Alle Ergebnisse</option>
               <option value="aek-wins">🔵 AEK Siege</option>
               <option value="real-wins">🔴 Real Siege</option>
-              <option value="draws">⚡ Unentschieden</option>
             </select>
           </div>
           

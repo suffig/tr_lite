@@ -57,10 +57,8 @@ class StatsCalculator {
       } else if (realGoals > aekGoals) {
         aekForm.push('L');
         realForm.push('W');
-      } else {
-        aekForm.push('D');
-        realForm.push('D');
       }
+      // Note: FIFA games cannot end in draws, so no draw handling needed
     });
 
     return { aek: aekForm, real: realForm };
@@ -358,11 +356,6 @@ export default function StatsTab({ onNavigate }) {
   const aekPlayers = players?.filter(p => p.team === 'AEK') || [];
   const realPlayers = players?.filter(p => p.team === 'Real') || [];
 
-  // Calculate market values
-  const aekMarketValue = aekPlayers.reduce((total, player) => total + (player.value || 0), 0);
-  const realMarketValue = realPlayers.reduce((total, player) => total + (player.value || 0), 0);
-  const totalMarketValue = aekMarketValue + realMarketValue;
-
   // Calculate wins per team 
   const aekWins = teamRecords.aek.wins;
   const realWins = teamRecords.real.wins;
@@ -373,8 +366,7 @@ export default function StatsTab({ onNavigate }) {
         key={index}
         className={`inline-block w-6 h-6 text-xs font-bold rounded-full text-center leading-6 mx-0.5 ${
           result === 'W' ? 'bg-green-500 text-white' :
-          result === 'L' ? 'bg-red-500 text-white' :
-          'bg-gray-400 text-white'
+          'bg-red-500 text-white'
         }`}
       >
         {result}
@@ -618,10 +610,8 @@ export default function StatsTab({ onNavigate }) {
                       if (currentRealStreak > maxStreak) {
                         maxStreak = currentRealStreak;
                       }
-                    } else {
-                      currentAekStreak = 0;
-                      currentRealStreak = 0;
                     }
+                    // Note: FIFA games cannot end in draws
                   });
                   
                   return maxStreak;
@@ -653,10 +643,8 @@ export default function StatsTab({ onNavigate }) {
                         maxStreak = currentRealStreak;
                         maxTeam = 'Real';
                       }
-                    } else {
-                      currentAekStreak = 0;
-                      currentRealStreak = 0;
                     }
+                    // Note: FIFA games cannot end in draws
                   });
                   
                   return maxTeam || 'Keine';
@@ -950,11 +938,6 @@ export default function StatsTab({ onNavigate }) {
             <div className="text-xs text-text-muted mt-1">in einem einzelnen Spiel</div>
           </div>
           <div className="text-center p-4 bg-bg-secondary rounded-lg">
-            <div className="text-2xl font-bold text-primary-green">{totalMatches - aekWins - realWins}</div>
-            <div className="text-sm text-text-muted">Unentschieden</div>
-            <div className="text-xs text-text-muted mt-1">spannende Duelle</div>
-          </div>
-          <div className="text-center p-4 bg-bg-secondary rounded-lg">
             <div className="text-2xl font-bold text-accent-orange">{Math.abs(aekWins - realWins)}</div>
             <div className="text-sm text-text-muted">Siegesdifferenz</div>
             <div className="text-xs text-text-muted mt-1">zwischen den Teams</div>
@@ -1044,15 +1027,6 @@ export default function StatsTab({ onNavigate }) {
               {headToHead.totalMatches > 0 ? `${((headToHead.realWins / headToHead.totalMatches) * 100).toFixed(1)}%` : '0%'}
             </div>
           </div>
-          <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <div className="text-2xl font-bold text-gray-600">
-              {headToHead.totalMatches - headToHead.aekWins - headToHead.realWins}
-            </div>
-            <div className="text-sm text-gray-700">Unentschieden</div>
-            <div className="text-xs text-text-muted mt-1">
-              {headToHead.totalMatches > 0 ? `${(((headToHead.totalMatches - headToHead.aekWins - headToHead.realWins) / headToHead.totalMatches) * 100).toFixed(1)}%` : '0%'}
-            </div>
-          </div>
           <div className="text-center p-4 bg-green-50 rounded-lg">
             <div className="text-2xl font-bold text-green-600">{headToHead.aekGoals + headToHead.realGoals}</div>
             <div className="text-sm text-green-700">Tore gesamt</div>
@@ -1112,10 +1086,6 @@ export default function StatsTab({ onNavigate }) {
               <div className="flex justify-between">
                 <span>Spiele gespielt:</span>
                 <span className="font-medium">{totalMatches}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Unentschieden:</span>
-                <span className="font-medium">{totalMatches - aekWins - realWins}</span>
               </div>
               <div className="flex justify-between">
                 <span>Längste Serie:</span>
