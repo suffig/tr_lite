@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import LoadingSpinner from '../LoadingSpinner';
 
 export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-line no-unused-vars
   // Load manager data from localStorage (set via TeamSettingsTab)
@@ -14,7 +13,6 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
   });
 
   const [drinkingStartTime, setDrinkingStartTime] = useState(null);
-  const [loading, setLoading] = useState(false);
 
   // Load saved values on component mount
   useEffect(() => {
@@ -142,10 +140,6 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
       return `${hoursElapsed.toFixed(1)} Stunden`;
     }
   };
-
-  if (loading) {
-    return <LoadingSpinner message="Lade Alkohol-Tracker..." />;
-  }
 
   return (
     <div className="p-4 pb-20">
