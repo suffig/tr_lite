@@ -2400,25 +2400,94 @@ export class FIFADataService {
      */
     static performFuzzyMatch(playerName) {
         const searchTerms = playerName.toLowerCase().split(' ');
+        const matches = [];
         
         for (const [dbName, data] of Object.entries(this.fifaDatabase)) {
             // Normalize the database name (remove accents, special characters)
             const dbNameNormalized = this.normalizeString(dbName.toLowerCase());
             const dbTerms = dbNameNormalized.split(' ');
             
-            // Check if all search terms are found in database name
-            const allTermsFound = searchTerms.every(term => {
-                const normalizedTerm = this.normalizeString(term);
-                return dbTerms.some(dbTerm => 
-                    dbTerm.includes(normalizedTerm) || 
-                    normalizedTerm.includes(dbTerm) ||
-                    this.calculateSimilarity(normalizedTerm, dbTerm) > 0.7
-                );
+            let score = 0;
+            let matchedTerms = 0;
+            
+            // Score based on term matching
+            searchTerms.forEach(searchTerm => {
+                const normalizedTerm = this.normalizeString(searchTerm);
+                let bestTermScore = 0;
+                
+                dbTerms.forEach(dbTerm => {
+                    let termScore = 0;
+                    
+                    // Exact match gets highest score
+                    if (dbTerm === normalizedTerm) {
+                        termScore = 1.0;
+                    }
+                    // Check if one contains the other (for partial matches)
+                    else if (dbTerm.includes(normalizedTerm) || normalizedTerm.includes(dbTerm)) {
+                        // Give higher score for longer matches
+                        const minLength = Math.min(dbTerm.length, normalizedTerm.length);
+                        const maxLength = Math.max(dbTerm.length, normalizedTerm.length);
+                        termScore = minLength / maxLength * 0.9;
+                    }
+                    // Use similarity calculation as fallback
+                    else {
+                        const similarity = this.calculateSimilarity(normalizedTerm, dbTerm);
+                        if (similarity > 0.6) {
+                            termScore = similarity * 0.8;
+                        }
+                    }
+                    
+                    bestTermScore = Math.max(bestTermScore, termScore);
+                });
+                
+                if (bestTermScore > 0.5) {
+                    matchedTerms++;
+                    score += bestTermScore;
+                }
             });
             
-            if (allTermsFound) {
-                return { name: dbName, data };
+            // Special handling for single term searches (likely last names)
+            if (searchTerms.length === 1) {
+                const singleTerm = this.normalizeString(searchTerms[0]);
+                
+                // Check if the search term matches any part of the database name
+                dbTerms.forEach(dbTerm => {
+                    if (dbTerm.includes(singleTerm) || singleTerm.includes(dbTerm)) {
+                        // Boost score for single term matches (common for last name searches)
+                        const similarity = Math.min(singleTerm.length, dbTerm.length) / Math.max(singleTerm.length, dbTerm.length);
+                        score = Math.max(score, similarity * 1.2);
+                        matchedTerms = Math.max(matchedTerms, 1);
+                    }
+                });
             }
+            
+            // Calculate final score (normalize by number of search terms)
+            const finalScore = searchTerms.length > 0 ? score / searchTerms.length : 0;
+            
+            // Accept if we have a good match or if we matched most terms
+            if (finalScore > 0.6 || (matchedTerms >= Math.ceil(searchTerms.length * 0.7) && finalScore > 0.4)) {
+                matches.push({
+                    name: dbName,
+                    data: data,
+                    score: finalScore,
+                    matchedTerms: matchedTerms
+                });
+            }
+        }
+        
+        // Return the best match if any found
+        if (matches.length > 0) {
+            matches.sort((a, b) => {
+                // First sort by score, then by number of matched terms
+                if (Math.abs(a.score - b.score) < 0.1) {
+                    return b.matchedTerms - a.matchedTerms;
+                }
+                return b.score - a.score;
+            });
+            
+            const bestMatch = matches[0];
+            console.log(`🎯 Found fuzzy match: "${playerName}" -> "${bestMatch.name}" (score: ${bestMatch.score.toFixed(2)})`);
+            return { name: bestMatch.name, data: bestMatch.data };
         }
 
         return null;
