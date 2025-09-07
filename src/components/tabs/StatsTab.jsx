@@ -3,9 +3,6 @@ import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import AdvancedAnalytics from './AdvancedAnalytics';
 import EnhancedDashboard from '../EnhancedDashboard';
-import PlayerPerformanceAnalytics from './enhanced/PlayerPerformanceAnalytics';
-import MatchPredictionEngine from './enhanced/MatchPredictionEngine';
-import EnhancedFinancialAnalytics from './enhanced/EnhancedFinancialAnalytics';
 import { 
   loadCalculatorValues, 
   updateCalculatorValues, 
@@ -399,9 +396,6 @@ export default function StatsTab({ onNavigate }) {
     { id: 'trends', label: 'Trends', icon: '📈' },
     { id: 'alkohol', label: 'Alkohol', icon: '🍺' },
     { id: 'advanced', label: 'Erweitert', icon: '🔬' },
-    { id: 'playeranalytics', label: 'Spieler-Analytics', icon: '🎯' },
-    { id: 'matchprediction', label: 'Match-Prediction', icon: '🔮' },
-    { id: 'financialanalytics', label: 'Finanz-Analytics', icon: '💰' },
   ];
 
   if (loading) {
@@ -2274,9 +2268,6 @@ export default function StatsTab({ onNavigate }) {
       case 'trends': return renderTrends();
       case 'alkohol': return renderAlkohol();
       case 'advanced': return <AdvancedAnalytics />;
-      case 'playeranalytics': return <PlayerPerformanceAnalytics />;
-      case 'matchprediction': return <MatchPredictionEngine />;
-      case 'financialanalytics': return <EnhancedFinancialAnalytics />;
       default: return renderOverview();
     }
   };
