@@ -66,7 +66,7 @@ export class FIFADataService {
             wage: "€455K",
             contract: "2025",
             sofifaId: 203376,
-            sofifaUrl: "https://sofifa.com/player/203376/?r=250001"
+            sofifaUrl: "https://sofifa.com/player/203376/virgil-van-dijk/250001/"
         },
 
         "Karim Benzema": {
@@ -119,7 +119,7 @@ export class FIFADataService {
             wage: "€73K",
             contract: "2025",
             sofifaId: 165153,
-            sofifaUrl: "https://sofifa.com/player/165153/?r=250001"
+            sofifaUrl: "https://sofifa.com/player/165153/karim-benzema/250001/"
         },
 
         "Iago Aspas": {
@@ -171,8 +171,8 @@ export class FIFADataService {
             value: "€84.7M",
             wage: "€426K",
             contract: "2025",
-            sofifaId: 178005,
-            sofifaUrl: "https://sofifa.com/player/178005/?r=250001"
+            sofifaId: 192629,
+            sofifaUrl: "https://sofifa.com/player/192629/250001/"
         },
 
         "Kylian Mbappé": {
@@ -225,7 +225,7 @@ export class FIFADataService {
             wage: "€133K",
             contract: "2025",
             sofifaId: 231747,
-            sofifaUrl: "https://sofifa.com/player/231747/?r=250001"
+            sofifaUrl: "https://sofifa.com/player/231747/kylian-mbappe/250001/"
         },
 
         "Erling Haaland": {
@@ -278,7 +278,7 @@ export class FIFADataService {
             wage: "€173K",
             contract: "2025",
             sofifaId: 239085,
-            sofifaUrl: "https://sofifa.com/player/239085/?r=250001"
+            sofifaUrl: "https://sofifa.com/player/239085/erling-haaland/250001/"
         },
 
         "Viktor Gyökeres": {
@@ -384,7 +384,7 @@ export class FIFADataService {
             wage: "€471K",
             contract: "2025",
             sofifaId: 192985,
-            sofifaUrl: "https://sofifa.com/player/192985/?r=250001"
+            sofifaUrl: "https://sofifa.com/player/192985/kevin-de-bruyne/250001/"
         },
 
         "Lionel Messi": {
@@ -437,7 +437,7 @@ export class FIFADataService {
             wage: "€249K",
             contract: "2025",
             sofifaId: 158023,
-            sofifaUrl: "https://sofifa.com/player/158023/?r=250001"
+            sofifaUrl: "https://sofifa.com/player/158023/lionel-messi/250001/"
         },
 
         "Frank Acheampong": {
@@ -2818,8 +2818,111 @@ export class FIFADataService {
     static isValidSofifaUrl(url) {
         if (typeof url !== 'string') return false;
         
-        const sofifaPattern = /^https:\/\/sofifa\.com\/player\/\d+\/[^\/]+\/\d+\/?$/;
+        // Updated pattern to handle both formats: with and without player name slug
+        const sofifaPattern = /^https:\/\/sofifa\.com\/player\/\d+\/([^\/]+\/)?(\d+\/?)?$/;
         return sofifaPattern.test(url);
+    }
+
+    /**
+     * Update SoFIFA URLs with the correct format
+     * @returns {Object} Update results
+     */
+    static updateSofifaUrls() {
+        console.log('🔧 Updating SoFIFA URLs to correct format...');
+        
+        // Provided correct URLs mapping
+        const correctUrls = {
+            "Virgil van Dijk": { id: 203376, url: "https://sofifa.com/player/203376/virgil-van-dijk/250001/" },
+            "Karim Benzema": { id: 165153, url: "https://sofifa.com/player/165153/karim-benzema/250001/" },
+            "Iago Aspas": { id: 192629, url: "https://sofifa.com/player/192629/250001/" },
+            "Kylian Mbappé": { id: 231747, url: "https://sofifa.com/player/231747/kylian-mbappe/250001/" },
+            "Erling Haaland": { id: 239085, url: "https://sofifa.com/player/239085/erling-haaland/250001/" },
+            "Viktor Gyökeres": { id: 241651, url: "https://sofifa.com/player/241651/250001/" },
+            "Kevin De Bruyne": { id: 192985, url: "https://sofifa.com/player/192985/kevin-de-bruyne/250001/" },
+            "Lionel Messi": { id: 158023, url: "https://sofifa.com/player/158023/lionel-messi/250001/" },
+            "Frank Acheampong": { id: 213013, url: "https://sofifa.com/player/213013/250001/" },
+            "Nestory Irankunda": { id: 266245, url: "https://sofifa.com/player/266245/250001/" },
+            "Pepe Reina": { id: 24630, url: "https://sofifa.com/player/24630/jose-manuel-reina-paez/250001/" },
+            "Amor Layouni": { id: 242166, url: "https://sofifa.com/player/242166/amor-layouni/250001/" },
+            "Luis Advíncula": { id: 204539, url: "https://sofifa.com/player/204539/luis-advincula/250001/" },
+            "Mohamed Salah": { id: 209331, url: "https://sofifa.com/player/209331/mohamed-salah/250001/" },
+            "Luis Suárez": { id: 176580, url: "https://sofifa.com/player/176580/luis-suarez/250001/" },
+            "Antonio Rüdiger": { id: 205452, url: "https://sofifa.com/player/205452/antonio-rudiger/250001/" },
+            "Kalidou Koulibaly": { id: 201024, url: "https://sofifa.com/player/201024/kalidou-koulibaly/250001/" },
+            "N'Golo Kanté": { id: 215914, url: "https://sofifa.com/player/215914/ngolo-kante/250001/" },
+            "Luka Modrić": { id: 177003, url: "https://sofifa.com/player/177003/luka-modric/250001/" },
+            "Kyle Walker": { id: 188377, url: "https://sofifa.com/player/188377/kyle-walker/250001/" },
+            "Dominik Kohr": { id: 212212, url: "https://sofifa.com/player/212212/dominik-kohr/250001/" },
+            "Robert Lewandowski": { id: 188545, url: "https://sofifa.com/player/188545/robert-lewandowski/250001/" },
+            "Cristiano Ronaldo": { id: 20801, url: "https://sofifa.com/player/20801/cristiano-ronaldo/250001/" },
+            "Iñaki Williams": { id: 216201, url: "https://sofifa.com/player/216201/inaki-williams-arthuer/250001/" },
+            "Francesco Acerbi": { id: 199845, url: "https://sofifa.com/player/199845/francesco-acerbi/250001/" },
+            "Nordin Amrabat": { id: 183108, url: "https://sofifa.com/player/183108/nordin-amrabat/250001/" },
+            "Federico Chiesa": { id: 235805, url: "https://sofifa.com/player/235805/federico-chiesa/250001/" },
+            "İlkay Gündoğan": { id: 186942, url: "https://sofifa.com/player/186942/ilkay-gundogan/250001/" },
+            "Theo Hernández": { id: 232656, url: "https://sofifa.com/player/232656/theo-hernandez/250001/" },
+            "Jordi Alba": { id: 189332, url: "https://sofifa.com/player/189332/jordi-alba/250001/" },
+            "Nicolò Barella": { id: 224232, url: "https://sofifa.com/player/224232/nicolo-barella/250001/" },
+            "Ferland Mendy": { id: 228618, url: "https://sofifa.com/player/228618/ferland-mendy/250001/" },
+            "Raphaël Varane": { id: 201535, url: "https://sofifa.com/player/201535/raphael-varane/250001/" },
+            "Wojciech Szczęsny": { id: 186153, url: "https://sofifa.com/player/186153/wojciech-szczesny/250001/" },
+            "Jonathan Tah": { id: 213331, url: "https://sofifa.com/player/213331/jonathan-tah/250001/" },
+            "Manuel Neuer": { id: 167495, url: "https://sofifa.com/player/167495/manuel-neuer/250001/" },
+            "Manuel Lazzari": { id: 235374, url: "https://sofifa.com/player/235374/manuel-lazzari/250001/" },
+            "Jonathan Clauss": { id: 239093, url: "https://sofifa.com/player/239093/jonathan-clauss/250001/" },
+            "Jeremiah St. Juste": { id: 226853, url: "https://sofifa.com/player/226853/jeremiah-st-juste/250001/" },
+            "David Alaba": { id: 197445, url: "https://sofifa.com/player/197445/david-alaba/250001/" },
+            "Saud Abdulhamid": { id: 246688, url: "https://sofifa.com/player/246688/saud-abdulhamid/250001/" },
+            "Lukáš Hrádecký": { id: 190941, url: "https://sofifa.com/player/190941/lukas-hradecky/250001/" },
+            "Alisson": { id: 212831, url: "https://sofifa.com/player/212831/alisson/250001/" }
+        };
+
+        const results = {
+            updated: [],
+            unchanged: [],
+            missing: [],
+            errors: []
+        };
+
+        // Update existing players
+        Object.entries(this.fifaDatabase).forEach(([playerName, playerData]) => {
+            if (correctUrls[playerName]) {
+                const correct = correctUrls[playerName];
+                if (playerData.sofifaUrl !== correct.url || playerData.sofifaId !== correct.id) {
+                    playerData.sofifaUrl = correct.url;
+                    playerData.sofifaId = correct.id;
+                    results.updated.push({
+                        name: playerName,
+                        newUrl: correct.url,
+                        newId: correct.id
+                    });
+                } else {
+                    results.unchanged.push(playerName);
+                }
+            }
+        });
+
+        // Check for missing players
+        Object.keys(correctUrls).forEach(playerName => {
+            if (!this.fifaDatabase[playerName]) {
+                results.missing.push({
+                    name: playerName,
+                    url: correctUrls[playerName].url,
+                    id: correctUrls[playerName].id
+                });
+            }
+        });
+
+        console.log(`✅ URL update complete: ${results.updated.length} updated, ${results.unchanged.length} unchanged, ${results.missing.length} missing`);
+        
+        if (results.missing.length > 0) {
+            console.log('⚠️ Missing players that need to be added:');
+            results.missing.forEach(player => {
+                console.log(`  - ${player.name}: ${player.url}`);
+            });
+        }
+
+        return results;
     }
 
     /**
