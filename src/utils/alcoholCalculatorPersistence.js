@@ -20,6 +20,15 @@ const getDefaultValues = () => ({
     aek: 0,
     real: 0
   },
+  // Individual tracking for Alexander and Philip
+  alexanderShots: {
+    cl40: 0, // 2cl shots at 40% alcohol
+    cl20: 0  // 2cl shots at 20% alcohol
+  },
+  philipShots: {
+    cl40: 0, // 2cl shots at 40% alcohol
+    cl20: 0  // 2cl shots at 20% alcohol
+  },
   // Cumulative shots from all matches (automatically updated)
   cumulativeShots: {
     aek: 0,      // Total cl of shots AEK has drunk from Real goals
@@ -61,6 +70,14 @@ export const loadCalculatorValues = () => {
       beerCount: {
         ...defaults.beerCount,
         ...(parsed.beerCount || {})
+      },
+      alexanderShots: {
+        ...defaults.alexanderShots,
+        ...(parsed.alexanderShots || {})
+      },
+      philipShots: {
+        ...defaults.philipShots,
+        ...(parsed.philipShots || {})
       },
       cumulativeShots: {
         ...defaults.cumulativeShots,

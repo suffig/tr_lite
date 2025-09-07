@@ -760,22 +760,6 @@ export default function AddMatchTab() {
           </div>
         </div>
       )}
-
-      <div className="mt-6 modern-card bg-blue-50 border-blue-200">
-        <div className="flex items-start">
-          <div className="text-blue-600 mr-3">
-            <i className="fas fa-info-circle"></i>
-          </div>
-          <div>
-            <h4 className="font-semibold text-blue-800 mb-1">Wichtige Hinweise</h4>
-            <ul className="text-blue-700 text-sm space-y-1">
-              <li>• <strong>Kein Unentschieden:</strong> Ein Team muss immer gewinnen - Unentschieden sind nicht erlaubt</li>
-              <li>• <strong>Spieler des Spiels Pflicht:</strong> Für jedes Spiel muss ein Spieler des Spiels ausgewählt werden</li>
-              <li>• Nach dem Hinzufügen können Sie das Spiel in der Spiele-Übersicht einsehen und bearbeiten</li>
-            </ul>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
