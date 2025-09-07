@@ -4,13 +4,10 @@ import LoadingSpinner from '../LoadingSpinner';
 
 export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-unused-vars
   const [expandedMatches, setExpandedMatches] = useState(new Set());
-  const [showAll, setShowAll] = useState(false);
+  const [timeFilter, setTimeFilter] = useState('4weeks'); // '1week', '4weeks', '3months', 'all'
   const [dateFilter, setDateFilter] = useState('');
-  
-  // Calculate date 4 weeks ago
-  const fourWeeksAgo = new Date();
-  fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
-  const fourWeeksAgoString = fourWeeksAgo.toISOString().split('T')[0];
+  const [resultFilter, setResultFilter] = useState('all'); // 'all', 'aek-wins', 'real-wins'
+  const [goalFilter, setGoalFilter] = useState('all'); // 'all', 'high-scoring', 'low-scoring'
   
   const { data: allMatches, loading, error, refetch } = useSupabaseQuery(
     'matches',
@@ -18,20 +15,74 @@ export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-u
     { order: { column: 'date', ascending: false } }
   );
   const { data: players, loading: playersLoading } = useSupabaseQuery('players', '*');
+  
+  // Calculate date based on time filter
+  const getTimeFilterDate = () => {
+    const now = new Date();
+    switch (timeFilter) {
+      case '1week':
+        now.setDate(now.getDate() - 7);
+        break;
+      case '4weeks':
+        now.setDate(now.getDate() - 28);
+        break;
+      case '3months':
+        now.setMonth(now.getMonth() - 3);
+        break;
+      default:
+        return null;
+    }
+    return now.toISOString().split('T')[0];
+  };
 
-  // Filter matches based on current settings and search results
+  // Filter matches based on current settings
   const getFilteredMatches = () => {
     if (!allMatches) return [];
     
-    // Use search results if available, otherwise use all matches
     let filtered = allMatches;
     
-    // Apply date filter if set (in addition to search)
+    // Apply date filter if set (exact date)
     if (dateFilter) {
       filtered = filtered.filter(match => match.date === dateFilter);
-    } else if (!showAll) {
-      // Show only last 4 weeks if not showing all and no search active
-      filtered = filtered.filter(match => match.date >= fourWeeksAgoString);
+    } else if (timeFilter !== 'all') {
+      // Apply time period filter
+      const filterDate = getTimeFilterDate();
+      if (filterDate) {
+        filtered = filtered.filter(match => match.date >= filterDate);
+      }
+    }
+    
+    // Apply result filter
+    if (resultFilter !== 'all') {
+      filtered = filtered.filter(match => {
+        const aekGoals = match.goalsa || 0;
+        const realGoals = match.goalsb || 0;
+        
+        switch (resultFilter) {
+          case 'aek-wins':
+            return aekGoals > realGoals;
+          case 'real-wins':
+            return realGoals > aekGoals;
+          default:
+            return true;
+        }
+      });
+    }
+    
+    // Apply goal filter
+    if (goalFilter !== 'all') {
+      filtered = filtered.filter(match => {
+        const totalGoals = (match.goalsa || 0) + (match.goalsb || 0);
+        
+        switch (goalFilter) {
+          case 'high-scoring':
+            return totalGoals >= 5;
+          case 'low-scoring':
+            return totalGoals <= 2;
+          default:
+            return true;
+        }
+      });
     }
     
     return filtered;
@@ -150,44 +201,98 @@ export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-u
         </p>
       </div>
 
-      {/* Filter Controls */}
-      <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <div className="flex-1">
-            <label htmlFor="dateFilter" className="block text-sm font-medium text-text-primary mb-1">
-              Filter nach Datum:
+      {/* Enhanced Filter Controls */}
+      <div className="mb-6 modern-card">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-text-primary mb-2">🔍 Filter & Suche</h3>
+          <p className="text-sm text-text-muted">Finde schnell die Spiele, die dich interessieren</p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Time Period Filter */}
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-2">
+              📅 Zeitraum
+            </label>
+            <select
+              value={timeFilter}
+              onChange={(e) => setTimeFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
+            >
+              <option value="1week">Letzte Woche</option>
+              <option value="4weeks">Letzte 4 Wochen</option>
+              <option value="3months">Letzte 3 Monate</option>
+              <option value="all">Alle Spiele</option>
+            </select>
+          </div>
+          
+          {/* Result Filter */}
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-2">
+              🏆 Ergebnis
+            </label>
+            <select
+              value={resultFilter}
+              onChange={(e) => setResultFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
+            >
+              <option value="all">Alle Ergebnisse</option>
+              <option value="aek-wins">🔵 AEK Siege</option>
+              <option value="real-wins">🔴 Real Siege</option>
+            </select>
+          </div>
+          
+          {/* Goal Filter */}
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-2">
+              ⚽ Tore
+            </label>
+            <select
+              value={goalFilter}
+              onChange={(e) => setGoalFilter(e.target.value)}
+              className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
+            >
+              <option value="all">Alle Spiele</option>
+              <option value="high-scoring">🔥 Torreich (5+ Tore)</option>
+              <option value="low-scoring">🛡️ Torarm (≤2 Tore)</option>
+            </select>
+          </div>
+          
+          {/* Specific Date Filter */}
+          <div>
+            <label className="block text-sm font-medium text-text-primary mb-2">
+              📆 Datum
             </label>
             <input
-              id="dateFilter"
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
             />
           </div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setDateFilter('')}
-              className="px-3 py-2 text-sm bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors"
-            >
-              Filter zurücksetzen
-            </button>
-            <button
-              onClick={() => setShowAll(!showAll)}
-              className={`px-3 py-2 text-sm rounded-md transition-colors ${
-                showAll 
-                  ? 'bg-blue-500 text-white hover:bg-blue-600' 
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              {showAll ? 'Nur letzte 4 Wochen' : 'Alle Spiele anzeigen'}
-            </button>
-          </div>
         </div>
-        <div className="mt-2 text-xs text-text-muted">
-          {!dateFilter && !showAll && `Zeige Spiele der letzten 4 Wochen (seit ${new Date(fourWeeksAgoString).toLocaleDateString('de-DE')})`}
-          {!dateFilter && showAll && 'Zeige alle Spiele'}
-          {dateFilter && `Zeige Spiele vom ${new Date(dateFilter).toLocaleDateString('de-DE')}`}
+        
+        {/* Filter Actions */}
+        <div className="mt-4 flex flex-wrap gap-2 items-center justify-between">
+          <div className="text-sm text-text-muted">
+            {(() => {
+              const count = matches.length;
+              const total = allMatches?.length || 0;
+              if (count === total) return `Zeige alle ${count} Spiele`;
+              return `${count} von ${total} Spielen gefiltert`;
+            })()}
+          </div>
+          <button
+            onClick={() => {
+              setTimeFilter('4weeks');
+              setDateFilter('');
+              setResultFilter('all');
+              setGoalFilter('all');
+            }}
+            className="px-4 py-2 text-sm bg-accent-orange text-white rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            🔄 Filter zurücksetzen
+          </button>
         </div>
       </div>
 

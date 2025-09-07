@@ -2,7 +2,6 @@ import { useState, Suspense, lazy, useEffect } from 'react';
 import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './hooks/useAuth';
-import useTouchGestures from './hooks/useTouchGestures';
 import { OfflineIndicator } from './hooks/useOfflineManager.jsx';
 import Login from './components/Login';
 import BottomNavigation from './components/BottomNavigation';
@@ -15,7 +14,6 @@ const MatchesTab = lazy(() => import('./components/tabs/MatchesTab'));
 const KaderTab = lazy(() => import('./components/tabs/KaderTab'));
 const BansTab = lazy(() => import('./components/tabs/BansTab'));
 const FinanzenTab = lazy(() => import('./components/tabs/FinanzenTab'));
-const AITab = lazy(() => import('./components/tabs/AITab'));
 const StatsTab = lazy(() => import('./components/tabs/StatsTab'));
 const AdminTab = lazy(() => import('./components/tabs/AdminTab'));
 
@@ -66,9 +64,6 @@ function App() {
     }
   };
 
-  // Enable touch gestures for mobile navigation
-  useTouchGestures(handleTabChange, activeTab);
-
   // Global search shortcut and event listener
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -116,8 +111,6 @@ function App() {
         return <FinanzenTab {...props} />;
       case 'squad':
         return <KaderTab {...props} />;
-      case 'ai':
-        return <AITab {...props} />;
       case 'stats':
         return <StatsTab {...props} />;
       case 'admin':

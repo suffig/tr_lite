@@ -2,8 +2,6 @@ import { useState } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import ExportImportManager from '../ExportImportManager';
-import FinancialAnalytics from './FinancialAnalytics';
-import FinancialInsights from '../FinancialInsights';
 import toast from 'react-hot-toast';
 
 export default function FinanzenTab({ onNavigate }) { // eslint-disable-line no-unused-vars
@@ -205,28 +203,6 @@ export default function FinanzenTab({ onNavigate }) { // eslint-disable-line no-
           <span className="hidden sm:inline">Übersicht</span>
         </button>
         <button
-          onClick={() => setCurrentView('insights')}
-          className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-            currentView === 'insights'
-              ? 'bg-primary-green text-white'
-              : 'bg-bg-secondary text-text-primary hover:bg-bg-tertiary'
-          }`}
-        >
-          <span>🔍</span>
-          <span className="hidden sm:inline">Insights</span>
-        </button>
-        <button
-          onClick={() => setCurrentView('analytics')}
-          className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-            currentView === 'analytics'
-              ? 'bg-primary-purple text-white'
-              : 'bg-bg-secondary text-text-primary hover:bg-bg-tertiary'
-          }`}
-        >
-          <span>📊</span>
-          <span className="hidden sm:inline">Analyse</span>
-        </button>
-        <button
           onClick={() => setCurrentView('transactions')}
           className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
             currentView === 'transactions'
@@ -240,13 +216,7 @@ export default function FinanzenTab({ onNavigate }) { // eslint-disable-line no-
       </div>
 
       {/* Conditional Content */}
-      {currentView === 'analytics' ? (
-        <FinancialAnalytics />
-      ) : currentView === 'insights' ? (
-        <div className="space-y-6">
-          <FinancialInsights selectedTeam={selectedTeam} />
-        </div>
-      ) : currentView === 'transactions' ? (
+      {currentView === 'transactions' ? (
         <div className="space-y-4">
           {/* Transactions List */}
           <div className="bg-bg-primary border border-border-light rounded-lg shadow-sm">
