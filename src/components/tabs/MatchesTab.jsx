@@ -77,9 +77,9 @@ export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-u
         
         switch (goalFilter) {
           case 'high-scoring':
-            return totalGoals >= 7; // Changed from 5 to 7 for FIFA games
+            return totalGoals > 10; // Many goals: >10
           case 'low-scoring':
-            return totalGoals <= 3; // Changed from 2 to 3 for FIFA games
+            return totalGoals < 5; // Few goals: <5
           default:
             return true;
         }
@@ -266,8 +266,8 @@ export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-u
                 className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
               >
                 <option value="all">Alle Spiele</option>
-                <option value="high-scoring">🔥 Torreich (7+ Tore)</option>
-                <option value="low-scoring">🛡️ Torarm (≤3 Tore)</option>
+                <option value="high-scoring">🔥 Torreich (&gt;10 Tore)</option>
+                <option value="low-scoring">🛡️ Torarm (&lt;5 Tore)</option>
               </select>
             </div>
             
