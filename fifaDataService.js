@@ -23,26 +23,61 @@ export class FIFADataService {
         try {
             console.log('📥 Loading FIFA database from JSON...');
             
-            // Try to fetch the JSON file
-            const response = await fetch('./sofifa_my_players_app.json');
-            if (!response.ok) {
-                throw new Error(`Failed to load JSON: ${response.status}`);
+            // Try multiple paths for the JSON file
+            const possiblePaths = [
+                './sofifa_my_players_app.json',
+                '/sofifa_my_players_app.json',
+                'sofifa_my_players_app.json'
+            ];
+            
+            let response = null;
+            let loadedPath = null;
+            
+            for (const path of possiblePaths) {
+                try {
+                    response = await fetch(path);
+                    if (response.ok) {
+                        loadedPath = path;
+                        break;
+                    }
+                } catch (e) {
+                    console.warn(`Failed to fetch from ${path}:`, e.message);
+                }
+            }
+            
+            if (!response || !response.ok) {
+                throw new Error(`Failed to load JSON from any path. Last status: ${response?.status || 'No response'}`);
             }
             
             const playersArray = await response.json();
-            console.log(`📊 Loaded ${playersArray.length} players from JSON`);
+            console.log(`📊 Loaded ${playersArray.length} players from JSON at ${loadedPath}`);
+            
+            // Validate that we have an array
+            if (!Array.isArray(playersArray)) {
+                throw new Error('JSON file does not contain an array of players');
+            }
             
             // Transform and populate the database
             this.fifaDatabase = {};
+            let successfulTransforms = 0;
+            
             for (const player of playersArray) {
-                const transformedPlayer = this.transformPlayerData(player);
-                this.fifaDatabase[player.name] = transformedPlayer;
+                try {
+                    const transformedPlayer = this.transformPlayerData(player);
+                    this.fifaDatabase[player.name] = transformedPlayer;
+                    successfulTransforms++;
+                } catch (transformError) {
+                    console.warn(`Failed to transform player data for ${player.name}:`, transformError.message);
+                }
             }
             
-            console.log(`✅ FIFA database loaded successfully with ${Object.keys(this.fifaDatabase).length} players`);
+            console.log(`✅ FIFA database loaded successfully with ${successfulTransforms}/${playersArray.length} players transformed`);
+            console.log(`🎯 Sample player names:`, Object.keys(this.fifaDatabase).slice(0, 5));
+            
             return true;
         } catch (error) {
-            console.warn('⚠️ Failed to load JSON database, using fallback data:', error.message);
+            console.error('❌ Failed to load JSON database:', error.message);
+            console.log('🔄 Loading fallback database...');
             this.loadFallbackDatabase();
             return false;
         }
@@ -213,12 +248,14 @@ export class FIFADataService {
      * @returns {Object|null} FIFA player data or null if not found
      */
     static async getPlayerData(playerName, options = { useLiveData: true, fallbackToMock: true }) {
-        console.log(`🔍 Searching for player: ${playerName}`);
+        console.log(`🔍 Searching for player: "${playerName}"`);
         
         // Load database if not already loaded
         if (Object.keys(this.fifaDatabase).length === 0) {
             console.log('📚 Database empty, loading data...');
-            await this.loadDatabase();
+            const loadSuccess = await this.loadDatabase();
+            console.log(`📚 Database load result: ${loadSuccess ? 'SUCCESS' : 'FALLBACK'}`);
+            console.log(`📊 Database now contains ${Object.keys(this.fifaDatabase).length} players`);
         }
         
         // Validate input
@@ -228,6 +265,8 @@ export class FIFADataService {
         }
 
         const cleanPlayerName = playerName.trim();
+        console.log(`🔍 Searching for exact match: "${cleanPlayerName}"`);
+        console.log(`📊 Available players sample:`, Object.keys(this.fifaDatabase).slice(0, 10));
         
         // Try exact match first in mock database
         let mockData = null;
@@ -236,13 +275,21 @@ export class FIFADataService {
                 ...this.fifaDatabase[cleanPlayerName],
                 searchName: cleanPlayerName,
                 found: true,
-                source: 'mock_database'
+                source: 'json_database'
             };
-            console.log(`✅ Found exact match in database: ${cleanPlayerName}`);
+            console.log(`✅ Found exact match in JSON database: ${cleanPlayerName}`);
+        } else {
+            console.log(`❌ No exact match found for: "${cleanPlayerName}"`);
+            console.log(`🔍 Available names containing "${cleanPlayerName.toLowerCase()}":`, 
+                Object.keys(this.fifaDatabase).filter(name => 
+                    name.toLowerCase().includes(cleanPlayerName.toLowerCase())
+                ).slice(0, 5)
+            );
         }
 
         // Try fuzzy matching if no exact match
         if (!mockData) {
+            console.log(`🔄 Attempting fuzzy match for: "${cleanPlayerName}"`);
             const fuzzyMatch = this.performFuzzyMatch(cleanPlayerName);
             if (fuzzyMatch) {
                 mockData = {
@@ -250,9 +297,11 @@ export class FIFADataService {
                     searchName: cleanPlayerName,
                     suggestedName: fuzzyMatch.name,
                     found: true,
-                    source: 'mock_database_fuzzy'
+                    source: 'json_database_fuzzy'
                 };
-                console.log(`✅ Found fuzzy match: ${cleanPlayerName} -> ${fuzzyMatch.name}`);
+                console.log(`✅ Found fuzzy match: "${cleanPlayerName}" -> "${fuzzyMatch.name}"`);
+            } else {
+                console.log(`❌ No fuzzy match found for: "${cleanPlayerName}"`);
             }
         }
 
