@@ -739,10 +739,6 @@ export default function StatsTab({ onNavigate }) {
               <span className="font-semibold text-red-600">{teamRecords.aek.losses}</span>
             </div>
             <div className="flex justify-between">
-              <span>Marktwert:</span>
-              <span className="font-semibold">{formatPlayerValue(aekMarketValue)}</span>
-            </div>
-            <div className="flex justify-between">
               <span>Zu Null:</span>
               <span className="font-semibold">{advancedStats.cleanSheets.aek}</span>
             </div>
@@ -763,10 +759,6 @@ export default function StatsTab({ onNavigate }) {
             <div className="flex justify-between">
               <span>Niederlagen:</span>
               <span className="font-semibold text-red-600">{teamRecords.real.losses}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Marktwert:</span>
-              <span className="font-semibold">{formatPlayerValue(realMarketValue)}</span>
             </div>
             <div className="flex justify-between">
               <span>Zu Null:</span>
@@ -916,10 +908,6 @@ export default function StatsTab({ onNavigate }) {
                 <span className="font-medium">{teamRecords.aek.losses}</span>
               </div>
               <div className="flex justify-between">
-                <span>Gesamtmarktwert:</span>
-                <span className="font-medium">{formatPlayerValue(aekMarketValue)}</span>
-              </div>
-              <div className="flex justify-between">
                 <span>Zu Null Spiele:</span>
                 <span className="font-medium">{advancedStats.cleanSheets.aek}</span>
               </div>
@@ -939,10 +927,6 @@ export default function StatsTab({ onNavigate }) {
               <div className="flex justify-between">
                 <span>Niederlagen:</span>
                 <span className="font-medium">{teamRecords.real.losses}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Gesamtmarktwert:</span>
-                <span className="font-medium">{formatPlayerValue(realMarketValue)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Zu Null Spiele:</span>
@@ -966,9 +950,9 @@ export default function StatsTab({ onNavigate }) {
             <div className="text-xs text-text-muted mt-1">in einem einzelnen Spiel</div>
           </div>
           <div className="text-center p-4 bg-bg-secondary rounded-lg">
-            <div className="text-2xl font-bold text-primary-green">{formatPlayerValue(totalMarketValue)}</div>
-            <div className="text-sm text-text-muted">Gesamtmarktwert</div>
-            <div className="text-xs text-text-muted mt-1">aller aktiven Spieler</div>
+            <div className="text-2xl font-bold text-primary-green">{totalMatches - aekWins - realWins}</div>
+            <div className="text-sm text-text-muted">Unentschieden</div>
+            <div className="text-xs text-text-muted mt-1">spannende Duelle</div>
           </div>
           <div className="text-center p-4 bg-bg-secondary rounded-lg">
             <div className="text-2xl font-bold text-accent-orange">{Math.abs(aekWins - realWins)}</div>
@@ -977,10 +961,14 @@ export default function StatsTab({ onNavigate }) {
           </div>
           <div className="text-center p-4 bg-bg-secondary rounded-lg">
             <div className="text-2xl font-bold text-accent-blue">
-              {totalMatches > 0 ? (((aekPlayers.length + realPlayers.length) * (totalMatches / 2)).toFixed(0)) : 0}
+              {(() => {
+                // Calculate average goals per match
+                const avgGoals = totalMatches > 0 ? (advancedStats.totalGoals / totalMatches).toFixed(1) : '0.0';
+                return avgGoals;
+              })()}
             </div>
-            <div className="text-sm text-text-muted">Geschätzte Spielminuten</div>
-            <div className="text-xs text-text-muted mt-1">pro Spieler (⌀ 45min)</div>
+            <div className="text-sm text-text-muted">⌀ Tore pro Spiel</div>
+            <div className="text-xs text-text-muted mt-1">Durchschnittswert</div>
           </div>
         </div>
         
@@ -1117,39 +1105,7 @@ export default function StatsTab({ onNavigate }) {
         <div className="mb-4 text-sm text-text-muted">
           Erweiterte Metriken für eine tiefgreifende Team-Analyse.
         </div>
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="space-y-3">
-            <h4 className="font-semibold text-blue-600">💰 Wirtschaftliche Effizienz</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span>⌀ Marktwert AEK:</span>
-                <span className="font-medium">
-                  {aekPlayers.length > 0 ? `${(aekPlayers.reduce((sum, p) => sum + (p.value || 0), 0) / aekPlayers.length).toFixed(1)}M €` : '0M €'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>⌀ Marktwert Real:</span>
-                <span className="font-medium">
-                  {realPlayers.length > 0 ? `${(realPlayers.reduce((sum, p) => sum + (p.value || 0), 0) / realPlayers.length).toFixed(1)}M €` : '0M €'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Tore pro 1M € (AEK):</span>
-                <span className="font-medium">
-                  {aekPlayers.reduce((sum, p) => sum + (p.value || 0), 0) > 0 ? 
-                    (advancedStats.aekTotalGoals / aekPlayers.reduce((sum, p) => sum + (p.value || 0), 0)).toFixed(2) : '0.00'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span>Tore pro 1M € (Real):</span>
-                <span className="font-medium">
-                  {realPlayers.reduce((sum, p) => sum + (p.value || 0), 0) > 0 ? 
-                    (advancedStats.realTotalGoals / realPlayers.reduce((sum, p) => sum + (p.value || 0), 0)).toFixed(2) : '0.00'}
-                </span>
-              </div>
-            </div>
-          </div>
-          
+        <div className="grid md:grid-cols-2 gap-6">          
           <div className="space-y-3">
             <h4 className="font-semibold text-red-600">🎲 Spielstatistiken</h4>
             <div className="space-y-2 text-sm">
@@ -1162,41 +1118,41 @@ export default function StatsTab({ onNavigate }) {
                 <span className="font-medium">{totalMatches - aekWins - realWins}</span>
               </div>
               <div className="flex justify-between">
-                <span>⌀ Spieldauer:</span>
-                <span className="font-medium">~90 Minuten</span>
-              </div>
-              <div className="flex justify-between">
                 <span>Längste Serie:</span>
                 <span className="font-medium">
                   {aekWins >= realWins ? 'AEK' : 'Real'} ({Math.max(aekWins, realWins)} Siege)
                 </span>
               </div>
+              <div className="flex justify-between">
+                <span>Torreichstes Spiel:</span>
+                <span className="font-medium">{advancedStats.highestScoringMatch} Tore</span>
+              </div>
             </div>
           </div>
           
           <div className="space-y-3">
-            <h4 className="font-semibold text-purple-600">🏆 Erfolgs-Metriken</h4>
+            <h4 className="font-semibold text-purple-600">🏆 Leistungs-Metriken</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span>Aktivste Spieler:</span>
+                <span>Aktive Spieler:</span>
                 <span className="font-medium">{aekPlayers.length + realPlayers.length}</span>
               </div>
               <div className="flex justify-between">
-                <span>Top-Performer:</span>
+                <span>Torschützen:</span>
                 <span className="font-medium">
-                  {playerStats.filter(p => p.sdsCount > 0).length} Spieler
+                  {playerStats.filter(p => p.goals > 0).length} Spieler
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>Konsistenz AEK:</span>
+                <span>Erfolgsquote AEK:</span>
                 <span className="font-medium">
-                  {totalMatches > 0 ? `${((aekWins / totalMatches) * 100).toFixed(0)}% Erfolg` : '0% Erfolg'}
+                  {totalMatches > 0 ? `${((aekWins / totalMatches) * 100).toFixed(0)}%` : '0%'}
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>Konsistenz Real:</span>
+                <span>Erfolgsquote Real:</span>
                 <span className="font-medium">
-                  {totalMatches > 0 ? `${((realWins / totalMatches) * 100).toFixed(0)}% Erfolg` : '0% Erfolg'}
+                  {totalMatches > 0 ? `${((realWins / totalMatches) * 100).toFixed(0)}%` : '0%'}
                 </span>
               </div>
             </div>
