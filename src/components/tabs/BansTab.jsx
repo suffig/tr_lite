@@ -4,7 +4,7 @@ import LoadingSpinner from '../LoadingSpinner';
 import { BAN_TYPES, getBanTypeColor, getBanIcon } from '../../constants/banTypes';
 
 export default function BansTab({ onNavigate }) { // eslint-disable-line no-unused-vars
-  const [selectedType, setSelectedType] = useState('all');
+  const [selectedType, setSelectedType] = useState('active'); // Changed from 'all' to 'active'
   
   const { data: bans, loading: bansLoading } = useSupabaseQuery('bans', '*');
   const { data: players, loading: playersLoading } = useSupabaseQuery('players', '*');
@@ -107,51 +107,82 @@ export default function BansTab({ onNavigate }) { // eslint-disable-line no-unus
       {/* Bans List */}
       {filteredBans.length > 0 ? (
         <div className="space-y-4">
-          {filteredBans.map((ban) => (
-            <div key={ban.id} className="modern-card">
-              <div className="flex items-start justify-between">
-                <div className="flex items-start space-x-4">
-                  <div className="text-2xl">
-                    {getBanIcon(ban.type)}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="font-semibold text-text-primary">
-                        {getPlayerName(ban.player_id)}
-                      </h3>
-                      <span className="text-sm text-text-muted">
-                        ({getPlayerTeam(ban.player_id)})
-                      </span>
+          {filteredBans.map((ban) => {
+            const remainingGames = (ban.totalgames || 0) - (ban.matchesserved || 0);
+            const progress = (ban.totalgames || 0) > 0 ? ((ban.matchesserved || 0) / (ban.totalgames || 0)) * 100 : 0;
+            const isActive = remainingGames > 0;
+            
+            return (
+              <div key={ban.id} className="modern-card">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start space-x-4 flex-1">
+                    <div className="text-2xl">
+                      {getBanIcon(ban.type)}
                     </div>
-                    
-                    <div className="flex items-center space-x-2 mb-2">
-                      <span className={`inline-block px-2 py-1 rounded text-xs font-medium border ${getBanTypeColor(ban.type)}`}>
-                        {ban.type}
-                      </span>
-                      <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
-                        Gesamt: {ban.totalgames || 0} Spiele
-                      </span>
-                      {(ban.totalgames - ban.matchesserved) > 0 ? (
-                        <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200">
-                          Verbleibend: {ban.totalgames - ban.matchesserved} Spiel{(ban.totalgames - ban.matchesserved) !== 1 ? 'e' : ''}
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-2 mb-2">
+                        <h3 className="font-semibold text-text-primary">
+                          {getPlayerName(ban.player_id)}
+                        </h3>
+                        <span className="text-sm text-text-muted">
+                          ({getPlayerTeam(ban.player_id)})
                         </span>
-                      ) : (
-                        <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                          Beendet
+                      </div>
+                      
+                      <div className="flex items-center space-x-2 mb-3">
+                        <span className={`inline-block px-2 py-1 rounded text-xs font-medium border ${getBanTypeColor(ban.type)}`}>
+                          {ban.type}
                         </span>
+                        {isActive ? (
+                          <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                            🔴 Aktiv - {remainingGames} Spiel{remainingGames !== 1 ? 'e' : ''} verbleibend
+                          </span>
+                        ) : (
+                          <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                            ✅ Beendet
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Progress Bar */}
+                      <div className="mb-3">
+                        <div className="flex justify-between text-xs text-text-muted mb-1">
+                          <span>Fortschritt: {ban.matchesserved || 0} / {ban.totalgames || 0} Spiele</span>
+                          <span>{Math.round(progress)}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              isActive ? 'bg-red-500' : 'bg-green-500'
+                            }`}
+                            style={{ width: `${Math.min(progress, 100)}%` }}
+                          ></div>
+                        </div>
+                      </div>
+
+                      {ban.reason && (
+                        <p className="text-sm text-text-muted">
+                          Grund: {ban.reason}
+                        </p>
                       )}
                     </div>
-
-                    {ban.reason && (
-                      <p className="text-sm text-text-muted">
-                        {ban.reason}
-                      </p>
-                    )}
                   </div>
+                  
+                  {/* Large remaining games indicator for active bans */}
+                  {isActive && (
+                    <div className="text-center ml-4">
+                      <div className="text-2xl font-bold text-red-600">
+                        {remainingGames}
+                      </div>
+                      <div className="text-xs text-red-600 uppercase font-medium">
+                        Verbleibend
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-12">
