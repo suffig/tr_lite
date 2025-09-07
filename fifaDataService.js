@@ -10,383 +10,199 @@ import SofifaIntegration from './src/utils/sofifaIntegration.js';
 export class FIFADataService {
     
     /**
-     * Mock FIFA database - in production this would connect to SoFIFA API or similar
+     * FIFA database - loaded from JSON file
      * Data structure based on https://sofifa.com player profiles
      */
-    static fifaDatabase = {
-        // Real Madrid players
-        "Erling Haaland": {
-            overall: 91,
-            potential: 94,
-            positions: ["ST", "CF"],
-            age: 23,
-            height: 195,
-            weight: 88,
-            foot: "Left",
-            pace: 89,
-            shooting: 91,
-            passing: 65,
-            dribbling: 80,
-            defending: 45,
-            physical: 88,
-            skills: {
-                crossing: 55,
-                finishing: 94,
-                headingAccuracy: 85,
-                shortPassing: 65,
-                volleys: 86,
-                curve: 77,
-                fkAccuracy: 84,
-                longPassing: 65,
-                ballControl: 81,
-                acceleration: 87,
-                sprintSpeed: 90,
-                agility: 77,
-                reactions: 93,
-                balance: 70,
-                shotPower: 94,
-                jumping: 95,
-                stamina: 88,
-                strength: 92,
-                longShots: 85,
-                aggression: 84,
-                interceptions: 30,
-                positioning: 95,
-                vision: 68,
-                penalties: 85,
-                composure: 88
-            },
-            workrates: "High/Medium",
-            weakFoot: 3,
-            skillMoves: 3,
-            nationality: "Norway",
-            club: "Manchester City",
-            value: "€180M",
-            wage: "€375K",
-            contract: "2027",
-            sofifaId: 239085,
-            sofifaUrl: "https://sofifa.com/player/239085/erling-haaland/250001/"
-        },
-        
-        "Kylian Mbappé": {
-            overall: 91,
-            potential: 95,
-            positions: ["LW", "ST", "RW"],
-            age: 25,
-            height: 178,
-            weight: 73,
-            foot: "Right",
-            pace: 97,
-            shooting: 89,
-            passing: 80,
-            dribbling: 92,
-            defending: 39,
-            physical: 77,
-            skills: {
-                crossing: 80,
-                finishing: 89,
-                headingAccuracy: 78,
-                shortPassing: 83,
-                volleys: 87,
-                curve: 80,
-                fkAccuracy: 79,
-                longPassing: 75,
-                ballControl: 92,
-                acceleration: 97,
-                sprintSpeed: 97,
-                agility: 92,
-                reactions: 92,
-                balance: 84,
-                shotPower: 88,
-                jumping: 78,
-                stamina: 88,
-                strength: 76,
-                longShots: 86,
-                aggression: 78,
-                interceptions: 41,
-                positioning: 90,
-                vision: 80,
-                penalties: 80,
-                composure: 85
-            },
-            workrates: "High/Low",
-            weakFoot: 4,
-            skillMoves: 5,
-            nationality: "France",
-            club: "Real Madrid",
-            value: "€180M",
-            wage: "€1.2M",
-            contract: "2029",
-            sofifaId: 231747,
-            sofifaUrl: "https://sofifa.com/player/231747/kylian-mbappe/250001/"
-        },
+    static fifaDatabase = {};
 
-        "Jude Bellingham": {
-            overall: 90,
-            potential: 94,
-            positions: ["CM", "CAM", "CDM"],
-            age: 20,
-            height: 186,
-            weight: 75,
-            foot: "Right",
-            pace: 75,
-            shooting: 83,
-            passing: 88,
-            dribbling: 86,
-            defending: 78,
-            physical: 82,
-            skills: {
-                crossing: 84,
-                finishing: 82,
-                headingAccuracy: 85,
-                shortPassing: 90,
-                volleys: 80,
-                curve: 85,
-                fkAccuracy: 81,
-                longPassing: 86,
-                ballControl: 87,
-                acceleration: 78,
-                sprintSpeed: 72,
-                agility: 84,
-                reactions: 89,
-                balance: 86,
-                shotPower: 85,
-                jumping: 84,
-                stamina: 88,
-                strength: 79,
-                longShots: 84,
-                aggression: 80,
-                interceptions: 76,
-                positioning: 88,
-                vision: 89,
-                penalties: 78,
-                composure: 84
-            },
-            workrates: "High/High",
-            weakFoot: 4,
-            skillMoves: 4,
-            nationality: "England",
-            club: "Real Madrid",
-            value: "€150M",
-            wage: "€350K",
-            contract: "2029",
-            sofifaId: 252371,
-            sofifaUrl: "https://sofifa.com/player/252371/jude-bellingham/250001/"
-        },
-
-        "Vinicius Jr.": {
-            overall: 89,
-            potential: 93,
-            positions: ["LW", "LM"],
-            age: 23,
-            height: 176,
-            weight: 73,
-            foot: "Right",
-            pace: 95,
-            shooting: 83,
-            passing: 78,
-            dribbling: 92,
-            defending: 29,
-            physical: 68,
-            skills: {
-                crossing: 81,
-                finishing: 83,
-                headingAccuracy: 62,
-                shortPassing: 80,
-                volleys: 78,
-                curve: 81,
-                fkAccuracy: 76,
-                longPassing: 76,
-                ballControl: 93,
-                acceleration: 97,
-                sprintSpeed: 93,
-                agility: 94,
-                reactions: 90,
-                balance: 82,
-                shotPower: 82,
-                jumping: 69,
-                stamina: 83,
-                strength: 53,
-                longShots: 79,
-                aggression: 56,
-                interceptions: 25,
-                positioning: 85,
-                vision: 79,
-                penalties: 75,
-                composure: 78
-            },
-            workrates: "High/Low",
-            weakFoot: 2,
-            skillMoves: 5,
-            nationality: "Brazil",
-            club: "Real Madrid",
-            value: "€120M",
-            wage: "€200K",
-            contract: "2027",
-            sofifaId: 238794,
-            sofifaUrl: "https://sofifa.com/player/238794/vinicius-junior/250001/"
-        },
-
-        // AEK Athens players (using more modest ratings)
-        "Sergio Araújo": {
-            overall: 72,
-            potential: 75,
-            positions: ["ST", "CF"],
-            age: 32,
-            height: 180,
-            weight: 75,
-            foot: "Left",
-            pace: 68,
-            shooting: 75,
-            passing: 62,
-            dribbling: 71,
-            defending: 30,
-            physical: 73,
-            skills: {
-                crossing: 55,
-                finishing: 78,
-                headingAccuracy: 72,
-                shortPassing: 65,
-                volleys: 74,
-                curve: 68,
-                fkAccuracy: 70,
-                longPassing: 58,
-                ballControl: 73,
-                acceleration: 70,
-                sprintSpeed: 66,
-                agility: 72,
-                reactions: 76,
-                balance: 70,
-                shotPower: 76,
-                jumping: 71,
-                stamina: 72,
-                strength: 74,
-                longShots: 72,
-                aggression: 65,
-                interceptions: 25,
-                positioning: 77,
-                vision: 60,
-                penalties: 75,
-                composure: 74
-            },
-            workrates: "Medium/Low",
-            weakFoot: 3,
-            skillMoves: 3,
-            nationality: "Argentina",
-            club: "AEK Athens",
-            value: "€2.8M",
-            wage: "€15K",
-            contract: "2025",
-            sofifaId: 199455,
-            sofifaUrl: "https://sofifa.com/player/199455/sergio-araujo/250001/"
-        },
-
-        "Nordin Amrabat": {
-            overall: 70,
-            potential: 70,
-            positions: ["RW", "RM", "RWB"],
-            age: 37,
-            height: 173,
-            weight: 65,
-            foot: "Right",
-            pace: 76,
-            shooting: 65,
-            passing: 73,
-            dribbling: 76,
-            defending: 61,
-            physical: 65,
-            skills: {
-                crossing: 78,
-                finishing: 62,
-                headingAccuracy: 55,
-                shortPassing: 74,
-                volleys: 68,
-                curve: 71,
-                fkAccuracy: 75,
-                longPassing: 72,
-                ballControl: 78,
-                acceleration: 78,
-                sprintSpeed: 74,
-                agility: 80,
-                reactions: 72,
-                balance: 74,
-                shotPower: 68,
-                jumping: 58,
-                stamina: 76,
-                strength: 52,
-                longShots: 70,
-                aggression: 68,
-                interceptions: 65,
-                positioning: 68,
-                vision: 75,
-                penalties: 65,
-                composure: 74
-            },
-            workrates: "High/Medium",
-            weakFoot: 4,
-            skillMoves: 4,
-            nationality: "Morocco",
-            club: "AEK Athens",
-            value: "€800K",
-            wage: "€8K",
-            contract: "2024",
-            sofifaId: 199014,
-            sofifaUrl: "https://sofifa.com/player/199014/nordin-amrabat/250001/"
-        },
-
-        "Levi García": {
-            overall: 73,
-            potential: 76,
-            positions: ["LW", "RW", "ST"],
-            age: 26,
-            height: 175,
-            weight: 70,
-            foot: "Left",
-            pace: 82,
-            shooting: 71,
-            passing: 68,
-            dribbling: 77,
-            defending: 35,
-            physical: 72,
-            skills: {
-                crossing: 70,
-                finishing: 73,
-                headingAccuracy: 65,
-                shortPassing: 70,
-                volleys: 68,
-                curve: 72,
-                fkAccuracy: 67,
-                longPassing: 66,
-                ballControl: 78,
-                acceleration: 84,
-                sprintSpeed: 80,
-                agility: 81,
-                reactions: 75,
-                balance: 78,
-                shotPower: 74,
-                jumping: 68,
-                stamina: 76,
-                strength: 67,
-                longShots: 69,
-                aggression: 64,
-                interceptions: 30,
-                positioning: 74,
-                vision: 67,
-                penalties: 68,
-                composure: 72
-            },
-            workrates: "High/Medium",
-            weakFoot: 3,
-            skillMoves: 4,
-            nationality: "Trinidad and Tobago",
-            club: "AEK Athens",
-            value: "€4.5M",
-            wage: "€12K",
-            contract: "2025",
-            sofifaId: 236772,
-            sofifaUrl: "https://sofifa.com/player/236772/levi-garcia/250001/"
+    /**
+     * Load FIFA database from JSON file
+     * @returns {Promise<boolean>} Success status
+     */
+    static async loadDatabase() {
+        try {
+            console.log('📥 Loading FIFA database from JSON...');
+            
+            // Try to fetch the JSON file
+            const response = await fetch('./sofifa_my_players_app.json');
+            if (!response.ok) {
+                throw new Error(`Failed to load JSON: ${response.status}`);
+            }
+            
+            const playersArray = await response.json();
+            console.log(`📊 Loaded ${playersArray.length} players from JSON`);
+            
+            // Transform and populate the database
+            this.fifaDatabase = {};
+            for (const player of playersArray) {
+                const transformedPlayer = this.transformPlayerData(player);
+                this.fifaDatabase[player.name] = transformedPlayer;
+            }
+            
+            console.log(`✅ FIFA database loaded successfully with ${Object.keys(this.fifaDatabase).length} players`);
+            return true;
+        } catch (error) {
+            console.warn('⚠️ Failed to load JSON database, using fallback data:', error.message);
+            this.loadFallbackDatabase();
+            return false;
         }
-    };
+    }
+
+    /**
+     * Transform player data from JSON format to internal format
+     * @param {Object} jsonPlayer - Player data from JSON
+     * @returns {Object} Transformed player data
+     */
+    static transformPlayerData(jsonPlayer) {
+        // Calculate proper age from birth year (if it looks like a year)
+        let age = jsonPlayer.age;
+        if (age > 1900 && age < 2010) {
+            age = new Date().getFullYear() - age;
+        }
+        
+        // Parse positions from string to array
+        const positions = jsonPlayer.positions ? 
+            jsonPlayer.positions.split(',').map(p => p.trim()) : 
+            ["Unknown"];
+
+        // Flatten detailed skills into a single skills object
+        const skills = this.flattenDetailedSkills(jsonPlayer.detailed_skills || {});
+
+        return {
+            overall: jsonPlayer.overall || 65,
+            potential: jsonPlayer.potential || jsonPlayer.overall || 65,
+            positions: positions,
+            age: age,
+            height: jsonPlayer.height_cm || 175,
+            weight: jsonPlayer.weight_kg || 70,
+            foot: jsonPlayer.preferred_foot || "Right",
+            pace: jsonPlayer.main_attributes?.pace || 65,
+            shooting: jsonPlayer.main_attributes?.shooting || 65,
+            passing: jsonPlayer.main_attributes?.passing || 65,
+            dribbling: jsonPlayer.main_attributes?.dribbling || 65,
+            defending: jsonPlayer.main_attributes?.defending || 65,
+            physical: jsonPlayer.main_attributes?.physical || 65,
+            skills: skills,
+            workrates: jsonPlayer.work_rate || "Medium/Medium",
+            weakFoot: jsonPlayer.weak_foot || 3,
+            skillMoves: jsonPlayer.skill_moves || 3,
+            nationality: jsonPlayer.nationality || "Unknown",
+            club: "Unknown", // Not provided in JSON
+            value: "€1M", // Default value
+            wage: "€5K", // Default wage
+            contract: "2025", // Default contract
+            sofifaId: parseInt(jsonPlayer.id) || null,
+            sofifaUrl: jsonPlayer.id ? `https://sofifa.com/player/${jsonPlayer.id}/` : null
+        };
+    }
+
+    /**
+     * Flatten detailed skills from JSON structure to flat skills object
+     * @param {Object} detailedSkills - Detailed skills from JSON
+     * @returns {Object} Flat skills object
+     */
+    static flattenDetailedSkills(detailedSkills) {
+        const skills = {};
+        
+        // Default skill values
+        const defaultSkills = {
+            crossing: 65, finishing: 65, headingAccuracy: 65, shortPassing: 65,
+            volleys: 65, curve: 65, fkAccuracy: 65, longPassing: 65,
+            ballControl: 65, acceleration: 65, sprintSpeed: 65, agility: 65,
+            reactions: 65, balance: 65, shotPower: 65, jumping: 65,
+            stamina: 65, strength: 65, longShots: 65, aggression: 65,
+            interceptions: 65, positioning: 65, vision: 65, penalties: 65,
+            composure: 65
+        };
+
+        // Start with defaults
+        Object.assign(skills, defaultSkills);
+
+        // Extract skills from detailed structure
+        Object.values(detailedSkills).forEach(category => {
+            if (typeof category === 'object') {
+                Object.entries(category).forEach(([skillName, value]) => {
+                    if (typeof value === 'number') {
+                        // Map JSON skill names to our format
+                        const mappedName = this.mapSkillName(skillName);
+                        if (mappedName) {
+                            skills[mappedName] = value;
+                        }
+                    }
+                });
+            }
+        });
+
+        return skills;
+    }
+
+    /**
+     * Map skill names from JSON format to internal format
+     * @param {string} jsonSkillName - Skill name from JSON
+     * @returns {string|null} Mapped skill name or null
+     */
+    static mapSkillName(jsonSkillName) {
+        const mapping = {
+            // Direct mappings
+            'crossing': 'crossing',
+            'finishing': 'finishing',
+            'volleys': 'volleys',
+            'curve': 'curve',
+            'vision': 'vision',
+            'acceleration': 'acceleration',
+            'agility': 'agility',
+            'reactions': 'reactions',
+            'balance': 'balance',
+            'jumping': 'jumping',
+            'stamina': 'stamina',
+            'strength': 'strength',
+            'aggression': 'aggression',
+            'interceptions': 'interceptions',
+            'positioning': 'positioning',
+            'penalties': 'penalties',
+            'composure': 'composure',
+            
+            // Name translations
+            'short_passing': 'shortPassing',
+            'long_passing': 'longPassing',
+            'fk_accuracy': 'fkAccuracy',
+            'ball_control': 'ballControl',
+            'sprint_speed': 'sprintSpeed',
+            'shot_power': 'shotPower',
+            'long_shots': 'longShots',
+            'defensive_awareness': 'interceptions', // Map to closest equivalent
+            'dribbling': 'ballControl', // Map to ball control as closest equivalent
+            'heading_accuracy': 'headingAccuracy'
+        };
+
+        return mapping[jsonSkillName] || null;
+    }
+
+    /**
+     * Load fallback database with essential players if JSON loading fails
+     */
+    static loadFallbackDatabase() {
+        this.fifaDatabase = {
+            "Erling Haaland": {
+                overall: 91, potential: 94, positions: ["ST", "CF"], age: 23,
+                height: 195, weight: 88, foot: "Left", pace: 89, shooting: 91,
+                passing: 65, dribbling: 80, defending: 45, physical: 88,
+                skills: {
+                    crossing: 55, finishing: 94, headingAccuracy: 85, shortPassing: 65,
+                    volleys: 86, curve: 77, fkAccuracy: 84, longPassing: 65,
+                    ballControl: 81, acceleration: 87, sprintSpeed: 90, agility: 77,
+                    reactions: 93, balance: 70, shotPower: 94, jumping: 95,
+                    stamina: 88, strength: 92, longShots: 85, aggression: 84,
+                    interceptions: 30, positioning: 95, vision: 68, penalties: 85,
+                    composure: 88
+                },
+                workrates: "High/Medium", weakFoot: 3, skillMoves: 3,
+                nationality: "Norway", club: "Manchester City",
+                value: "€180M", wage: "€375K", contract: "2027",
+                sofifaId: 239085, sofifaUrl: "https://sofifa.com/player/239085/erling-haaland/250001/"
+            }
+        };
+    }
 
     /**
      * Search for a player in the FIFA database with SoFIFA integration
@@ -398,6 +214,12 @@ export class FIFADataService {
      */
     static async getPlayerData(playerName, options = { useLiveData: true, fallbackToMock: true }) {
         console.log(`🔍 Searching for player: ${playerName}`);
+        
+        // Load database if not already loaded
+        if (Object.keys(this.fifaDatabase).length === 0) {
+            console.log('📚 Database empty, loading data...');
+            await this.loadDatabase();
+        }
         
         // Validate input
         if (!playerName || typeof playerName !== 'string' || playerName.trim().length === 0) {
@@ -657,7 +479,11 @@ export class FIFADataService {
      * Get all available players in the FIFA database
      * @returns {Array} List of player names available in the database
      */
-    static getAvailablePlayers() {
+    static async getAvailablePlayers() {
+        // Load database if not already loaded
+        if (Object.keys(this.fifaDatabase).length === 0) {
+            await this.loadDatabase();
+        }
         return Object.keys(this.fifaDatabase);
     }
 
@@ -675,7 +501,11 @@ export class FIFADataService {
      * @param {string} playerName - Player name to check
      * @returns {boolean} True if player exists
      */
-    static hasPlayer(playerName) {
+    static async hasPlayer(playerName) {
+        // Load database if not already loaded
+        if (Object.keys(this.fifaDatabase).length === 0) {
+            await this.loadDatabase();
+        }
         return this.fifaDatabase.hasOwnProperty(playerName);
     }
 

@@ -15,7 +15,10 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
     mode: 'automatic',
     aekGoals: 0,
     realGoals: 0,
-    beerCount: 0,
+    beerCount: {
+      aek: 0,
+      real: 0
+    },
     // Individual tracking for Alexander and Philip
     alexanderShots: {
       cl40: 0, // 2cl shots at 40% alcohol
@@ -47,7 +50,7 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
   const handleValueChange = (key, value) => {
     const newValues = { ...calculatorValues, [key]: value };
     setCalculatorValues(newValues);
-    updateCalculatorValues(newValues);
+    updateCalculatorValues({ [key]: value }, calculatorValues);
   };
 
   // Function to add shots for specific person
@@ -55,7 +58,7 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
     const newValues = { ...calculatorValues };
     newValues[`${person}Shots`][shotType] += 1;
     setCalculatorValues(newValues);
-    updateCalculatorValues(newValues);
+    updateCalculatorValues({ [`${person}Shots`]: newValues[`${person}Shots`] }, calculatorValues);
   };
 
   // Function to calculate individual alcohol consumption
@@ -347,8 +350,16 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
           <input
             type="number"
             min="0"
-            value={calculatorValues.beerCount}
-            onChange={(e) => handleValueChange('beerCount', parseInt(e.target.value) || 0)}
+            value={(calculatorValues.beerCount?.aek || 0) + (calculatorValues.beerCount?.real || 0)}
+            onChange={(e) => {
+              const totalBeers = parseInt(e.target.value) || 0;
+              const halfBeers = Math.floor(totalBeers / 2);
+              const remainder = totalBeers % 2;
+              handleValueChange('beerCount', {
+                aek: halfBeers + remainder,
+                real: halfBeers
+              });
+            }}
             className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-blue"
           />
         </div>
@@ -360,7 +371,7 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
                 getTotalAlcoholCl(), 
                 { weight: calculatorValues.playerWeight, gender: calculatorValues.playerGender },
                 null,
-                calculatorValues.beerCount
+                (calculatorValues.beerCount?.aek || 0) + (calculatorValues.beerCount?.real || 0)
               )}‰
             </div>
             <div className="text-sm text-red-700 font-medium">
