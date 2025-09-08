@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { dataManager } from '../../../../dataManager.js';
 
 export default function TeamSettingsTab() {
   const [managers, setManagers] = useState({
@@ -6,18 +7,36 @@ export default function TeamSettingsTab() {
     real: { name: 'Philip', age: 30, weight: 105 }
   });
   const [hasChanges, setHasChanges] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Load manager settings from localStorage
+  // Load manager settings from database
   useEffect(() => {
-    const savedManagers = localStorage.getItem('teamManagers');
-    if (savedManagers) {
-      try {
-        setManagers(JSON.parse(savedManagers));
-      } catch (e) {
-        console.error('Error loading manager settings:', e);
-      }
-    }
+    loadManagersFromDatabase();
   }, []);
+
+  const loadManagersFromDatabase = async () => {
+    try {
+      setLoading(true);
+      const result = await dataManager.getManagers();
+      
+      if (result.data && result.data.length >= 2) {
+        // Convert database format to component format
+        // Assuming id=1 is AEK manager, id=2 is Real manager
+        const aekManager = result.data.find(m => m.id === 1) || { name: 'Alexander', gewicht: 110 };
+        const realManager = result.data.find(m => m.id === 2) || { name: 'Philip', gewicht: 105 };
+        
+        setManagers({
+          aek: { name: aekManager.name, age: 30, weight: aekManager.gewicht },
+          real: { name: realManager.name, age: 30, weight: realManager.gewicht }
+        });
+      }
+    } catch (error) {
+      console.error('Error loading manager settings from database:', error);
+      // Fallback to defaults if database fails
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleManagerChange = (team, field, value) => {
     setManagers(prev => ({
@@ -30,9 +49,20 @@ export default function TeamSettingsTab() {
     setHasChanges(true);
   };
 
-  const saveSettings = () => {
+  const saveSettings = async () => {
     try {
-      localStorage.setItem('teamManagers', JSON.stringify(managers));
+      setLoading(true);
+      
+      // Update both managers in the database
+      const aekData = { name: managers.aek.name, gewicht: managers.aek.weight };
+      const realData = { name: managers.real.name, gewicht: managers.real.weight };
+      
+      // Update AEK manager (id=1)
+      await dataManager.update('managers', aekData, 1);
+      
+      // Update Real manager (id=2)
+      await dataManager.update('managers', realData, 2);
+      
       setHasChanges(false);
       
       // Dispatch custom event to notify other components
@@ -63,6 +93,8 @@ export default function TeamSettingsTab() {
           document.body.removeChild(toast);
         }
       }, 3000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,7 +108,15 @@ export default function TeamSettingsTab() {
 
   return (
     <div className="p-4 space-y-6">
-      <div className="modern-card">
+      {loading ? (
+        <div className="modern-card">
+          <div className="flex justify-center items-center p-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-green"></div>
+            <span className="ml-2 text-text-muted">Lade Manager-Einstellungen...</span>
+          </div>
+        </div>
+      ) : (
+        <div className="modern-card">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-text-primary">
             🏆 Team-Manager Einstellungen
@@ -197,24 +237,25 @@ export default function TeamSettingsTab() {
           
           <button
             onClick={saveSettings}
-            disabled={!hasChanges}
+            disabled={!hasChanges || loading}
             className={`px-4 py-2 text-sm rounded-lg transition-colors ${
-              hasChanges 
+              hasChanges && !loading
                 ? 'bg-primary-green text-white hover:bg-green-600' 
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }`}
           >
-            Einstellungen speichern
+            {loading ? 'Speichern...' : 'Einstellungen speichern'}
           </button>
         </div>
 
         <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
           <div className="text-sm text-yellow-800">
             <strong>Hinweis:</strong> Diese Einstellungen werden für die BAK-Berechnung in der Statistik verwendet.
-            Die Werte sind nur lokal gespeichert und gelten für diesen Browser.
+            Die Werte werden in der Datenbank gespeichert.
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

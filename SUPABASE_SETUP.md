@@ -56,6 +56,13 @@ Diese Anwendung ist für die Nutzung mit Supabase konfiguriert. Aktuell läuft s
      date TIMESTAMP DEFAULT NOW(),
      created_at TIMESTAMP DEFAULT NOW()
    );
+
+   -- Manager Tabelle
+   CREATE TABLE managers (
+     id SERIAL PRIMARY KEY,
+     name TEXT NOT NULL,
+     gewicht SMALLINT NOT NULL
+   );
    ```
 
 4. **Row Level Security (RLS) aktivieren**
@@ -65,12 +72,14 @@ Diese Anwendung ist für die Nutzung mit Supabase konfiguriert. Aktuell läuft s
    ALTER TABLE matches ENABLE ROW LEVEL SECURITY;
    ALTER TABLE bans ENABLE ROW LEVEL SECURITY;
    ALTER TABLE finances ENABLE ROW LEVEL SECURITY;
+   ALTER TABLE managers ENABLE ROW LEVEL SECURITY;
 
    -- Basis-Policies erstellen (erlaubt allen authentifizierten Benutzern alles)
    CREATE POLICY "Enable all for authenticated users" ON players FOR ALL USING (auth.role() = 'authenticated');
    CREATE POLICY "Enable all for authenticated users" ON matches FOR ALL USING (auth.role() = 'authenticated');
    CREATE POLICY "Enable all for authenticated users" ON bans FOR ALL USING (auth.role() = 'authenticated');
    CREATE POLICY "Enable all for authenticated users" ON finances FOR ALL USING (auth.role() = 'authenticated');
+   CREATE POLICY "Enable all for authenticated users" ON managers FOR ALL USING (auth.role() = 'authenticated');
    ```
 
 ## Beispielkonfiguration

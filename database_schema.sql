@@ -76,12 +76,27 @@ CREATE TABLE IF NOT EXISTS spieler_des_spiels (
   CONSTRAINT spieler_des_spiels_pkey PRIMARY KEY (id)
 );
 
+-- 7. Managers table for alcohol tracker
+CREATE TABLE IF NOT EXISTS managers (
+  id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
+  name text NOT NULL,
+  gewicht int2 NOT NULL,
+  CONSTRAINT managers_pkey PRIMARY KEY (id)
+);
+
 -- Insert default finance records if they don't exist
 INSERT INTO finances (team, balance, debt) 
 VALUES 
   ('AEK', 0, 0),
   ('Real', 0, 0)
 ON CONFLICT (team) DO NOTHING;
+
+-- Insert default manager records if they don't exist
+INSERT INTO managers (id, name, gewicht) 
+VALUES 
+  (1, 'Alexander', 110),
+  (2, 'Philip', 105)
+ON CONFLICT (id) DO NOTHING;
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_players_team ON players(team);
@@ -91,6 +106,7 @@ CREATE INDEX IF NOT EXISTS idx_transactions_team ON transactions(team);
 CREATE INDEX IF NOT EXISTS idx_transactions_match_id ON transactions(match_id);
 CREATE INDEX IF NOT EXISTS idx_bans_player_id ON bans(player_id);
 CREATE INDEX IF NOT EXISTS idx_finances_team ON finances(team);
+CREATE INDEX IF NOT EXISTS idx_managers_name ON managers(name);
 
 -- Row Level Security (RLS) policies
 ALTER TABLE players ENABLE ROW LEVEL SECURITY;
@@ -99,6 +115,7 @@ ALTER TABLE transactions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE finances ENABLE ROW LEVEL SECURITY;
 ALTER TABLE bans ENABLE ROW LEVEL SECURITY;
 ALTER TABLE spieler_des_spiels ENABLE ROW LEVEL SECURITY;
+ALTER TABLE managers ENABLE ROW LEVEL SECURITY;
 
 -- Create policies for authenticated users
 CREATE POLICY IF NOT EXISTS "Enable all for authenticated users" ON players 
@@ -117,4 +134,7 @@ CREATE POLICY IF NOT EXISTS "Enable all for authenticated users" ON bans
   FOR ALL USING (auth.role() = 'authenticated');
 
 CREATE POLICY IF NOT EXISTS "Enable all for authenticated users" ON spieler_des_spiels 
+  FOR ALL USING (auth.role() = 'authenticated');
+
+CREATE POLICY IF NOT EXISTS "Enable all for authenticated users" ON managers 
   FOR ALL USING (auth.role() = 'authenticated');

@@ -67,6 +67,10 @@ class DataManager {
                 name: { required: true, type: 'string', minLength: 1 },
                 team: { required: true, type: 'string' },
                 count: { required: false, type: 'number', min: 0 }
+            },
+            managers: {
+                name: { required: true, type: 'string', minLength: 1 },
+                gewicht: { required: true, type: 'number', min: 40, max: 200 }
             }
         };
     }
@@ -384,6 +388,10 @@ class DataManager {
         return this.select('spieler_des_spiels', '*');
     }
 
+    async getManagers() {
+        return this.select('managers', '*', { order: { column: 'id', ascending: true } });
+    }
+
     // Batch operations for better performance
     async loadAllAppData() {
         const requests = [
@@ -392,7 +400,8 @@ class DataManager {
             { key: 'bans', table: 'bans', query: '*', options: {} },
             { key: 'finances', table: 'finances', query: '*', options: {} },
             { key: 'transactions', table: 'transactions', query: '*', options: { order: { column: 'id', ascending: false } } },
-            { key: 'spieler_des_spiels', table: 'spieler_des_spiels', query: '*', options: {} }
+            { key: 'spieler_des_spiels', table: 'spieler_des_spiels', query: '*', options: {} },
+            { key: 'managers', table: 'managers', query: '*', options: { order: { column: 'id', ascending: true } } }
         ];
 
         const results = await this.batchedSelect(requests);

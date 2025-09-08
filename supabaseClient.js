@@ -89,6 +89,10 @@ const createFallbackClient = () => {
       { id: 6, name: 'Lukas Wolf', team: 'Real', count: 0, created_at: '2024-08-13' },
       { id: 7, name: 'Tim Fischer', team: 'AEK', count: 0, created_at: '2024-08-13' },
       { id: 8, name: 'Ben Richter', team: 'Real', count: 0, created_at: '2024-08-13' }
+    ],
+    managers: [
+      { id: 1, name: 'Alexander', gewicht: 110, created_at: '2024-01-01' },
+      { id: 2, name: 'Philip', gewicht: 105, created_at: '2024-01-01' }
     ]
   };
   

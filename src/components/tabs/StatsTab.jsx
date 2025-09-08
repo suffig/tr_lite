@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
-import AdvancedAnalytics from './AdvancedAnalytics';
 import EnhancedDashboard from '../EnhancedDashboard';
 
 // Enhanced Statistics Calculator Class (ported from vanilla JS)
@@ -280,7 +279,6 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
     { id: 'players', label: 'Spieler', icon: '👥' },
     { id: 'teams', label: 'Teams', icon: '🏆' },
     { id: 'trends', label: 'Trends', icon: '📈' },
-    { id: 'advanced', label: 'Erweitert', icon: '🔬' },
   ];
 
   if (loading) {
@@ -1057,7 +1055,6 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
       case 'players': return renderPlayers();
       case 'teams': return renderTeams();
       case 'trends': return renderTrends();
-      case 'advanced': return <AdvancedAnalytics />;
       default: return renderOverview();
     }
   };

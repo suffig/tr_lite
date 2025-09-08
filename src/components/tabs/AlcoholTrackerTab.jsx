@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AlcoholProgressionGraph from '../AlcoholProgressionGraph.jsx';
+import { dataManager } from '../../../dataManager.js';
 
 export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   // Sub-navigation state
@@ -22,6 +23,28 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
   });
 
   const [drinkingStartTime, setDrinkingStartTime] = useState(null);
+
+  // Load manager data from database
+  const loadManagersFromDatabase = useCallback(async () => {
+    try {
+      const result = await dataManager.getManagers();
+      
+      if (result.data && result.data.length >= 2) {
+        // Convert database format to component format
+        // Assuming id=1 is AEK manager, id=2 is Real manager
+        const aekManager = result.data.find(m => m.id === 1) || { name: 'Alexander', gewicht: 110 };
+        const realManager = result.data.find(m => m.id === 2) || { name: 'Philip', gewicht: 105 };
+        
+        setManagers({
+          aek: { name: aekManager.name, age: 30, weight: aekManager.gewicht },
+          real: { name: realManager.name, age: 30, weight: realManager.gewicht }
+        });
+      }
+    } catch (error) {
+      console.error('Error loading manager settings from database:', error);
+      // Fallback to defaults if database fails
+    }
+  }, []);
 
   // Enhanced Blackjack game state - both players vs bank
   const [blackjackGames, setBlackjackGames] = useState({
@@ -55,17 +78,10 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
 
   // Load saved values on component mount
   useEffect(() => {
-    // Load manager settings
-    const savedManagers = localStorage.getItem('teamManagers');
-    if (savedManagers) {
-      try {
-        setManagers(JSON.parse(savedManagers));
-      } catch (e) {
-        console.error('Error loading manager settings:', e);
-      }
-    }
+    // Load manager settings from database
+    loadManagersFromDatabase();
 
-    // Load beer consumption
+    // Load beer consumption from localStorage (keeping this in localStorage for now)
     const savedBeer = localStorage.getItem('beerConsumption');
     if (savedBeer) {
       try {
@@ -75,7 +91,7 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
       }
     }
 
-    // Load shot consumption
+    // Load shot consumption from localStorage (keeping this in localStorage for now)
     const savedShots = localStorage.getItem('shotConsumption');
     if (savedShots) {
       try {
@@ -85,13 +101,13 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
       }
     }
 
-    // Load drinking start time
+    // Load drinking start time from localStorage (keeping this in localStorage for now)
     const savedStartTime = localStorage.getItem('drinkingStartTime');
     if (savedStartTime) {
       setDrinkingStartTime(savedStartTime);
     }
 
-    // Load blackjack game data
+    // Load blackjack game data from localStorage (keeping this in localStorage for now)
     const savedBlackjack = localStorage.getItem('blackjackGames');
     if (savedBlackjack) {
       try {
@@ -103,19 +119,13 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
 
     // Listen for manager settings changes
     const handleManagerChange = () => {
-      const savedManagers = localStorage.getItem('teamManagers');
-      if (savedManagers) {
-        try {
-          setManagers(JSON.parse(savedManagers));
-        } catch (e) {
-          console.error('Error loading manager settings:', e);
-        }
-      }
+      // Reload from database when settings change
+      loadManagersFromDatabase();
     };
 
     window.addEventListener('managerSettingsChanged', handleManagerChange);
     return () => window.removeEventListener('managerSettingsChanged', handleManagerChange);
-  }, []);
+  }, [loadManagersFromDatabase]);
 
   // Save data to localStorage
   const saveBeerConsumption = (newConsumption) => {
