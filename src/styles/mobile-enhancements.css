@@ -955,3 +955,43 @@ button:focus {
     transform: scale(1);
   }
 }
+
+/* Mobile-specific modal animations */
+@media (max-width: 640px) {
+  .enhanced-modal {
+    margin: 1rem;
+    max-height: calc(100vh - 2rem);
+    animation: mobileModalSlideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  
+  .modal-body {
+    max-height: calc(100vh - 12rem);
+  }
+  
+  @keyframes mobileModalSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Touch feedback for mobile */
+@media (hover: none) and (pointer: coarse) {
+  .enhanced-card:hover,
+  .stat-card:hover,
+  .activity-card:hover {
+    transform: none;
+  }
+  
+  .enhanced-card:active,
+  .stat-card:active,
+  .activity-card:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
