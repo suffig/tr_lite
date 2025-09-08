@@ -153,7 +153,7 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
   ];
 
   return (
-    <div className="p-4 pb-20">
+    <div className="p-4 pb-24 mobile-safe-bottom">
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-text-primary mb-2">
           Kader-Übersicht
@@ -271,7 +271,7 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
                                       Stärke: {player.staerke}
                                     </span>
                                   )}
-                                  {player.value && (
+                                  {(player.value !== null && player.value !== undefined) && (
                                     <span className="text-xs text-primary-green font-medium">
                                       {formatCurrencyInMillions(player.value)}
                                     </span>

@@ -14,6 +14,27 @@ export class SofifaIntegration {
     };
 
     /**
+     * Normalize player name for better matching
+     * @param {string} name - Player name to normalize
+     * @returns {string} Normalized name
+     */
+    static normalizePlayerName(name) {
+        if (!name) return '';
+        return name
+            .toLowerCase()
+            .trim()
+            // Remove accents and special characters
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            // Remove common punctuation
+            .replace(/[''`]/g, '')
+            .replace(/[.,-]/g, ' ')
+            // Normalize whitespace
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    /**
      * Load the local JSON file with player data
      * @returns {Promise<Array|null>} Player data array or null if failed
      */
@@ -63,17 +84,38 @@ export class SofifaIntegration {
                 }
             }
 
-            // Search by name (fuzzy matching)
+            // Search by name (improved fuzzy matching)
             if (playerName) {
-                const normalizedSearchName = playerName.toLowerCase().trim();
-                const playerByName = jsonData.find(player => {
-                    const normalizedPlayerName = player.name.toLowerCase().trim();
-                    return normalizedPlayerName.includes(normalizedSearchName) || 
-                           normalizedSearchName.includes(normalizedPlayerName);
+                const normalizedSearchName = this.normalizePlayerName(playerName);
+                
+                // First try exact match
+                let playerByName = jsonData.find(player => {
+                    const normalizedPlayerName = this.normalizePlayerName(player.name);
+                    return normalizedPlayerName === normalizedSearchName;
                 });
                 
+                // If no exact match, try contains match
+                if (!playerByName) {
+                    playerByName = jsonData.find(player => {
+                        const normalizedPlayerName = this.normalizePlayerName(player.name);
+                        return normalizedPlayerName.includes(normalizedSearchName) || 
+                               normalizedSearchName.includes(normalizedPlayerName);
+                    });
+                }
+                
+                // If still no match, try word-based matching for compound names
+                if (!playerByName) {
+                    const searchWords = normalizedSearchName.split(' ').filter(w => w.length > 2);
+                    if (searchWords.length > 0) {
+                        playerByName = jsonData.find(player => {
+                            const normalizedPlayerName = this.normalizePlayerName(player.name);
+                            return searchWords.every(word => normalizedPlayerName.includes(word));
+                        });
+                    }
+                }
+                
                 if (playerByName) {
-                    console.log(`🎯 Found player by name in JSON: ${playerByName.name}`);
+                    console.log(`🎯 Found player by name in JSON: ${playerByName.name} (searched: ${playerName})`);
                     return this.transformJsonPlayerData(playerByName);
                 }
             }

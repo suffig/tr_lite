@@ -190,7 +190,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
   const dateGroups = groupMatchesByDate();
 
   return (
-    <div className="p-4 pb-20">
+    <div className="p-4 pb-24 mobile-safe-bottom">
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-semibold text-text-primary">

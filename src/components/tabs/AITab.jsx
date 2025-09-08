@@ -521,7 +521,7 @@ ${netResult >= 0 ?
   };
 
   return (
-    <div className="p-4 pb-20">
+    <div className="p-4 pb-24 mobile-safe-bottom">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-text-primary mb-2 flex items-center">
           <span className="mr-3">🤖</span>
