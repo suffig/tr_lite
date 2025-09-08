@@ -153,7 +153,7 @@ export default function DashboardWidgets() {
               Letzte Spiele
             </h3>
             <div className="space-y-3">
-              {dashboardData.recentMatches.slice(0, 5).map((match, index) => (
+              {dashboardData.recentMatches.slice(0, 5).map((match) => (
                 <div key={match.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
                   <div className="text-sm text-gray-600">
                     {new Date(match.date).toLocaleDateString('de-DE')}
@@ -490,7 +490,7 @@ export default function DashboardWidgets() {
       {selectedWidgets.length === 0 && (
         <div className="text-center py-8 text-gray-500">
           <i className="fas fa-puzzle-piece text-4xl mb-4" />
-          <p>Keine Widgets ausgewählt. Klicken Sie auf "Anpassen" um Widgets hinzuzufügen.</p>
+          <p>Keine Widgets ausgewählt. Klicken Sie auf &quot;Anpassen&quot; um Widgets hinzuzufügen.</p>
         </div>
       )}
     </div>

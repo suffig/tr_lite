@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 
 // Real-time notification system for FIFA Tracker
@@ -7,30 +7,8 @@ export default function NotificationSystem() {
   const [isEnabled, setIsEnabled] = useState(false);
   const notificationId = useRef(0);
 
-  // Initialize notification system
-  useEffect(() => {
-    // Check if notifications are supported and request permission
-    if ('Notification' in window) {
-      if (Notification.permission === 'granted') {
-        setIsEnabled(true);
-      } else if (Notification.permission !== 'denied') {
-        Notification.requestPermission().then(permission => {
-          setIsEnabled(permission === 'granted');
-        });
-      }
-    }
-
-    // Listen for custom events to trigger notifications
-    const handleNotificationEvent = (event) => {
-      const { type, data } = event.detail;
-      showNotification(type, data);
-    };
-
-    window.addEventListener('fifa-notification', handleNotificationEvent);
-    return () => window.removeEventListener('fifa-notification', handleNotificationEvent);
-  }, []);
-
-  const showNotification = (type, data) => {
+  // Show notification function
+  const showNotification = useCallback((type, data) => {
     const id = ++notificationId.current;
     const notification = {
       id,
@@ -61,7 +39,30 @@ export default function NotificationSystem() {
     setTimeout(() => {
       setNotifications(prev => prev.filter(n => n.id !== id));
     }, 5000);
-  };
+  }, [isEnabled]);
+
+  // Initialize notification system
+  useEffect(() => {
+    // Check if notifications are supported and request permission
+    if ('Notification' in window) {
+      if (Notification.permission === 'granted') {
+        setIsEnabled(true);
+      } else if (Notification.permission !== 'denied') {
+        Notification.requestPermission().then(permission => {
+          setIsEnabled(permission === 'granted');
+        });
+      }
+    }
+
+    // Listen for custom events to trigger notifications
+    const handleNotificationEvent = (event) => {
+      const { type, data } = event.detail;
+      showNotification(type, data);
+    };
+
+    window.addEventListener('fifa-notification', handleNotificationEvent);
+    return () => window.removeEventListener('fifa-notification', handleNotificationEvent);
+  }, [showNotification]);
 
   const getNotificationTitle = (type, data) => {
     switch (type) {

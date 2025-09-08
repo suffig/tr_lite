@@ -1,12 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useSupabaseQuery, useSupabaseMutation } from '../hooks/useSupabase';
+import { useState } from 'react';
+import { useSupabaseQuery } from '../hooks/useSupabase';
 import EnhancedDeletionSystem, { BatchDeletionManager } from '../components/EnhancedDeletion';
-import { ConfirmationModal } from '../components/EnhancedModals';
-import { IOSToast } from '../components/IOSComponents';
 import { triggerNotification } from '../components/NotificationSystem';
 
 export default function DeletionTestSuite() {
-  const [activeTest, setActiveTest] = useState('single');
   const [testResults, setTestResults] = useState([]);
   const [isRunning, setIsRunning] = useState(false);
   const [showResults, setShowResults] = useState(false);
@@ -14,14 +11,7 @@ export default function DeletionTestSuite() {
   const { data: matches } = useSupabaseQuery('matches', '*', {
     order: { column: 'date', ascending: false }
   });
-  const { data: players } = useSupabaseQuery('players', '*');
-  const { data: bans } = useSupabaseQuery('bans', '*');
   const { data: transactions } = useSupabaseQuery('transactions', '*');
-
-  const { remove: removeMatch } = useSupabaseMutation('matches');
-  const { remove: removePlayer } = useSupabaseMutation('players');
-  const { remove: removeBan } = useSupabaseMutation('bans');
-  const { remove: removeTransaction } = useSupabaseMutation('transactions');
 
   // Test functions for deletion functionality
   const runSingleDeletionTest = async () => {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useHapticFeedback } from './IOSComponents';
 
@@ -15,7 +15,6 @@ export default function EnhancedModal({
   fullScreen = false
 }) {
   const [isVisible, setIsVisible] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
   const modalRef = useRef(null);
   const { triggerHaptic } = useHapticFeedback();
 
@@ -61,19 +60,12 @@ export default function EnhancedModal({
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
-      setIsAnimating(true);
       triggerHaptic('light');
       document.body.style.overflow = 'hidden';
-      
-      // Add entrance animation
-      setTimeout(() => setIsAnimating(false), 300);
     } else if (isVisible) {
-      setIsAnimating(true);
-      
       // Add exit animation
       setTimeout(() => {
         setIsVisible(false);
-        setIsAnimating(false);
         document.body.style.overflow = 'unset';
       }, 300);
     }
@@ -98,12 +90,12 @@ export default function EnhancedModal({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isVisible, closeOnEscape]);
+  }, [isVisible, closeOnEscape, handleClose]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     triggerHaptic('light');
     onClose();
-  };
+  }, [triggerHaptic, onClose]);
 
   const handleBackdropClick = (e) => {
     if (closeOnBackdrop && e.target === e.currentTarget) {

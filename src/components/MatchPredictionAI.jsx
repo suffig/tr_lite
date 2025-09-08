@@ -3,7 +3,6 @@ import { useSupabaseQuery } from '../hooks/useSupabase';
 import LoadingSpinner from './LoadingSpinner';
 
 export default function MatchPredictionAI() {
-  const [selectedFormation, setSelectedFormation] = useState('4-4-2');
   const [predictionsEnabled, setPredictionsEnabled] = useState(true);
   const [analysisDepth, setAnalysisDepth] = useState('detailed'); // 'quick', 'detailed', 'deep'
 
@@ -175,7 +174,7 @@ export default function MatchPredictionAI() {
       prediction,
       analysisDate: new Date()
     };
-  }, [matches, players, bans, analysisDepth]);
+  }, [matches, players, bans]);
 
   const loading = matchesLoading || playersLoading || bansLoading;
 

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { supabase, switchToFallbackMode } from '../utils/supabase';
 import { ErrorHandler, FormValidator } from '../utils/errorHandling';
-import { InlineSpinner } from './LoadingSpinner';
 
 export default function Login() {
   const [isLogin, setIsLogin] = useState(true);

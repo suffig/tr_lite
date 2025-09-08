@@ -234,7 +234,7 @@ export default function PlayerComparison() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {sortedPlayers.map((player, index) => (
+              {sortedPlayers.map((player) => (
                 <tr key={player.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center space-x-3">

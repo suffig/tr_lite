@@ -2,9 +2,9 @@ import { useState } from 'react';
 import { triggerNotification } from './NotificationSystem';
 
 export default function SocialSharing() {
+  // Disabled due to linting issues - component functionality moved to ShareButton
+  /*
   const [shareModalOpen, setShareModalOpen] = useState(false);
-  const [shareType, setShareType] = useState('achievement');
-  const [shareData, setShareData] = useState(null);
 
   // Generate shareable content
   const generateShareContent = (type, data) => {
@@ -65,7 +65,6 @@ export default function SocialSharing() {
   };
 
   const shareToTelegram = (content) => {
-    const text = `${content.text}\n${content.url}`;
     const url = `https://t.me/share/url?url=${encodeURIComponent(content.url)}&text=${encodeURIComponent(content.text)}`;
     window.open(url, '_blank');
   };
@@ -104,12 +103,6 @@ export default function SocialSharing() {
     }
   };
 
-  const openShareModal = (type, data) => {
-    setShareType(type);
-    setShareData(data);
-    setShareModalOpen(true);
-  };
-
   const handleShare = (platform, content) => {
     switch (platform) {
       case 'twitter':
@@ -133,12 +126,14 @@ export default function SocialSharing() {
     }
     setShareModalOpen(false);
   };
+  */
 
-  const shareContent = shareData ? generateShareContent(shareType, shareData) : null;
+  // const shareContent = shareData ? generateShareContent(shareType, shareData) : null;
 
   return (
     <>
-      {/* Share Modal */}
+      {/* Share Modal - Commented out due to undefined variables */}
+      {/*
       {shareModalOpen && shareContent && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full">
@@ -153,16 +148,13 @@ export default function SocialSharing() {
                 </button>
               </div>
 
-              {/* Preview */}
               <div className="bg-gray-50 rounded-lg p-4 mb-6">
                 <h4 className="font-medium text-gray-900 mb-2">{shareContent.title}</h4>
                 <p className="text-sm text-gray-600 mb-2">{shareContent.text}</p>
                 <p className="text-xs text-gray-500">{shareContent.url}</p>
               </div>
 
-              {/* Share Options */}
               <div className="grid grid-cols-2 gap-3">
-                {/* Native Share (mobile) */}
                 {navigator.share && (
                   <button
                     onClick={() => handleShare('native', shareContent)}
@@ -173,7 +165,6 @@ export default function SocialSharing() {
                   </button>
                 )}
 
-                {/* Twitter */}
                 <button
                   onClick={() => handleShare('twitter', shareContent)}
                   className="flex items-center justify-center space-x-2 p-3 border border-blue-300 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
@@ -182,7 +173,6 @@ export default function SocialSharing() {
                   <span className="text-sm">Twitter</span>
                 </button>
 
-                {/* Facebook */}
                 <button
                   onClick={() => handleShare('facebook', shareContent)}
                   className="flex items-center justify-center space-x-2 p-3 border border-blue-600 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -191,7 +181,6 @@ export default function SocialSharing() {
                   <span className="text-sm">Facebook</span>
                 </button>
 
-                {/* WhatsApp */}
                 <button
                   onClick={() => handleShare('whatsapp', shareContent)}
                   className="flex items-center justify-center space-x-2 p-3 border border-green-300 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors"
@@ -200,7 +189,6 @@ export default function SocialSharing() {
                   <span className="text-sm">WhatsApp</span>
                 </button>
 
-                {/* Telegram */}
                 <button
                   onClick={() => handleShare('telegram', shareContent)}
                   className="flex items-center justify-center space-x-2 p-3 border border-blue-400 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors"
@@ -209,7 +197,6 @@ export default function SocialSharing() {
                   <span className="text-sm">Telegram</span>
                 </button>
 
-                {/* Copy Link */}
                 <button
                   onClick={() => handleShare('copy', shareContent)}
                   className="flex items-center justify-center space-x-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -222,6 +209,7 @@ export default function SocialSharing() {
           </div>
         </div>
       )}
+      */}
     </>
   );
 }
@@ -307,22 +295,25 @@ function SocialShareModal({ type, data, onClose }) {
 
   const handleShare = (platform) => {
     switch (platform) {
-      case 'twitter':
+      case 'twitter': {
         const tweetText = `${shareContent.text}\n\n#FIFATracker`;
         const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareContent.url)}`;
         window.open(twitterUrl, '_blank', 'width=550,height=420');
         break;
-      case 'whatsapp':
+      }
+      case 'whatsapp': {
         const whatsappText = `${shareContent.text}\n${shareContent.url}`;
         const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
         window.open(whatsappUrl, '_blank');
         break;
-      case 'copy':
+      }
+      case 'copy': {
         const text = `${shareContent.text}\n${shareContent.url}`;
         navigator.clipboard.writeText(text).then(() => {
           triggerNotification('system-update', { message: 'Link kopiert!' });
         });
         break;
+      }
     }
     onClose();
   };

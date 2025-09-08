@@ -21,7 +21,7 @@ export default function BottomNavigation({ activeTab, onTabChange }) {
           transform: `translateX(${tabs.findIndex(tab => tab.id === activeTab) * 100}%)`,
           width: `${100 / tabs.length}%`
         }}></div>
-        {tabs.map((tab, index) => (
+        {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}

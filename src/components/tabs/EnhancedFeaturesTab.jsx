@@ -9,7 +9,7 @@ import { triggerNotification } from '../NotificationSystem';
 import PullToRefresh from '../PullToRefresh';
 import { EnhancedLoading } from '../EnhancedLoading';
 
-export default function EnhancedFeaturesTab({ onNavigate, showHints = false }) {
+export default function EnhancedFeaturesTab({ showHints = false }) {
   const [activeSection, setActiveSection] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [featuresEnabled, setFeaturesEnabled] = useState(true);
