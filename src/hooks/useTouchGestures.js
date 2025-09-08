@@ -16,7 +16,7 @@ export function useTouchGestures(onTabChange, activeTab) {
     const minSwipeDistance = 50;
     const maxVerticalDistance = 100;
 
-    const tabs = ['matches', 'bans', 'finanzen', 'squad', 'stats', 'admin'];
+    const tabs = ['matches', 'bans', 'finanzen', 'squad', 'stats', 'spieler', 'alcohol', 'admin'];
     const currentIndex = tabs.indexOf(activeTab);
 
     const isInExcludedArea = (target) => {

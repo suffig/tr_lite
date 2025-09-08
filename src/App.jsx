@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './hooks/useAuth';
 import { OfflineIndicator } from './hooks/useOfflineManager.jsx';
+import { useTouchGestures } from './hooks/useTouchGestures';
 import Login from './components/Login';
 import BottomNavigation from './components/BottomNavigation';
 import LoadingSpinner, { FullScreenLoader } from './components/LoadingSpinner';
@@ -26,6 +27,9 @@ function App() {
   const [tabLoading, setTabLoading] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
+
+  // Enable touch gestures for tab navigation
+  useTouchGestures(handleTabChange, activeTab);
 
   // Check if we're in demo mode
   useEffect(() => {
