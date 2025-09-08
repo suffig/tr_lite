@@ -303,25 +303,25 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
   if (!isOpen || !player) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-white/10">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm modal-overlay animate-fade-in">
+      <div className="enhanced-modal bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-white/10 animate-scale-in">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
-          <div>
+        <div className="modal-header bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
+          <div className="animate-slide-in-left">
             <h2 className="text-2xl font-bold text-white">{player.name}</h2>
             <div className="flex gap-3 mt-2">
-              <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
+              <span className={`modal-badge px-3 py-1 rounded-full text-sm font-semibold animate-slide-in-left ${
                 getTeamClass() === 'team-aek' ? 'bg-blue-500/20 text-blue-300' :
                 getTeamClass() === 'team-real' ? 'bg-red-500/20 text-red-300' :
                 'bg-gray-500/20 text-gray-300'
-              }`}>
+              }`} style={{ animationDelay: '0.1s' }}>
                 {getTeamDisplayName()}
               </span>
-              <span className="bg-white/20 text-white px-3 py-1 rounded-full text-sm font-semibold">
+              <span className="modal-badge bg-white/20 text-white px-3 py-1 rounded-full text-sm font-semibold animate-slide-in-left" style={{ animationDelay: '0.2s' }}>
                 {player.position || 'N/A'}
               </span>
               {fifaData?.found && (
-                <span className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold">
+                <span className="modal-badge bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 px-3 py-1 rounded-full text-sm font-bold animate-slide-in-left" style={{ animationDelay: '0.3s' }}>
                   FIFA {fifaData.overall}
                 </span>
               )}
@@ -329,26 +329,28 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
           </div>
           <button 
             onClick={onClose}
-            className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-colors"
+            className="modal-close-btn w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white transition-all duration-300 hover:scale-110 active:scale-95 animate-slide-in-right"
           >
             <i className="fas fa-times"></i>
           </button>
         </div>
 
         {/* Body */}
-        <div className="p-6 max-h-[calc(90vh-120px)] overflow-y-auto">
+        <div className="modal-body p-6 max-h-[calc(90vh-120px)] overflow-y-auto custom-scrollbar">
           {loading ? (
-            <div className="text-center py-12">
-              <div className="text-4xl text-blue-400 mb-4">
+            <div className="text-center py-12 animate-pulse-gentle">
+              <div className="text-4xl text-blue-400 mb-4 animate-bounce-gentle">
                 <i className="fas fa-spinner fa-spin"></i>
               </div>
               <p className="text-slate-400">Loading FIFA data...</p>
             </div>
           ) : (
-            <>
-              {renderBasicInfo()}
+            <div className="modal-content-wrapper">
+              <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                {renderBasicInfo()}
+              </div>
               {fifaData?.found ? (
-                <>
+                <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
                   <div className="fifa-stats-section">
                     <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-3">
                       <i className="fas fa-chart-bar text-blue-400"></i>
@@ -358,22 +360,30 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
                           href={fifaData.sofifaUrl} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="ml-auto bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-sm font-medium hover:bg-blue-500/20 transition-colors border border-blue-500/20"
+                          className="ml-auto bg-blue-500/10 text-blue-400 px-3 py-1 rounded-lg text-sm font-medium hover:bg-blue-500/20 transition-all duration-300 border border-blue-500/20 hover:scale-105"
                         >
                           <i className="fas fa-external-link-alt mr-2"></i>
                           View on SoFIFA
                         </a>
                       )}
                     </h3>
-                    {renderFIFAOverview()}
-                    {renderFIFAAttributes()}
-                    {renderFIFASkills()}
+                    <div className="animate-fade-in" style={{ animationDelay: '0.8s' }}>
+                      {renderFIFAOverview()}
+                    </div>
+                    <div className="animate-fade-in" style={{ animationDelay: '1.0s' }}>
+                      {renderFIFAAttributes()}
+                    </div>
+                    <div className="animate-fade-in" style={{ animationDelay: '1.2s' }}>
+                      {renderFIFASkills()}
+                    </div>
                   </div>
-                </>
+                </div>
               ) : (
-                renderNoFIFAData()
+                <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                  {renderNoFIFAData()}
+                </div>
               )}
-            </>
+            </div>
           )}
         </div>
       </div>
