@@ -179,7 +179,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
   const { matchGroups, nonMatchTransactions } = groupTransactionsByMatch();
 
   return (
-    <div className="p-4 pb-20">
+    <div className="p-4 pb-24 mobile-safe-bottom">
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-text-primary mb-2">
           Finanzen
