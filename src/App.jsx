@@ -12,7 +12,6 @@ import NotificationSystem from './components/NotificationSystem';
 
 // Lazy load tab components for better performance
 const MatchesTab = lazy(() => import('./components/tabs/MatchesTab'));
-const EnhancedFeaturesTab = lazy(() => import('./components/tabs/EnhancedFeaturesTab'));
 const KaderTab = lazy(() => import('./components/tabs/KaderTab'));
 const BansTab = lazy(() => import('./components/tabs/BansTab'));
 const FinanzenTab = lazy(() => import('./components/tabs/FinanzenTab'));
@@ -111,8 +110,6 @@ function App() {
     switch (activeTab) {
       case 'matches':
         return <MatchesTab {...props} />;
-      case 'enhanced':
-        return <EnhancedFeaturesTab {...props} />;
       case 'bans':
         return <BansTab {...props} />;
       case 'finanzen':
