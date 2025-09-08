@@ -7,7 +7,7 @@ import TeamPerformanceHeatmap from '../TeamPerformanceHeatmap';
 import { ShareButton } from '../SocialSharing';
 import { triggerNotification } from '../NotificationSystem';
 import PullToRefresh from '../PullToRefresh';
-import { EnhancedLoading } from '../EnhancedLoading';
+import SkeletonLoading from '../EnhancedLoading';
 
 export default function EnhancedFeaturesTab({ showHints = false }) {
   const [activeSection, setActiveSection] = useState(0);
@@ -119,8 +119,8 @@ export default function EnhancedFeaturesTab({ showHints = false }) {
         <div className="p-4">
           {isRefreshing ? (
             <div className="space-y-4">
-              <EnhancedLoading type="stat-card" count={4} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" />
-              <EnhancedLoading type="player-card" count={3} className="space-y-4" />
+              <SkeletonLoading type="stat-card" count={4} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" />
+              <SkeletonLoading type="player-card" count={3} className="space-y-4" />
             </div>
           ) : (
             renderContent()

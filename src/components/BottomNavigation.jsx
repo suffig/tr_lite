@@ -1,5 +1,6 @@
 const tabs = [
   { id: 'matches', icon: '⚽', label: 'Spiele', ariaLabel: 'Zu Spiele-Übersicht wechseln' },
+  { id: 'enhanced', icon: '✨', label: 'Enhanced', ariaLabel: 'Zu Enhanced Features wechseln' },
   { id: 'bans', icon: '🚫', label: 'Bans', ariaLabel: 'Zu Bans-Übersicht wechseln' },
   { id: 'finanzen', icon: '€', label: 'Finanzen', ariaLabel: 'Zu Finanzen-Übersicht wechseln' },
   { id: 'squad', icon: '👥', label: 'Kader', ariaLabel: 'Zu Kader-Übersicht wechseln' },
