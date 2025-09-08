@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
+import '../../styles/match-animations.css';
 
 export default function MatchesTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   const [expandedMatches, setExpandedMatches] = useState(new Set());
@@ -9,6 +10,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
   const [dateFilter, setDateFilter] = useState('');
   const [resultFilter, setResultFilter] = useState('all'); // 'all', 'aek-wins', 'real-wins'
   const [goalFilter, setGoalFilter] = useState('all'); // 'all', 'high-scoring', 'low-scoring'
+  const [hoveredMatch, setHoveredMatch] = useState(null);
+  const [animatingMatches, setAnimatingMatches] = useState(new Set());
+  const animationTimeouts = useRef(new Map());
   
   const { data: allMatches, loading, error, refetch } = useSupabaseQuery(
     'matches',
@@ -106,13 +110,43 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
 
   const toggleMatchDetails = (matchId) => {
     const newExpanded = new Set(expandedMatches);
-    if (newExpanded.has(matchId)) {
+    const isCurrentlyExpanded = newExpanded.has(matchId);
+    
+    // Add animation state
+    setAnimatingMatches(prev => new Set(prev).add(matchId));
+    
+    // Clear any existing timeout for this match
+    if (animationTimeouts.current.has(matchId)) {
+      clearTimeout(animationTimeouts.current.get(matchId));
+    }
+    
+    if (isCurrentlyExpanded) {
       newExpanded.delete(matchId);
     } else {
       newExpanded.add(matchId);
     }
+    
     setExpandedMatches(newExpanded);
+    
+    // Remove animation state after animation completes
+    const timeout = setTimeout(() => {
+      setAnimatingMatches(prev => {
+        const next = new Set(prev);
+        next.delete(matchId);
+        return next;
+      });
+      animationTimeouts.current.delete(matchId);
+    }, 300);
+    
+    animationTimeouts.current.set(matchId, timeout);
   };
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      animationTimeouts.current.forEach(timeout => clearTimeout(timeout));
+    };
+  }, []);
 
   // Group matches by date
   const groupMatchesByDate = () => {
@@ -342,196 +376,394 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                 </div>
                 
                 <div className="p-4 space-y-3">
-                  {dateGroup.matches.map((match) => {
+                  {dateGroup.matches.map((match, matchIndex) => {
                     const isExpanded = expandedMatches.has(match.id);
+                    const isAnimating = animatingMatches.has(match.id);
+                    const isHovered = hoveredMatch === match.id;
+                    
+                    // Determine winner for styling
+                    const aekGoals = match.goalsa || 0;
+                    const realGoals = match.goalsb || 0;
+                    const winner = aekGoals > realGoals ? 'aek' : realGoals > aekGoals ? 'real' : 'draw';
                     
                     return (
-                      <div key={match.id} className="bg-white bg-opacity-50 rounded-lg border border-white border-opacity-30">
+                      <div 
+                        key={match.id} 
+                        className={`
+                          relative overflow-hidden rounded-xl border transition-all duration-300 ease-out transform
+                          ${isExpanded ? 'shadow-2xl scale-[1.02]' : 'shadow-lg hover:shadow-xl hover:scale-[1.01]'}
+                          ${isHovered ? 'ring-2 ring-blue-400/50' : ''}
+                          bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200
+                          ${isAnimating ? 'transition-all duration-300' : ''}
+                        `}
+                        style={{
+                          animationDelay: `${matchIndex * 100}ms`,
+                          animation: 'slideInUp 0.5s ease-out forwards'
+                        }}
+                        onMouseEnter={() => setHoveredMatch(match.id)}
+                        onMouseLeave={() => setHoveredMatch(null)}
+                      >
+                        {/* Decorative background pattern */}
+                        <div className="absolute inset-0 opacity-5">
+                          <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
+                        </div>
+                        
                         <button
                           onClick={() => toggleMatchDetails(match.id)}
-                          className="w-full p-4 flex items-center justify-between cursor-pointer hover:bg-opacity-80 transition-all duration-200 rounded-lg"
+                          className="relative w-full p-6 flex items-center justify-between cursor-pointer hover:bg-white/20 transition-all duration-200 rounded-xl group"
                         >
-                          <div className="flex items-center space-x-4">
-                            <div className="text-center">
-                              <div className="text-lg font-bold text-text-primary">
-                                {match.teama || 'AEK'} {match.goalsa || 0} : {match.goalsb || 0} {match.teamb || 'Real'}
-                              </div>
-                              {match.status && (
-                                <span className={`inline-block px-2 py-1 rounded text-xs font-medium mt-1 ${
-                                  match.status === 'finished' 
-                                    ? 'bg-primary-green/10 text-primary-green'
-                                    : 'bg-accent-orange/10 text-accent-orange'
+                          <div className="flex items-center space-x-6">
+                            {/* Match result with enhanced styling */}
+                            <div className="text-center relative">
+                              {/* Winner indicator */}
+                              {winner !== 'draw' && (
+                                <div className={`absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                                  winner === 'aek' ? 'bg-blue-500' : 'bg-red-500'
                                 }`}>
-                                  {match.status === 'finished' ? 'Beendet' : 'Laufend'}
-                                </span>
+                                  👑
+                                </div>
+                              )}
+                              
+                              <div className="flex items-center gap-4">
+                                {/* Team A */}
+                                <div className="text-right">
+                                  <div className="text-lg font-bold text-blue-700">
+                                    {match.teama || 'AEK'}
+                                  </div>
+                                </div>
+                                
+                                {/* Score */}
+                                <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg">
+                                  <div className="text-2xl font-black text-gray-800">
+                                    <span className={winner === 'aek' ? 'text-blue-600' : 'text-gray-600'}>{aekGoals}</span>
+                                    <span className="mx-2 text-gray-400">:</span>
+                                    <span className={winner === 'real' ? 'text-red-600' : 'text-gray-600'}>{realGoals}</span>
+                                  </div>
+                                  <div className="text-xs text-gray-500 text-center mt-1">
+                                    {aekGoals + realGoals} Tore insgesamt
+                                  </div>
+                                </div>
+                                
+                                {/* Team B */}
+                                <div className="text-left">
+                                  <div className="text-lg font-bold text-red-700">
+                                    {match.teamb || 'Real'}
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              {/* Match status */}
+                              {match.status && (
+                                <div className="mt-3">
+                                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${
+                                    match.status === 'finished' 
+                                      ? 'bg-green-100 text-green-700 border border-green-200'
+                                      : 'bg-orange-100 text-orange-700 border border-orange-200'
+                                  }`}>
+                                    {match.status === 'finished' ? '✅ Beendet' : '⏱️ Laufend'}
+                                  </span>
+                                </div>
                               )}
                             </div>
                           </div>
                           
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-text-muted">Details</span>
-                            <span className={`text-lg transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
-                              ▶
-                            </span>
+                          {/* Quick stats preview */}
+                          <div className="flex items-center gap-4">
+                            {/* Goals stats */}
+                            <div className="text-right">
+                              <div className="text-xs text-gray-500">Tore</div>
+                              <div className="text-sm font-semibold">{aekGoals + realGoals}</div>
+                            </div>
+                            
+                            {/* Cards stats */}
+                            <div className="text-right">
+                              <div className="text-xs text-gray-500">Karten</div>
+                              <div className="text-sm font-semibold">
+                                🟨{(match.yellowa || 0) + (match.yellowb || 0)} 🟥{(match.reda || 0) + (match.redb || 0)}
+                              </div>
+                            </div>
+                            
+                            {/* Expand indicator */}
+                            <div className="flex items-center gap-2 ml-4">
+                              <span className="text-xs text-gray-500 group-hover:text-gray-700 transition-colors">
+                                {isExpanded ? 'Weniger' : 'Details'}
+                              </span>
+                              <div className={`
+                                p-2 rounded-full bg-white/60 group-hover:bg-white/80 transition-all duration-300
+                                ${isExpanded ? 'rotate-90 bg-blue-100' : 'hover:scale-110'}
+                              `}>
+                                <span className="text-lg block">▶</span>
+                              </div>
+                            </div>
                           </div>
                         </button>
                         
+                        {/* Enhanced expanded details with smooth animation */}
                         {isExpanded && (
-                          <div className="px-4 pb-4 border-t border-gray-200 bg-gray-50">
-                            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                              
-                              {/* Goal Scorers */}
-                              <div className="space-y-2">
-                                <h4 className="font-semibold text-text-primary flex items-center">
-                                  ⚽ Torschützen
-                                </h4>
-                                <div className="space-y-2">
-                                  {(() => {
-                                    // Safely parse goalslista - it might be a JSON string or already an array
-                                    let goalsList = [];
-                                    try {
-                                      if (typeof match.goalslista === 'string') {
-                                        goalsList = JSON.parse(match.goalslista);
-                                      } else if (Array.isArray(match.goalslista)) {
-                                        goalsList = match.goalslista;
-                                      }
-                                    } catch (e) {
-                                      console.warn('Failed to parse goalslista:', e);
-                                      goalsList = [];
-                                    }
-                                    
-                                    return goalsList && goalsList.length > 0 ? (
-                                      <div>
-                                        <p className="text-xs text-blue-600 font-medium mb-1">AEK:</p>
-                                        {goalsList.map((goal, idx) => {
-                                          const isObject = typeof goal === 'object' && goal !== null;
-                                          const playerInfo = isObject 
-                                            ? getPlayerInfo(goal.player_id, goal.player)
-                                            : getPlayerInfo(null, goal);
-                                          return (
-                                            <div key={idx} className="text-sm p-2 bg-blue-50 rounded border-l-4 border-blue-400">
-                                              <div className="font-medium text-blue-800">
-                                                {playerInfo.name}
-                                                {isObject && goal.count > 1 && (
-                                                  <span className="ml-1 text-xs bg-blue-200 px-1 rounded">
-                                                    {goal.count}x
-                                                  </span>
-                                                )}
-                                              </div>
-                                              <div className="text-xs text-blue-600">
-                                                Marktwert: {playerInfo.value}M €
-                                              </div>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    ) : <p className="text-xs text-text-muted">AEK: Keine Tore</p>;
-                                  })()}
-                                  
-                                  {(() => {
-                                    // Safely parse goalslistb - it might be a JSON string or already an array
-                                    let goalsList = [];
-                                    try {
-                                      if (typeof match.goalslistb === 'string') {
-                                        goalsList = JSON.parse(match.goalslistb);
-                                      } else if (Array.isArray(match.goalslistb)) {
-                                        goalsList = match.goalslistb;
-                                      }
-                                    } catch (e) {
-                                      console.warn('Failed to parse goalslistb:', e);
-                                      goalsList = [];
-                                    }
-                                    
-                                    return goalsList && goalsList.length > 0 ? (
-                                      <div>
-                                        <p className="text-xs text-red-600 font-medium mb-1">Real:</p>
-                                        {goalsList.map((goal, idx) => {
-                                          const isObject = typeof goal === 'object' && goal !== null;
-                                          const playerInfo = isObject 
-                                            ? getPlayerInfo(goal.player_id, goal.player)
-                                            : getPlayerInfo(null, goal);
-                                          return (
-                                            <div key={idx} className="text-sm p-2 bg-red-50 rounded border-l-4 border-red-400">
-                                              <div className="font-medium text-red-800">
-                                                {playerInfo.name}
-                                                {isObject && goal.count > 1 && (
-                                                  <span className="ml-1 text-xs bg-red-200 px-1 rounded">
-                                                    {goal.count}x
-                                                  </span>
-                                                )}
-                                              </div>
-                                              <div className="text-xs text-red-600">
-                                                Marktwert: {playerInfo.value}M €
-                                              </div>
-                                            </div>
-                                          );
-                                        })}
-                                      </div>
-                                    ) : <p className="text-xs text-text-muted">Real: Keine Tore</p>;
-                                  })()}
+                          <div className={`
+                            px-6 pb-6 border-t border-gray-200/50 bg-white/60 backdrop-blur-sm
+                            transform transition-all duration-300 ease-out
+                            ${isAnimating ? 'animate-slideDown' : ''}
+                          `}>
+                            <div className="mt-6">
+                              {/* Enhanced match statistics header */}
+                              <div className="flex items-center justify-between mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                                <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                  📊 Match Details & Statistiken
+                                </h3>
+                                <div className="flex items-center gap-2 text-sm text-gray-600">
+                                  <span>Match #{match.id}</span>
+                                  <span>•</span>
+                                  <span>{new Date(match.date).toLocaleDateString('de-DE')}</span>
                                 </div>
                               </div>
                               
-                              {/* Player of the Match (SdS) */}
-                              <div className="space-y-2">
-                                <h4 className="font-semibold text-text-primary flex items-center">
-                                  ⭐ Spieler des Spiels
-                                </h4>
-                                <div className="space-y-1">
-                                  {match.manofthematch ? (
-                                    <div className="p-2 bg-yellow-50 rounded border-l-4 border-yellow-400">
-                                      <div className="font-medium text-yellow-800">
-                                        {match.manofthematch}
-                                      </div>
-                                      {(() => {
-                                        const playerInfo = getPlayerInfo(match.manofthematch_player_id, match.manofthematch);
-                                        return (
-                                          <div className="text-xs text-yellow-600">
-                                            Team: {playerInfo.team} | Marktwert: {playerInfo.value}M €
+                              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+                                
+                                {/* Enhanced Goal Scorers Section */}
+                                <div className="space-y-3 bg-white/80 rounded-lg p-4 border border-gray-100 hover:shadow-md transition-shadow">
+                                  <h4 className="font-bold text-gray-800 flex items-center gap-2 text-lg">
+                                    ⚽ Torschützen
+                                    <span className="text-xs bg-gray-200 px-2 py-1 rounded-full">
+                                      {(match.goalsa || 0) + (match.goalsb || 0)} Tore
+                                    </span>
+                                  </h4>
+                                  <div className="space-y-3">
+                                    {(() => {
+                                      // Safely parse goalslista
+                                      let goalsList = [];
+                                      try {
+                                        if (typeof match.goalslista === 'string') {
+                                          goalsList = JSON.parse(match.goalslista);
+                                        } else if (Array.isArray(match.goalslista)) {
+                                          goalsList = match.goalslista;
+                                        }
+                                      } catch (e) {
+                                        console.warn('Failed to parse goalslista:', e);
+                                        goalsList = [];
+                                      }
+                                      
+                                      return goalsList && goalsList.length > 0 ? (
+                                        <div className="space-y-2">
+                                          <div className="flex items-center gap-2 text-sm font-medium text-blue-700">
+                                            🔵 AEK ({match.goalsa || 0} Tore)
                                           </div>
-                                        );
-                                      })()}
+                                          {goalsList.map((goal, idx) => {
+                                            const isObject = typeof goal === 'object' && goal !== null;
+                                            const playerInfo = isObject 
+                                              ? getPlayerInfo(goal.player_id, goal.player)
+                                              : getPlayerInfo(null, goal);
+                                            return (
+                                              <div key={idx} className="group p-3 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border-l-4 border-blue-400 hover:shadow-sm transition-all">
+                                                <div className="flex items-center justify-between">
+                                                  <div>
+                                                    <div className="font-semibold text-blue-800 flex items-center gap-2">
+                                                      ⚽ {playerInfo.name}
+                                                      {isObject && goal.count > 1 && (
+                                                        <span className="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded-full font-bold">
+                                                          {goal.count}x Treffer
+                                                        </span>
+                                                      )}
+                                                    </div>
+                                                    <div className="text-xs text-blue-600 flex items-center gap-3 mt-1">
+                                                      <span>💰 {playerInfo.value}M €</span>
+                                                      <span>👕 {playerInfo.team}</span>
+                                                    </div>
+                                                  </div>
+                                                  <div className="text-2xl text-blue-500 group-hover:scale-110 transition-transform">
+                                                    ⚽
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      ) : (
+                                        <div className="p-3 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                                          <p className="text-sm text-gray-500 text-center">🔵 AEK: Keine Tore erzielt</p>
+                                        </div>
+                                      );
+                                    })()}
+                                    
+                                    {(() => {
+                                      // Safely parse goalslistb
+                                      let goalsList = [];
+                                      try {
+                                        if (typeof match.goalslistb === 'string') {
+                                          goalsList = JSON.parse(match.goalslistb);
+                                        } else if (Array.isArray(match.goalslistb)) {
+                                          goalsList = match.goalslistb;
+                                        }
+                                      } catch (e) {
+                                        console.warn('Failed to parse goalslistb:', e);
+                                        goalsList = [];
+                                      }
+                                      
+                                      return goalsList && goalsList.length > 0 ? (
+                                        <div className="space-y-2">
+                                          <div className="flex items-center gap-2 text-sm font-medium text-red-700">
+                                            🔴 Real ({match.goalsb || 0} Tore)
+                                          </div>
+                                          {goalsList.map((goal, idx) => {
+                                            const isObject = typeof goal === 'object' && goal !== null;
+                                            const playerInfo = isObject 
+                                              ? getPlayerInfo(goal.player_id, goal.player)
+                                              : getPlayerInfo(null, goal);
+                                            return (
+                                              <div key={idx} className="group p-3 bg-gradient-to-r from-red-50 to-red-100 rounded-lg border-l-4 border-red-400 hover:shadow-sm transition-all">
+                                                <div className="flex items-center justify-between">
+                                                  <div>
+                                                    <div className="font-semibold text-red-800 flex items-center gap-2">
+                                                      ⚽ {playerInfo.name}
+                                                      {isObject && goal.count > 1 && (
+                                                        <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded-full font-bold">
+                                                          {goal.count}x Treffer
+                                                        </span>
+                                                      )}
+                                                    </div>
+                                                    <div className="text-xs text-red-600 flex items-center gap-3 mt-1">
+                                                      <span>💰 {playerInfo.value}M €</span>
+                                                      <span>👕 {playerInfo.team}</span>
+                                                    </div>
+                                                  </div>
+                                                  <div className="text-2xl text-red-500 group-hover:scale-110 transition-transform">
+                                                    ⚽
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            );
+                                          })}
+                                        </div>
+                                      ) : (
+                                        <div className="p-3 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                                          <p className="text-sm text-gray-500 text-center">🔴 Real: Keine Tore erzielt</p>
+                                        </div>
+                                      );
+                                    })()}
+                                  </div>
+                                </div>
+                                
+                                {/* Enhanced Player of the Match Section */}
+                                <div className="space-y-3 bg-white/80 rounded-lg p-4 border border-gray-100 hover:shadow-md transition-shadow">
+                                  <h4 className="font-bold text-gray-800 flex items-center gap-2 text-lg">
+                                    ⭐ Spieler des Spiels
+                                  </h4>
+                                  <div className="space-y-2">
+                                    {match.manofthematch ? (
+                                      <div className="p-4 bg-gradient-to-r from-yellow-50 to-amber-50 rounded-lg border-l-4 border-yellow-400 relative overflow-hidden">
+                                        {/* Sparkle animation background */}
+                                        <div className="absolute inset-0 bg-gradient-to-r from-yellow-100/30 to-amber-100/30 animate-pulse"></div>
+                                        <div className="relative">
+                                          <div className="flex items-center justify-between">
+                                            <div>
+                                              <div className="font-bold text-yellow-800 text-lg flex items-center gap-2">
+                                                🏆 {match.manofthematch}
+                                                <span className="text-xs bg-yellow-200 text-yellow-800 px-2 py-1 rounded-full">
+                                                  MVP
+                                                </span>
+                                              </div>
+                                              {(() => {
+                                                const playerInfo = getPlayerInfo(match.manofthematch_player_id, match.manofthematch);
+                                                return (
+                                                  <div className="text-sm text-yellow-700 flex items-center gap-3 mt-2">
+                                                    <span>👕 Team: {playerInfo.team}</span>
+                                                    <span>💰 Marktwert: {playerInfo.value}M €</span>
+                                                  </div>
+                                                );
+                                              })()}
+                                            </div>
+                                            <div className="text-4xl animate-bounce">
+                                              ⭐
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="p-4 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+                                        <p className="text-sm text-gray-500 text-center">⭐ Kein Spieler des Spiels ausgewählt</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                                
+                                {/* Enhanced Cards Section */}
+                                <div className="space-y-3 bg-white/80 rounded-lg p-4 border border-gray-100 hover:shadow-md transition-shadow">
+                                  <h4 className="font-bold text-gray-800 flex items-center gap-2 text-lg">
+                                    🟨🟥 Karten & Disziplin
+                                  </h4>
+                                  <div className="space-y-3">
+                                    <div className="grid grid-cols-2 gap-3">
+                                      {/* AEK Cards */}
+                                      <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                        <div className="text-sm font-medium text-blue-700 mb-2">🔵 AEK</div>
+                                        <div className="space-y-1">
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-sm text-gray-600">🟨 Gelbe Karten</span>
+                                            <span className="font-bold text-yellow-600">{match.yellowa || 0}</span>
+                                          </div>
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-sm text-gray-600">🟥 Rote Karten</span>
+                                            <span className="font-bold text-red-600">{match.reda || 0}</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Real Cards */}
+                                      <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                                        <div className="text-sm font-medium text-red-700 mb-2">🔴 Real</div>
+                                        <div className="space-y-1">
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-sm text-gray-600">🟨 Gelbe Karten</span>
+                                            <span className="font-bold text-yellow-600">{match.yellowb || 0}</span>
+                                          </div>
+                                          <div className="flex items-center justify-between">
+                                            <span className="text-sm text-gray-600">🟥 Rote Karten</span>
+                                            <span className="font-bold text-red-600">{match.redb || 0}</span>
+                                          </div>
+                                        </div>
+                                      </div>
                                     </div>
-                                  ) : (
-                                    <p className="text-xs text-text-muted">Kein Spieler des Spiels ausgewählt</p>
-                                  )}
-                                </div>
-                              </div>
-                              
-                              {/* Cards */}
-                              <div className="space-y-2">
-                                <h4 className="font-semibold text-text-primary flex items-center">
-                                  🟨🟥 Karten
-                                </h4>
-                                <div className="space-y-1">
-                                  <div>
-                                    <p className="text-xs text-blue-600 font-medium">AEK:</p>
-                                    <p className="text-sm text-text-muted">🟨 {match.yellowa || 0} Gelb</p>
-                                    <p className="text-sm text-text-muted">🟥 {match.reda || 0} Rot</p>
-                                  </div>
-                                  <div>
-                                    <p className="text-xs text-red-600 font-medium">Real:</p>
-                                    <p className="text-sm text-text-muted">🟨 {match.yellowb || 0} Gelb</p>
-                                    <p className="text-sm text-text-muted">🟥 {match.redb || 0} Rot</p>
+                                    
+                                    {/* Total cards summary */}
+                                    <div className="p-2 bg-gray-100 rounded-lg">
+                                      <div className="text-center text-sm text-gray-600">
+                                        Gesamt: 🟨 {(match.yellowa || 0) + (match.yellowb || 0)} | 🟥 {(match.reda || 0) + (match.redb || 0)}
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              
-                              {/* Prize Money */}
-                              <div className="space-y-2">
-                                <h4 className="font-semibold text-text-primary flex items-center">
-                                  💰 Preisgelder
-                                </h4>
-                                <div className="space-y-1">
-                                  <p className="text-sm text-text-muted">
-                                    <span className="text-blue-600">AEK:</span> {match.prizeaek ? `€${match.prizeaek}` : '€0'}
-                                  </p>
-                                  <p className="text-sm text-text-muted">
-                                    <span className="text-red-600">Real:</span> {match.prizereal ? `€${match.prizereal}` : '€0'}
-                                  </p>
+                                
+                                {/* Enhanced Prize Money Section */}
+                                <div className="space-y-3 bg-white/80 rounded-lg p-4 border border-gray-100 hover:shadow-md transition-shadow">
+                                  <h4 className="font-bold text-gray-800 flex items-center gap-2 text-lg">
+                                    💰 Preisgelder & Finanzen
+                                  </h4>
+                                  <div className="space-y-3">
+                                    <div className="grid grid-cols-1 gap-3">
+                                      {/* AEK Prize */}
+                                      <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-sm font-medium text-blue-700">🔵 AEK</span>
+                                          <span className={`font-bold text-lg ${(match.prizeaek || 0) > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                                            €{match.prizeaek || 0}
+                                          </span>
+                                        </div>
+                                      </div>
+                                      
+                                      {/* Real Prize */}
+                                      <div className="p-3 bg-red-50 rounded-lg border border-red-200">
+                                        <div className="flex items-center justify-between">
+                                          <span className="text-sm font-medium text-red-700">🔴 Real</span>
+                                          <span className={`font-bold text-lg ${(match.prizereal || 0) > 0 ? 'text-green-600' : 'text-gray-500'}`}>
+                                            €{match.prizereal || 0}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
+                                
                               </div>
-                              
                             </div>
                           </div>
                         )}
@@ -573,6 +805,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
           </div>
         </div>
       )}
+
     </div>
   );
 }
