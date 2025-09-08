@@ -65,17 +65,19 @@ function App() {
     }
   };
 
-  // Global search shortcut and event listener
+  // Global search shortcut and event listener - only work on admin page
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.key === 'k') {
+      if (e.ctrlKey && e.key === 'k' && activeTab === 'admin') {
         e.preventDefault();
         setShowGlobalSearch(true);
       }
     };
 
     const handleGlobalSearchToggle = () => {
-      setShowGlobalSearch(true);
+      if (activeTab === 'admin') {
+        setShowGlobalSearch(true);
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -85,7 +87,7 @@ function App() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('global-search-toggle', handleGlobalSearchToggle);
     };
-  }, []);
+  }, [activeTab]);
 
   const handleLogout = async () => {
     try {
@@ -101,7 +103,8 @@ function App() {
   };
 
   const renderTabContent = () => {
-    const props = { onNavigate: handleTabChange };
+    const showHints = activeTab === 'admin';
+    const props = { onNavigate: handleTabChange, showHints };
     
     switch (activeTab) {
       case 'matches':
@@ -162,11 +165,11 @@ function App() {
 
   return (
     <div className="flex flex-col min-h-screen bg-bg-primary">
-      {/* Offline Status Indicator */}
-      <OfflineIndicator />
+      {/* Offline Status Indicator - Only show on admin page */}
+      {activeTab === 'admin' && <OfflineIndicator />}
       
-      {/* Connection Status Indicator */}
-      {isDemoMode && (
+      {/* Connection Status Indicator - Only show on admin page */}
+      {isDemoMode && activeTab === 'admin' && (
         <div className="bg-warning border-yellow-400 text-yellow-900 px-4 py-2 text-center text-sm font-medium" role="alert">
           <span className="inline-flex items-center gap-2">
             <span aria-hidden="true">⚠️</span>
@@ -233,16 +236,16 @@ function App() {
         }}
       />
 
-      {/* Global Search Modal */}
-      {showGlobalSearch && (
+      {/* Global Search Modal - Only available on admin page */}
+      {showGlobalSearch && activeTab === 'admin' && (
         <GlobalSearch 
           onNavigate={handleGlobalSearchNavigate}
           onClose={() => setShowGlobalSearch(false)}
         />
       )}
 
-      {/* Performance Monitor */}
-      <PerformanceMonitor />
+      {/* Performance Monitor - Only show on admin page */}
+      {activeTab === 'admin' && <PerformanceMonitor />}
     </div>
   );
 }
