@@ -321,39 +321,39 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
       <div className="space-y-6">
         {/* Consolidated Quick Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="modern-card text-center">
-            <div className="text-2xl font-bold text-primary-green">{totalMatches}</div>
-            <div className="text-sm text-text-muted">Spiele gespielt</div>
+          <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
+            <div className="text-2xl font-bold text-primary-green group-hover:scale-110 transition-transform">{totalMatches}</div>
+            <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">Spiele gespielt</div>
           </div>
-          <div className="modern-card text-center">
-            <div className="text-2xl font-bold text-primary-green">{advancedStats.totalGoals}</div>
-            <div className="text-sm text-text-muted">Tore insgesamt</div>
-            <div className="text-xs text-text-muted mt-1">
+          <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
+            <div className="text-2xl font-bold text-primary-green group-hover:scale-110 transition-transform">{advancedStats.totalGoals}</div>
+            <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">Tore insgesamt</div>
+            <div className="text-xs text-text-muted mt-1 group-hover:text-text-primary transition-colors">
               ⌀ {totalMatches > 0 ? (advancedStats.totalGoals / totalMatches).toFixed(1) : '0.0'}/Spiel
             </div>
           </div>
-          <div className="modern-card text-center">
-            <div className="text-lg font-bold text-primary-green">
+          <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
+            <div className="text-lg font-bold text-primary-green group-hover:text-blue-600 transition-colors">
               {topScorer ? topScorer.name : 'Keine Daten'}
             </div>
-            <div className="text-sm text-text-muted">
+            <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">
               🥇 Topscorer ({topScorer ? topScorer.goals : 0} Tore)
             </div>
-            <div className="text-xs text-text-muted mt-1">
+            <div className="text-xs text-text-muted mt-1 group-hover:text-text-primary transition-colors">
               {topScorer && topScorer.matchesPlayed > 0 ? 
                 `⌀ ${(topScorer.goals / topScorer.matchesPlayed).toFixed(2)}/Spiel` : 
                 '⌀ 0.00/Spiel'
               }
             </div>
           </div>
-          <div className="modern-card text-center">
-            <div className="text-lg font-bold text-primary-green">
+          <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
+            <div className="text-lg font-bold text-primary-green group-hover:text-yellow-600 transition-colors">
               {topSdSPlayer ? topSdSPlayer.name : 'Keine Daten'}
             </div>
-            <div className="text-sm text-text-muted">
+            <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">
               ⭐ Top SdS ({topSdSPlayer ? topSdSPlayer.sdsCount : 0}x)
             </div>
-            <div className="text-xs text-text-muted mt-1">
+            <div className="text-xs text-text-muted mt-1 group-hover:text-text-primary transition-colors">
               {topSdSPlayer && topSdSPlayer.matchesPlayed > 0 ? 
                 `${((topSdSPlayer.sdsCount / topSdSPlayer.matchesPlayed) * 100).toFixed(1)}% Quote` : 
                 '0.0% Quote'
@@ -364,39 +364,37 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
 
         {/* New Enhanced Statistics Row - Team-specific highest wins */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="modern-card text-center">
-            <div className="text-xl font-bold text-blue-600">
+          <div className="modern-card text-center hover:bg-blue-50 transition-colors cursor-pointer group">
+            <div className="text-xl font-bold text-blue-600 group-hover:scale-110 transition-transform">
               {headToHead.biggestAekWin.diff > 0 ? headToHead.biggestAekWin.score : '–'}
             </div>
-            <div className="text-sm text-text-muted">🔵 Größter AEK Sieg</div>
+            <div className="text-sm text-text-muted group-hover:text-blue-700 transition-colors">🔵 Größter AEK Sieg</div>
             {headToHead.biggestAekWin.diff > 0 && (
-              <div className="text-xs text-text-muted mt-1">
+              <div className="text-xs text-text-muted mt-1 group-hover:text-blue-600 transition-colors">
                 vs {headToHead.biggestAekWin.opponent}<br/>
                 {new Date(headToHead.biggestAekWin.date).toLocaleDateString('de-DE')}
               </div>
             )}
           </div>
-          <div className="modern-card text-center">
-            <div className="text-xl font-bold text-red-600">
-              {headToHead.biggestRealWin.diff > 0 ? headToHead.biggestRealWin.score : '–'}
-            </div>
-            <div className="text-sm text-text-muted">🔴 Größter Real Sieg</div>
+          <div className="modern-card text-center hover:bg-red-50 transition-colors cursor-pointer group">
+            <div className="text-xl font-bold text-red-600 group-hover:scale-110 transition-transform">{headToHead.biggestRealWin.diff > 0 ? headToHead.biggestRealWin.score : '–'}</div>
+            <div className="text-sm text-text-muted group-hover:text-red-700 transition-colors">🔴 Größter Real Sieg</div>
             {headToHead.biggestRealWin.diff > 0 && (
-              <div className="text-xs text-text-muted mt-1">
+              <div className="text-xs text-text-muted mt-1 group-hover:text-red-600 transition-colors">
                 vs {headToHead.biggestRealWin.opponent}<br/>
                 {new Date(headToHead.biggestRealWin.date).toLocaleDateString('de-DE')}
               </div>
             )}
           </div>
-          <div className="modern-card text-center">
-            <div className="text-xl font-bold text-accent-blue">
+          <div className="modern-card text-center hover:bg-blue-50 transition-colors cursor-pointer group">
+            <div className="text-xl font-bold text-accent-blue group-hover:scale-110 transition-transform">
               {mostGoalsInMatch?.player || 'Keine Daten'}
             </div>
-            <div className="text-sm text-text-muted">
+            <div className="text-sm text-text-muted group-hover:text-blue-700 transition-colors">
               ⚽ Meiste Tore ({mostGoalsInMatch?.count || 0} in einem Spiel)
             </div>
             {mostGoalsInMatch?.match && (
-              <div className="text-xs text-text-muted mt-1">
+              <div className="text-xs text-text-muted mt-1 group-hover:text-blue-600 transition-colors">
                 {new Date(mostGoalsInMatch.match.date).toLocaleDateString('de-DE')}
               </div>
             )}

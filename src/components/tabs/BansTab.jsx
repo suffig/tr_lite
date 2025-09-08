@@ -78,29 +78,29 @@ export default function BansTab({ onNavigate, showHints = false }) { // eslint-d
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="modern-card text-center">
-          <div className="text-2xl font-bold text-accent-red">
+        <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
+          <div className="text-2xl font-bold text-accent-red group-hover:scale-110 transition-transform">
             {activeBans.length}
           </div>
-          <div className="text-sm text-text-muted">Aktive Sperren</div>
+          <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">Aktive Sperren</div>
         </div>
-        <div className="modern-card text-center">
-          <div className="text-2xl font-bold text-primary-green">
+        <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
+          <div className="text-2xl font-bold text-primary-green group-hover:scale-110 transition-transform">
             {completedBans.length}
           </div>
-          <div className="text-sm text-text-muted">Beendete Sperren</div>
+          <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">Beendete Sperren</div>
         </div>
-        <div className="modern-card text-center">
-          <div className="text-2xl font-bold text-accent-orange">
+        <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
+          <div className="text-2xl font-bold text-accent-orange group-hover:scale-110 transition-transform">
             {bans?.length || 0}
           </div>
-          <div className="text-sm text-text-muted">Gesamt Sperren</div>
+          <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">Gesamt Sperren</div>
         </div>
-        <div className="modern-card text-center">
-          <div className="text-2xl font-bold text-accent-blue">
+        <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
+          <div className="text-2xl font-bold text-accent-blue group-hover:scale-110 transition-transform">
             {BAN_TYPES.length}
           </div>
-          <div className="text-sm text-text-muted">Sperr-Arten</div>
+          <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">Sperr-Arten</div>
         </div>
       </div>
 
@@ -113,32 +113,32 @@ export default function BansTab({ onNavigate, showHints = false }) { // eslint-d
             const isActive = remainingGames > 0;
             
             return (
-              <div key={ban.id} className="modern-card">
+              <div key={ban.id} className="modern-card hover:bg-bg-secondary transition-colors cursor-pointer group">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start space-x-4 flex-1">
-                    <div className="text-2xl">
+                    <div className="text-2xl group-hover:scale-110 transition-transform">
                       {getBanIcon(ban.type)}
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
-                        <h3 className="font-semibold text-text-primary">
+                        <h3 className="font-semibold text-text-primary group-hover:text-primary-green transition-colors">
                           {getPlayerName(ban.player_id)}
                         </h3>
-                        <span className="text-sm text-text-muted">
+                        <span className="text-sm text-text-muted group-hover:text-text-primary transition-colors">
                           ({getPlayerTeam(ban.player_id)})
                         </span>
                       </div>
                       
                       <div className="flex items-center space-x-2 mb-3">
-                        <span className={`inline-block px-2 py-1 rounded text-xs font-medium border ${getBanTypeColor(ban.type)}`}>
+                        <span className={`inline-block px-2 py-1 rounded text-xs font-medium border transition-all group-hover:scale-105 ${getBanTypeColor(ban.type)}`}>
                           {ban.type}
                         </span>
                         {isActive ? (
-                          <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200">
+                          <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200 transition-all group-hover:scale-105">
                             🔴 Aktiv - {remainingGames} Spiel{remainingGames !== 1 ? 'e' : ''} verbleibend
                           </span>
                         ) : (
-                          <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                          <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-800 border border-green-200 transition-all group-hover:scale-105">
                             ✅ Beendet
                           </span>
                         )}
