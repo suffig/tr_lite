@@ -8,6 +8,7 @@ import BottomNavigation from './components/BottomNavigation';
 import LoadingSpinner, { FullScreenLoader } from './components/LoadingSpinner';
 import GlobalSearch from './components/GlobalSearch';
 import PerformanceMonitor from './components/PerformanceMonitor';
+import NotificationSystem from './components/NotificationSystem';
 
 // Lazy load tab components for better performance
 const MatchesTab = lazy(() => import('./components/tabs/MatchesTab'));
@@ -246,6 +247,9 @@ function App() {
 
       {/* Performance Monitor - Only show on admin page */}
       {activeTab === 'admin' && <PerformanceMonitor />}
+
+      {/* Global Notification System */}
+      <NotificationSystem />
     </div>
   );
 }
