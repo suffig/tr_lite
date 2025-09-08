@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 
-export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-unused-vars
+export default function MatchesTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   const [expandedMatches, setExpandedMatches] = useState(new Set());
   const [filterExpanded, setFilterExpanded] = useState(false);
   const [timeFilter, setTimeFilter] = useState('4weeks'); // '1week', '4weeks', '3months', 'all'
@@ -557,20 +557,22 @@ export default function MatchesTab({ onNavigate }) { // eslint-disable-line no-u
         </div>
       )}
 
-      {/* Info Card */}
-      <div className="mt-6 modern-card bg-blue-50 border-blue-200">
-        <div className="flex items-start">
-          <div className="text-blue-600 mr-3">
-            <i className="fas fa-info-circle"></i>
-          </div>
-          <div>
-            <h4 className="font-semibold text-blue-800 mb-1">Hinweis</h4>
-            <p className="text-blue-700 text-sm">
-              Klicken Sie auf ein Spiel, um detaillierte Statistiken wie Torschützen, Karten und Preisgelder anzuzeigen. Neue Spiele können im Verwaltungsbereich hinzugefügt werden.
-            </p>
+      {/* Info Card - Only show on admin page */}
+      {showHints && (
+        <div className="mt-6 modern-card bg-blue-50 border-blue-200">
+          <div className="flex items-start">
+            <div className="text-blue-600 mr-3">
+              <i className="fas fa-info-circle"></i>
+            </div>
+            <div>
+              <h4 className="font-semibold text-blue-800 mb-1">Hinweis</h4>
+              <p className="text-blue-700 text-sm">
+                Klicken Sie auf ein Spiel, um detaillierte Statistiken wie Torschützen, Karten und Preisgelder anzuzeigen. Neue Spiele können im Verwaltungsbereich hinzugefügt werden.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

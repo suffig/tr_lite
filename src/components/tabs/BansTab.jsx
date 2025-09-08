@@ -3,7 +3,7 @@ import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import { BAN_TYPES, getBanTypeColor, getBanIcon } from '../../constants/banTypes';
 
-export default function BansTab({ onNavigate }) { // eslint-disable-line no-unused-vars
+export default function BansTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   const [selectedType, setSelectedType] = useState('active'); // Changed from 'all' to 'active'
   
   const { data: bans, loading: bansLoading } = useSupabaseQuery('bans', '*');
@@ -199,20 +199,22 @@ export default function BansTab({ onNavigate }) { // eslint-disable-line no-unus
         </div>
       )}
 
-      {/* Info Card */}
-      <div className="mt-6 modern-card bg-red-50 border-red-200">
-        <div className="flex items-start">
-          <div className="text-red-600 mr-3">
-            <i className="fas fa-info-circle"></i>
-          </div>
-          <div>
-            <h4 className="font-semibold text-red-800 mb-1">Hinweis</h4>
-            <p className="text-red-700 text-sm">
-              Um neue Sperren hinzuzufügen oder zu verwalten, nutzen Sie den Verwaltungsbereich.
-            </p>
+      {/* Info Card - Only show on admin page */}
+      {showHints && (
+        <div className="mt-6 modern-card bg-red-50 border-red-200">
+          <div className="flex items-start">
+            <div className="text-red-600 mr-3">
+              <i className="fas fa-info-circle"></i>
+            </div>
+            <div>
+              <h4 className="font-semibold text-red-800 mb-1">Hinweis</h4>
+              <p className="text-red-700 text-sm">
+                Um neue Sperren hinzuzufügen oder zu verwalten, nutzen Sie den Verwaltungsbereich.
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

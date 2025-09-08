@@ -4,7 +4,7 @@ import LoadingSpinner from '../LoadingSpinner';
 import ExportImportManager from '../ExportImportManager';
 import toast from 'react-hot-toast';
 
-export default function FinanzenTab({ onNavigate }) { // eslint-disable-line no-unused-vars
+export default function FinanzenTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   const [selectedTeam, setSelectedTeam] = useState('AEK');
   const [expandedMatches, setExpandedMatches] = useState(new Set());
   const [showExportImport, setShowExportImport] = useState(false);
@@ -596,36 +596,39 @@ export default function FinanzenTab({ onNavigate }) { // eslint-disable-line no-
         </div>
       </div>
 
-      {/* Info Card */}
-      <div className="mt-6 modern-card bg-blue-50 border-blue-200">
-        <div className="flex items-start">
-          <div className="text-blue-600 mr-3">
-            <i className="fas fa-info-circle"></i>
+      {/* Info Cards - Only show on admin page */}
+      {showHints && (
+        <>
+          <div className="mt-6 modern-card bg-blue-50 border-blue-200">
+            <div className="flex items-start">
+              <div className="text-blue-600 mr-3">
+                <i className="fas fa-info-circle"></i>
+              </div>
+              <div>
+                <h4 className="font-semibold text-blue-800 mb-1">Hinweis zu Marktwerten</h4>
+                <p className="text-blue-700 text-sm">
+                  Spieler-Marktwerte werden in der Datenbank in Millionen Euro gespeichert (z.B. 12.5 = 12,5M €).
+                  Für die Gesamtkapital-Berechnung werden diese automatisch in Euro umgerechnet.
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            <h4 className="font-semibold text-blue-800 mb-1">Hinweis zu Marktwerten</h4>
-            <p className="text-blue-700 text-sm">
-              Spieler-Marktwerte werden in der Datenbank in Millionen Euro gespeichert (z.B. 12.5 = 12,5M €).
-              Für die Gesamtkapital-Berechnung werden diese automatisch in Euro umgerechnet.
-            </p>
-          </div>
-        </div>
-      </div>
 
-      {/* Previous Info Card */}
-      <div className="mt-6 modern-card bg-blue-50 border-blue-200">
-        <div className="flex items-start">
-          <div className="text-blue-600 mr-3">
-            <i className="fas fa-info-circle"></i>
+          <div className="mt-6 modern-card bg-blue-50 border-blue-200">
+            <div className="flex items-start">
+              <div className="text-blue-600 mr-3">
+                <i className="fas fa-info-circle"></i>
+              </div>
+              <div>
+                <h4 className="font-semibold text-blue-800 mb-1">Transaktionen verwalten</h4>
+                <p className="text-blue-700 text-sm">
+                  Um neue Transaktionen hinzuzufügen, nutzen Sie den Verwaltungsbereich.
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            <h4 className="font-semibold text-blue-800 mb-1">Transaktionen verwalten</h4>
-            <p className="text-blue-700 text-sm">
-              Um neue Transaktionen hinzuzufügen, nutzen Sie den Verwaltungsbereich.
-            </p>
-          </div>
-        </div>
-      </div>
+        </>
+      )}
 
       {/* Export/Import Modal */}
       {showExportImport && (

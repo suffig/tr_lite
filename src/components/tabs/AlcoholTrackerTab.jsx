@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import AlcoholProgressionGraph from '../AlcoholProgressionGraph.jsx';
 
-export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-line no-unused-vars
+export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   // Sub-navigation state
   const [activeSection, setActiveSection] = useState('alcohol');
   
@@ -841,18 +841,20 @@ export default function AlcoholTrackerTab({ onNavigate }) { // eslint-disable-li
         drinkingStartTime={drinkingStartTime}
       />
 
-      {/* Info */}
-      <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-        <h4 className="font-medium text-yellow-800 mb-2">ℹ️ Hinweise</h4>
-        <ul className="text-sm text-yellow-700 space-y-1">
-          <li>• BAK-Berechnung basiert auf der Widmark-Formel</li>
-          <li>• Annahme: 0,5L Bier mit 5% Alkoholgehalt</li>
-          <li>• Shots: 2cl mit 20% oder 40% Alkoholgehalt</li>
-          <li>• Abbau: 0,15‰ pro Stunde</li>
-          <li>• Farbkodierung: Grün (0-0,3‰), Gelb (0,3-0,5‰), Orange (0,5-1,0‰), Rot (&gt;1,0‰)</li>
-          <li>• Manager-Daten können unter Admin → Team-Verwaltung angepasst werden</li>
-        </ul>
-      </div>
+      {/* Info - Only show on admin page */}
+      {showHints && (
+        <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <h4 className="font-medium text-yellow-800 mb-2">ℹ️ Hinweise</h4>
+          <ul className="text-sm text-yellow-700 space-y-1">
+            <li>• BAK-Berechnung basiert auf der Widmark-Formel</li>
+            <li>• Annahme: 0,5L Bier mit 5% Alkoholgehalt</li>
+            <li>• Shots: 2cl mit 20% oder 40% Alkoholgehalt</li>
+            <li>• Abbau: 0,15‰ pro Stunde</li>
+            <li>• Farbkodierung: Grün (0-0,3‰), Gelb (0,3-0,5‰), Orange (0,5-1,0‰), Rot (&gt;1,0‰)</li>
+            <li>• Manager-Daten können unter Admin → Team-Verwaltung angepasst werden</li>
+          </ul>
+        </div>
+      )}
         </>
       )}
 

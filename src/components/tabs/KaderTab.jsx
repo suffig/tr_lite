@@ -6,7 +6,7 @@ import PlayerDetailModal from '../PlayerDetailModal';
 import { POSITIONS } from '../../utils/errorHandling';
 import toast from 'react-hot-toast';
 
-export default function KaderTab({ onNavigate }) { // eslint-disable-line no-unused-vars
+export default function KaderTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   const [openPanel, setOpenPanel] = useState(null);
   const [showExportImport, setShowExportImport] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState(null);

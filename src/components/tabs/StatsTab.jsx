@@ -224,7 +224,7 @@ class StatsCalculator {
   }
 }
 
-export default function StatsTab({ onNavigate }) {
+export default function StatsTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   const [selectedView, setSelectedView] = useState('dashboard');
   
   const { data: matches, loading: matchesLoading } = useSupabaseQuery('matches', '*');
