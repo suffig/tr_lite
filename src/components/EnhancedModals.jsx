@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useHapticFeedback } from './IOSComponents';
 
@@ -76,6 +76,11 @@ export default function EnhancedModal({
   }, [isOpen, isVisible, triggerHaptic]);
 
   // Handle escape key
+  const handleClose = () => {
+    triggerHaptic('light');
+    onClose();
+  };
+
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape' && closeOnEscape && isVisible) {
@@ -90,12 +95,7 @@ export default function EnhancedModal({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isVisible, closeOnEscape, handleClose]);
-
-  const handleClose = useCallback(() => {
-    triggerHaptic('light');
-    onClose();
-  }, [triggerHaptic, onClose]);
+  }, [isVisible, closeOnEscape, triggerHaptic, onClose]);
 
   const handleBackdropClick = (e) => {
     if (closeOnBackdrop && e.target === e.currentTarget) {

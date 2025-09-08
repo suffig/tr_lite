@@ -294,7 +294,7 @@ export default function EnhancedDeletionSystem({ onDelete, type, data, className
 }
 
 // Batch deletion with progress tracking
-export function BatchDeletionManager({ items, onDelete, type, className = "" }) {
+export function BatchDeletionManager({ items, onDelete, className = "" }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentItem, setCurrentItem] = useState(null);
@@ -334,11 +334,6 @@ export function BatchDeletionManager({ items, onDelete, type, className = "" }) 
       setCurrentItem(null);
       setShowResults(true);
       triggerHaptic('success');
-      
-      // Send completion notification
-      triggerNotification('system-update', {
-        message: `${completedItems.length} ${type}(s) successfully deleted`
-      });
 
     } catch (error) {
       triggerHaptic('error');
