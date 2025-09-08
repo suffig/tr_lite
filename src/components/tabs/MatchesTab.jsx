@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
-import { MatchAnalytics, LiveMatchTracker, MatchComparison } from '../MatchAnalytics';
 import '../../styles/match-animations.css';
 
 export default function MatchesTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
@@ -13,11 +12,6 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
   const [goalFilter, setGoalFilter] = useState('all'); // 'all', 'high-scoring', 'low-scoring'
   const [hoveredMatch, setHoveredMatch] = useState(null);
   const [animatingMatches, setAnimatingMatches] = useState(new Set());
-  const [showAnalytics, setShowAnalytics] = useState(false);
-  const [showLiveTracker, setShowLiveTracker] = useState(false);
-  const [showComparison, setShowComparison] = useState(false);
-  const [selectedMatches, setSelectedMatches] = useState([]);
-  const [fabExpanded, setFabExpanded] = useState(false);
   const animationTimeouts = useRef(new Map());
   
   const { data: allMatches, loading, error, refetch } = useSupabaseQuery(
@@ -350,36 +344,6 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
         </div>
       </div>
 
-      {/* Enhanced Features Panel */}
-      <div className="mb-6 space-y-4">
-        {/* Analytics Panel */}
-        {showAnalytics && (
-          <div className="animate-fadeInScale">
-            <MatchAnalytics matches={matches} />
-          </div>
-        )}
-        
-        {/* Live Match Tracker */}
-        {showLiveTracker && (
-          <div className="animate-fadeInScale">
-            <LiveMatchTracker 
-              onStartMatch={() => console.log('Live match started')}
-              onEndMatch={(data) => console.log('Live match ended:', data)}
-            />
-          </div>
-        )}
-        
-        {/* Match Comparison */}
-        {showComparison && (
-          <div className="animate-fadeInScale">
-            <MatchComparison 
-              match1={selectedMatches[0]} 
-              match2={selectedMatches[1]} 
-            />
-          </div>
-        )}
-      </div>
-
       {dateGroups && dateGroups.length > 0 ? (
         <div className="space-y-4">
           {dateGroups.map((dateGroup, groupIndex) => {
@@ -429,9 +393,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                           relative overflow-hidden rounded-xl border transition-all duration-300 ease-out transform
                           ${isExpanded ? 'shadow-2xl scale-[1.02]' : 'shadow-lg hover:shadow-xl hover:scale-[1.01]'}
                           ${isHovered ? 'ring-2 ring-blue-400/50' : ''}
-                          ${winner === 'aek' ? 'bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200' : 
-                            winner === 'real' ? 'bg-gradient-to-r from-red-50 to-red-100 border-red-200' : 
-                            'bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200'}
+                          bg-gradient-to-r from-blue-50 to-blue-100 border-blue-200
                           ${isAnimating ? 'transition-all duration-300' : ''}
                         `}
                         style={{
@@ -443,11 +405,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                       >
                         {/* Decorative background pattern */}
                         <div className="absolute inset-0 opacity-5">
-                          <div className={`w-full h-full bg-gradient-to-br ${
-                            winner === 'aek' ? 'from-blue-400 to-blue-600' : 
-                            winner === 'real' ? 'from-red-400 to-red-600' : 
-                            'from-gray-400 to-gray-600'
-                          }`}></div>
+                          <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
                         </div>
                         
                         <button
@@ -469,11 +427,8 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                               <div className="flex items-center gap-4">
                                 {/* Team A */}
                                 <div className="text-right">
-                                  <div className={`text-lg font-bold ${winner === 'aek' ? 'text-blue-700' : 'text-gray-700'}`}>
+                                  <div className="text-lg font-bold text-blue-700">
                                     {match.teama || 'AEK'}
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {aekGoals > realGoals ? '🏆 Sieger' : aekGoals === realGoals ? '🤝 Unentschieden' : '😔 Verlierer'}
                                   </div>
                                 </div>
                                 
@@ -491,11 +446,8 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                 
                                 {/* Team B */}
                                 <div className="text-left">
-                                  <div className={`text-lg font-bold ${winner === 'real' ? 'text-red-700' : 'text-gray-700'}`}>
+                                  <div className="text-lg font-bold text-red-700">
                                     {match.teamb || 'Real'}
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {realGoals > aekGoals ? '🏆 Sieger' : aekGoals === realGoals ? '🤝 Unentschieden' : '😔 Verlierer'}
                                   </div>
                                 </div>
                               </div>
@@ -808,44 +760,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                         </div>
                                       </div>
                                     </div>
-                                    
-                                    {/* Total prize money */}
-                                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                                      <div className="flex items-center justify-between">
-                                        <span className="text-sm font-medium text-green-700">💰 Gesamtsumme</span>
-                                        <span className="font-bold text-lg text-green-600">
-                                          €{(match.prizeaek || 0) + (match.prizereal || 0)}
-                                        </span>
-                                      </div>
-                                    </div>
                                   </div>
                                 </div>
                                 
-                              </div>
-                              
-                              {/* Additional match insights */}
-                              <div className="mt-6 p-4 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-lg border border-purple-200">
-                                <h4 className="font-bold text-purple-800 mb-3 flex items-center gap-2">
-                                  📈 Match Insights
-                                </h4>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-purple-600">{((match.goalsa || 0) + (match.goalsb || 0))}</div>
-                                    <div className="text-purple-700">Tore insgesamt</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-purple-600">
-                                      {Math.abs((match.goalsa || 0) - (match.goalsb || 0))}
-                                    </div>
-                                    <div className="text-purple-700">Tor-Differenz</div>
-                                  </div>
-                                  <div className="text-center">
-                                    <div className="text-2xl font-bold text-purple-600">
-                                      {((match.yellowa || 0) + (match.yellowb || 0) + (match.reda || 0) + (match.redb || 0))}
-                                    </div>
-                                    <div className="text-purple-700">Karten total</div>
-                                  </div>
-                                </div>
                               </div>
                             </div>
                           </div>
@@ -889,118 +806,6 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
         </div>
       )}
 
-      {/* Floating Action Button with Enhanced Features */}
-      <div className="fixed bottom-20 right-4 z-40">
-        <div className={`transition-all duration-300 ${fabExpanded ? 'space-y-2' : 'space-y-0'}`}>
-          {/* Feature buttons - appear when FAB is expanded */}
-          {fabExpanded && (
-            <>
-              <button
-                onClick={() => {
-                  setShowAnalytics(!showAnalytics);
-                  setFabExpanded(false);
-                }}
-                className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-indigo-700 transition-all animate-slideInUp"
-                style={{ animationDelay: '0.1s' }}
-              >
-                <span className="text-sm">📊</span>
-                <span className="text-sm font-medium">Analytics</span>
-              </button>
-              
-              <button
-                onClick={() => {
-                  setShowLiveTracker(!showLiveTracker);
-                  setFabExpanded(false);
-                }}
-                className="flex items-center gap-2 bg-red-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-red-700 transition-all animate-slideInUp"
-                style={{ animationDelay: '0.2s' }}
-              >
-                <span className="text-sm">🔴</span>
-                <span className="text-sm font-medium">Live</span>
-              </button>
-              
-              <button
-                onClick={() => {
-                  setShowComparison(!showComparison);
-                  setFabExpanded(false);
-                }}
-                className="flex items-center gap-2 bg-yellow-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-yellow-700 transition-all animate-slideInUp"
-                style={{ animationDelay: '0.3s' }}
-              >
-                <span className="text-sm">⚖️</span>
-                <span className="text-sm font-medium">Vergleich</span>
-              </button>
-              
-              <button
-                onClick={() => {
-                  // Export functionality
-                  exportMatchData(matches);
-                  setFabExpanded(false);
-                }}
-                className="flex items-center gap-2 bg-green-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-green-700 transition-all animate-slideInUp"
-                style={{ animationDelay: '0.4s' }}
-              >
-                <span className="text-sm">📤</span>
-                <span className="text-sm font-medium">Export</span>
-              </button>
-            </>
-          )}
-          
-          {/* Main FAB button */}
-          <button
-            onClick={() => setFabExpanded(!fabExpanded)}
-            className={`
-              w-14 h-14 bg-blue-600 text-white rounded-full shadow-xl hover:bg-blue-700 
-              transition-all duration-300 flex items-center justify-center
-              hover:scale-110 active:scale-95
-              ${fabExpanded ? 'rotate-45' : 'rotate-0'}
-            `}
-          >
-            <span className="text-2xl">{fabExpanded ? '✕' : '⚡'}</span>
-          </button>
-        </div>
-      </div>
     </div>
   );
-
-  // Helper function to export match data
-  function exportMatchData(matches) {
-    if (!matches || matches.length === 0) {
-      alert('Keine Spiele zum Exportieren vorhanden');
-      return;
-    }
-
-    const csvData = matches.map(match => ({
-      Datum: match.date,
-      TeamA: match.teama || 'AEK',
-      ToreA: match.goalsa || 0,
-      TeamB: match.teamb || 'Real', 
-      ToreB: match.goalsb || 0,
-      SpielerDesSpiels: match.manofthematch || '',
-      PreisgeldAEK: match.prizeaek || 0,
-      PreisgeldReal: match.prizereal || 0,
-      GelbeKartenAEK: match.yellowa || 0,
-      RotKartenAEK: match.reda || 0,
-      GelbeKartenReal: match.yellowb || 0,
-      RotKartenReal: match.redb || 0
-    }));
-
-    const csv = [
-      Object.keys(csvData[0]).join(','),
-      ...csvData.map(row => Object.values(row).join(','))
-    ].join('\n');
-
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `fifa-matches-${new Date().toISOString().split('T')[0]}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-    
-    // Show success message
-    alert('✅ Match-Daten erfolgreich exportiert!');
-  }
 }
