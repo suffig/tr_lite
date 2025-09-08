@@ -334,6 +334,11 @@ export function BatchDeletionManager({ items, onDelete, type, className = "" }) 
       setCurrentItem(null);
       setShowResults(true);
       triggerHaptic('success');
+      
+      // Send completion notification
+      triggerNotification('system-update', {
+        message: `${completedItems.length} ${type}(s) successfully deleted`
+      });
 
     } catch (error) {
       triggerHaptic('error');
