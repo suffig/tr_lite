@@ -3,6 +3,7 @@ import { useSupabaseQuery, useSupabaseMutation } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import ExportImportManager from '../ExportImportManager';
 import PlayerDetailModal from '../PlayerDetailModal';
+import EASquadOverview from '../EASquadOverview';
 import { POSITIONS } from '../../utils/errorHandling';
 import toast from 'react-hot-toast';
 
@@ -12,6 +13,7 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showPlayerDetail, setShowPlayerDetail] = useState(false);
+  const [viewMode, setViewMode] = useState('classic'); // 'classic' or 'ea'
   
   const { data: players, loading, error, refetch } = useSupabaseQuery('players', '*');
   const { update } = useSupabaseMutation('players');
@@ -165,10 +167,41 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
 
       {/* Enhanced Quick Actions Panel */}
       <div className="modern-card mb-6">
-        <h3 className="font-bold text-lg mb-4 flex items-center">
-          <span className="mr-2">⚡</span>
-          Kader-Management
-        </h3>
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+          <div>
+            <h3 className="font-bold text-lg flex items-center">
+              <span className="mr-2">⚡</span>
+              Kader-Management
+            </h3>
+          </div>
+          
+          {/* View Mode Toggle */}
+          <div className="flex rounded-lg bg-bg-secondary p-1">
+            <button
+              onClick={() => setViewMode('classic')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'classic' 
+                  ? 'bg-primary-blue text-white' 
+                  : 'text-text-muted hover:text-text-primary'
+              }`}
+            >
+              <i className="fas fa-list mr-1"></i>
+              Classic View
+            </button>
+            <button
+              onClick={() => setViewMode('ea')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                viewMode === 'ea' 
+                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                  : 'text-text-muted hover:text-text-primary'
+              }`}
+            >
+              <i className="fas fa-gamepad mr-1"></i>
+              EA Sports FC
+            </button>
+          </div>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
           {/* Existing Actions */}
           <button
@@ -207,140 +240,145 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
         </div>
       </div>
 
-      {/* Team Accordions */}
-      <div className="space-y-4">
-        {teams.map((team) => (
-          <div key={team.id} className={getTeamCardClass(team.name)}>
-            {/* Team Header */}
-            <button
-              onClick={() => setOpenPanel(openPanel === team.id ? null : team.id)}
-              className="w-full text-left p-4 focus:outline-none"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <span className="text-2xl">{team.icon}</span>
-                  <div>
-                    <h3 className={`font-semibold text-lg ${getTeamColor(team.name)}`}>
-                      {team.displayName}
-                    </h3>
-                    <p className="text-sm text-text-muted">
-                      {team.players.length} Spieler
-                      {team.squadValue > 0 && (
-                        <span className="ml-2">
-                          • Kaderwert: {formatCurrencyInMillions(team.squadValue)}
-                        </span>
-                      )}
-                    </p>
+      {/* Main Content - Conditional View */}
+      {viewMode === 'ea' ? (
+        <EASquadOverview players={players} loading={loading} />
+      ) : (
+        <>
+          {/* Team Accordions - Classic View */}
+          <div className="space-y-4">
+            {teams.map((team) => (
+              <div key={team.id} className={getTeamCardClass(team.name)}>
+                {/* Team Header */}
+                <button
+                  onClick={() => setOpenPanel(openPanel === team.id ? null : team.id)}
+                  className="w-full text-left p-4 focus:outline-none"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <span className="text-2xl">{team.icon}</span>
+                      <div>
+                        <h3 className={`font-semibold text-lg ${getTeamColor(team.name)}`}>
+                          {team.displayName}
+                        </h3>
+                        <p className="text-sm text-text-muted">
+                          {team.players.length} Spieler
+                          {team.squadValue > 0 && (
+                            <span className="ml-2">
+                              • Kaderwert: {formatCurrencyInMillions(team.squadValue)}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-sm text-text-muted">
+                        {team.players.length}
+                      </span>
+                      <i className={`fas fa-chevron-${openPanel === team.id ? 'up' : 'down'} transition-transform`}></i>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-text-muted">
-                    {team.players.length}
-                  </span>
-                  <i className={`fas fa-chevron-${openPanel === team.id ? 'up' : 'down'} transition-transform`}></i>
-                </div>
-              </div>
-            </button>
+                </button>
 
-            {/* Team Players */}
-            {openPanel === team.id && (
-              <div className="px-4 pb-4 border-t border-border-light mt-4 pt-4">
-                {team.players.length > 0 ? (
-                  <div className="grid gap-3">
-                    {team.players.map((player) => (
-                      <div key={player.id} className="bg-bg-tertiary rounded-lg p-3 hover:bg-bg-secondary transition-colors cursor-pointer relative group"
-                           onClick={() => handleShowPlayerDetail(player)}>
-                        {/* FIFA Indicator */}
-                        <div className="absolute top-2 right-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-                          🎮 FIFA
-                        </div>
-                        
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-3">
-                              <div>
-                                <h4 className="font-medium text-text-primary group-hover:text-blue-400 transition-colors">
-                                  {player.name}
-                                </h4>
-                                <div className="flex items-center space-x-2 mt-1">
-                                  <span className={getPositionBadgeClass(player.position)}>
-                                    {player.position}
-                                  </span>
-                                  {player.staerke && (
-                                    <span className="text-xs text-text-muted">
-                                      Stärke: {player.staerke}
-                                    </span>
-                                  )}
-                                  {(player.value !== null && player.value !== undefined) && (
-                                    <span className="text-xs text-primary-green font-medium">
-                                      {formatCurrencyInMillions(player.value)}
-                                    </span>
-                                  )}
+                {/* Team Players */}
+                {openPanel === team.id && (
+                  <div className="px-4 pb-4 border-t border-border-light mt-4 pt-4">
+                    {team.players.length > 0 ? (
+                      <div className="grid gap-3">
+                        {team.players.map((player) => (
+                          <div key={player.id} className="bg-bg-tertiary rounded-lg p-3 hover:bg-bg-secondary transition-colors cursor-pointer relative group"
+                               onClick={() => handleShowPlayerDetail(player)}>
+                            {/* FIFA Indicator */}
+                            <div className="absolute top-2 right-2 text-xs bg-blue-600 text-white px-2 py-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                              🎮 FIFA
+                            </div>
+                            
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center space-x-3">
+                                  <div>
+                                    <h4 className="font-medium text-text-primary group-hover:text-blue-400 transition-colors">
+                                      {player.name}
+                                    </h4>
+                                    <div className="flex items-center space-x-2 mt-1">
+                                      <span className={getPositionBadgeClass(player.position)}>
+                                        {player.position}
+                                      </span>
+                                      {player.staerke && (
+                                        <span className="text-xs text-text-muted">
+                                          Stärke: {player.staerke}
+                                        </span>
+                                      )}
+                                      {(player.value !== null && player.value !== undefined) && (
+                                        <span className="text-xs text-primary-green font-medium">
+                                          {formatCurrencyInMillions(player.value)}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="text-xs text-blue-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                      <i className="fas fa-info-circle mr-1"></i>
+                                      Click for FIFA statistics
+                                    </div>
+                                  </div>
                                 </div>
-                                <div className="text-xs text-blue-400 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                  <i className="fas fa-info-circle mr-1"></i>
-                                  Click for FIFA statistics
-                                </div>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleShowPlayerDetail(player);
+                                  }}
+                                  className="text-blue-400 hover:text-blue-300 transition-colors p-2 rounded-full hover:bg-blue-400/10"
+                                  title="FIFA Statistics"
+                                >
+                                  <i className="fas fa-chart-bar text-sm"></i>
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditPlayer(player);
+                                  }}
+                                  className="text-text-muted hover:text-primary-green transition-colors p-1"
+                                  title="Bearbeiten"
+                                >
+                                  <i className="fas fa-edit text-sm"></i>
+                                </button>
                               </div>
                             </div>
                           </div>
-                          <div className="flex items-center space-x-2">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleShowPlayerDetail(player);
-                              }}
-                              className="text-blue-400 hover:text-blue-300 transition-colors p-2 rounded-full hover:bg-blue-400/10"
-                              title="FIFA Statistics"
-                            >
-                              <i className="fas fa-chart-bar text-sm"></i>
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleEditPlayer(player);
-                              }}
-                              className="text-text-muted hover:text-primary-green transition-colors p-1"
-                              title="Bearbeiten"
-                            >
-                              <i className="fas fa-edit text-sm"></i>
-                            </button>
-                          </div>
-                        </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <div className="text-4xl mb-2">{team.icon}</div>
-                    <p className="text-text-muted">
-                      Keine Spieler in {team.displayName}
-                    </p>
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="text-4xl mb-2">{team.icon}</div>
+                        <p className="text-text-muted">
+                          Keine Spieler in {team.displayName}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
-
-
               </div>
-            )}
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Summary Cards */}
-      <div className="mt-6 grid grid-cols-2 gap-4">
-        <div className="modern-card text-center">
-          <div className="text-2xl font-bold text-primary-green">
-            {players?.length || 0}
+          {/* Summary Cards - Classic View Only */}
+          <div className="mt-6 grid grid-cols-2 gap-4">
+            <div className="modern-card text-center">
+              <div className="text-2xl font-bold text-primary-green">
+                {players?.length || 0}
+              </div>
+              <div className="text-sm text-text-muted">Gesamt Spieler</div>
+            </div>
+            <div className="modern-card text-center">
+              <div className="text-2xl font-bold text-accent-orange">
+                {POSITIONS.length}
+              </div>
+              <div className="text-sm text-text-muted">Positionen</div>
+            </div>
           </div>
-          <div className="text-sm text-text-muted">Gesamt Spieler</div>
-        </div>
-        <div className="modern-card text-center">
-          <div className="text-2xl font-bold text-accent-orange">
-            {POSITIONS.length}
-          </div>
-          <div className="text-sm text-text-muted">Positionen</div>
-        </div>
-      </div>
+        </>
+      )}
 
       {/* New Feature Modals */}
       {showExportImport && (
