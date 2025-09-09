@@ -4,6 +4,7 @@ const tabs = [
   { id: 'finanzen', icon: '€', label: 'Finanzen', ariaLabel: 'Zu Finanzen-Übersicht wechseln' },
   { id: 'squad', icon: '👥', label: 'Kader', ariaLabel: 'Zu Kader-Übersicht wechseln' },
   { id: 'stats', icon: '📊', label: 'Stats', ariaLabel: 'Zu Statistik-Übersicht wechseln' },
+  { id: 'features', icon: '✨', label: 'Features', ariaLabel: 'Zu neuen Features wechseln' },
   { id: 'alcohol', icon: '🍺🃏', label: 'Alkohol & Blackjack', ariaLabel: 'Zu Alkohol & Blackjack-Tracker wechseln' },
   { id: 'admin', icon: '⚙️', label: 'Verwaltung', ariaLabel: 'Zu Verwaltung wechseln' },
 ];

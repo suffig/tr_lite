@@ -6,8 +6,9 @@ import AddTransactionTab from './admin/AddTransactionTab';
 import DeleteTab from './admin/DeleteTab';
 import SearchTab from './admin/SearchTab';
 import TeamSettingsTab from './admin/TeamSettingsTab';
+import EnhancedFeaturesDashboard from '../EnhancedFeaturesDashboard';
 
-export default function AdminTab({ onLogout, onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
+export default function AdminTab({ onLogout, onNavigate, showHints = false, onShowSlotMachine, onShowThemeSettings }) { // eslint-disable-line no-unused-vars
   const [activeSubTab, setActiveSubTab] = useState('search');
 
   const subTabs = [
