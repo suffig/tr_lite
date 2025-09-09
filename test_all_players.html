@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test All Players - Player Data Verification</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .player-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+        .player-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .overlap-test {
+            position: relative;
+            z-index: 1;
+        }
+        .error-highlight {
+            border-left: 4px solid #ef4444;
+            background-color: #fef2f2;
+        }
+        .success-highlight {
+            border-left: 4px solid #10b981;
+            background-color: #f0fdf4;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg p-6 mb-8">
+            <h1 class="text-3xl font-bold mb-2">🔍 All Players Test</h1>
+            <p class="text-lg opacity-90">Comprehensive test of all players in the database</p>
+            <div class="mt-4 text-sm bg-white bg-opacity-20 rounded p-3">
+                <strong>🎯 Testing:</strong> Player data accuracy, card layout, API integration
+            </div>
+        </div>
+
+        <!-- Test Controls -->
+        <div class="bg-white rounded-lg p-6 mb-8 shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">Test Controls</h2>
+            <div class="flex gap-4 mb-4">
+                <button onclick="testAllPlayers()" class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                    🧪 Test All Players
+                </button>
+                <button onclick="testCardOverlap()" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                    📐 Test Card Layout
+                </button>
+                <button onclick="clearResults()" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+                    🗑️ Clear Results
+                </button>
+            </div>
+            <div id="testStatus" class="text-sm text-gray-600">Ready to test</div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Database Players -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">📊 Database Players</h3>
+                <div id="databasePlayers" class="space-y-4">
+                    Loading...
+                </div>
+            </div>
+
+            <!-- Test Results -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">✅ Test Results</h3>
+                <div id="testResults" class="space-y-4">
+                    No tests run yet
+                </div>
+            </div>
+        </div>
+
+        <!-- Player Cards Display Area -->
+        <div class="bg-white rounded-lg p-6 mt-8 shadow-lg">
+            <h3 class="text-lg font-semibold mb-4">🎴 Player Cards Display Test</h3>
+            <div id="playerCardsArea" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Player cards will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Import services -->
+    <script type="module">
+        import { FIFADataService } from './src/utils/fifaDataService.js';
+        import MSMCApiService from './src/utils/msmcApiService.js';
+        import { dataManager } from './dataManager.js';
+        
+        // Make available globally
+        window.FIFADataService = FIFADataService;
+        window.MSMCApiService = MSMCApiService;
+        window.dataManager = dataManager;
+        
+        // Test data
+        let allPlayers = [];
+        let testResults = [];
+
+        // Load initial data
+        async function loadInitialData() {
+            try {
+                const data = await dataManager.loadAllAppData();
+                allPlayers = data.players || [];
+                
+                displayDatabasePlayers();
+                updateTestStatus(`Loaded ${allPlayers.length} players from database`);
+            } catch (error) {
+                console.error('Error loading data:', error);
+                updateTestStatus('Error loading initial data: ' + error.message);
+            }
+        }
+
+        function displayDatabasePlayers() {
+            const container = document.getElementById('databasePlayers');
+            if (!allPlayers.length) {
+                container.innerHTML = '<div class="text-gray-500">No players found</div>';
+                return;
+            }
+
+            const teamGroups = {
+                'AEK': allPlayers.filter(p => p.team === 'AEK'),
+                'Real': allPlayers.filter(p => p.team === 'Real'),
+                'Ehemalige': allPlayers.filter(p => p.team === 'Ehemalige')
+            };
+
+            let html = '';
+            for (const [team, players] of Object.entries(teamGroups)) {
+                if (players.length > 0) {
+                    html += `
+                        <div class="mb-4">
+                            <h4 class="font-semibold text-gray-700 mb-2">${team} (${players.length} players)</h4>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                ${players.map(p => `
+                                    <div class="flex justify-between">
+                                        <span>${p.name}</span>
+                                        <span class="text-xs">${p.position || 'N/A'} - ${p.value || 0}M</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            container.innerHTML = html;
+        }
+
+        function updateTestStatus(message) {
+            document.getElementById('testStatus').textContent = message;
+        }
+
+        function displayTestResults() {
+            const container = document.getElementById('testResults');
+            if (!testResults.length) {
+                container.innerHTML = '<div class="text-gray-500">No test results yet</div>';
+                return;
+            }
+
+            const html = testResults.map((result, index) => `
+                <div class="border rounded p-3 ${result.success ? 'success-highlight' : 'error-highlight'}">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="font-medium">${result.playerName}</span>
+                        <span class="text-xs ${result.success ? 'text-green-600' : 'text-red-600'}">
+                            ${result.success ? '✅' : '❌'}
+                        </span>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        <div>Team: ${result.team}</div>
+                        <div>FIFA Data: ${result.fifaData ? '✅ Found' : '❌ Missing'}</div>
+                        <div>API Status: ${result.apiStatus}</div>
+                        ${result.issues ? `<div class="text-red-600 mt-1">Issues: ${result.issues}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = html;
+        }
+
+        // Test all players
+        window.testAllPlayers = async function() {
+            updateTestStatus('Testing all players...');
+            testResults = [];
+            
+            for (let i = 0; i < allPlayers.length; i++) {
+                const player = allPlayers[i];
+                updateTestStatus(`Testing player ${i + 1}/${allPlayers.length}: ${player.name}`);
+                
+                try {
+                    // Test FIFA data service (static method)
+                    const fifaData = await FIFADataService.getPlayerData(player.name);
+                    
+                    const result = {
+                        playerName: player.name,
+                        team: player.team,
+                        fifaData: !!fifaData,
+                        apiStatus: fifaData?.source || 'unknown',
+                        success: true,
+                        issues: []
+                    };
+
+                    // Check for data issues
+                    if (fifaData) {
+                        // Check if position matches
+                        if (player.position && fifaData.position && 
+                            !fifaData.position.toLowerCase().includes(player.position.toLowerCase()) &&
+                            !player.position.toLowerCase().includes(fifaData.position.toLowerCase())) {
+                            result.issues.push(`Position mismatch: DB(${player.position}) vs FIFA(${fifaData.position})`);
+                        }
+
+                        // Check for suspicious data
+                        if (fifaData.mockData) {
+                            result.issues.push('Using mock data instead of real data');
+                        }
+
+                        if (fifaData.club === 'Unknown' || fifaData.nationality === 'Unknown') {
+                            result.issues.push('Contains unknown/placeholder data');
+                        }
+                    } else {
+                        result.issues.push('No FIFA data found');
+                        result.success = false;
+                    }
+
+                    testResults.push(result);
+                } catch (error) {
+                    testResults.push({
+                        playerName: player.name,
+                        team: player.team,
+                        fifaData: false,
+                        apiStatus: 'error',
+                        success: false,
+                        issues: ['Error: ' + error.message]
+                    });
+                }
+                
+                // Update display every 5 players
+                if (i % 5 === 0 || i === allPlayers.length - 1) {
+                    displayTestResults();
+                }
+            }
+            
+            const successCount = testResults.filter(r => r.success).length;
+            updateTestStatus(`Testing complete: ${successCount}/${testResults.length} players passed`);
+        };
+
+        // Test card overlap
+        window.testCardOverlap = function() {
+            updateTestStatus('Testing card layout and overlap...');
+            
+            const cardsArea = document.getElementById('playerCardsArea');
+            cardsArea.innerHTML = '';
+
+            // Create sample cards to test overlap
+            const samplePlayers = allPlayers.slice(0, 9); // Test with 9 cards
+            
+            samplePlayers.forEach((player, index) => {
+                const card = document.createElement('div');
+                card.className = 'player-card overlap-test bg-white rounded-lg p-4 shadow-md';
+                card.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <h4 class="font-semibold text-gray-800">${player.name}</h4>
+                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">${player.position || 'N/A'}</span>
+                    </div>
+                    <div class="text-sm text-gray-600">
+                        <div>Team: ${player.team}</div>
+                        <div>Value: ${player.value || 0}M €</div>
+                    </div>
+                    <div class="mt-3 text-xs text-gray-500">
+                        Card #${index + 1} - Testing overlap
+                    </div>
+                `;
+                cardsArea.appendChild(card);
+            });
+
+            // Check for overlaps
+            setTimeout(() => {
+                const cards = cardsArea.querySelectorAll('.player-card');
+                let overlapDetected = false;
+                
+                cards.forEach((card, index) => {
+                    const rect = card.getBoundingClientRect();
+                    cards.forEach((otherCard, otherIndex) => {
+                        if (index !== otherIndex) {
+                            const otherRect = otherCard.getBoundingClientRect();
+                            
+                            // Check for overlap
+                            if (!(rect.right <= otherRect.left || 
+                                  rect.left >= otherRect.right || 
+                                  rect.bottom <= otherRect.top || 
+                                  rect.top >= otherRect.bottom)) {
+                                overlapDetected = true;
+                                card.classList.add('error-highlight');
+                                otherCard.classList.add('error-highlight');
+                            }
+                        }
+                    });
+                });
+
+                if (overlapDetected) {
+                    updateTestStatus('❌ Card overlap detected! Some cards are overlapping.');
+                } else {
+                    updateTestStatus('✅ No card overlap detected. Layout is correct.');
+                }
+            }, 100);
+        };
+
+        // Clear results
+        window.clearResults = function() {
+            testResults = [];
+            document.getElementById('testResults').innerHTML = '<div class="text-gray-500">No test results yet</div>';
+            document.getElementById('playerCardsArea').innerHTML = '';
+            updateTestStatus('Results cleared');
+        };
+
+        // Initialize
+        loadInitialData();
+    </script>
+</body>
+</html>
