@@ -6,6 +6,7 @@ import AddTransactionTab from './admin/AddTransactionTab';
 import DeleteTab from './admin/DeleteTab';
 import SearchTab from './admin/SearchTab';
 import TeamSettingsTab from './admin/TeamSettingsTab';
+import EventsSettingsTab from './admin/EventsSettingsTab';
 
 export default function AdminTab({ onLogout, onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   const [activeSubTab, setActiveSubTab] = useState('search');
@@ -17,6 +18,7 @@ export default function AdminTab({ onLogout, onNavigate, showHints = false }) { 
     { id: 'players', label: 'Spieler hinzufügen', icon: 'fas fa-users' },
     { id: 'transactions', label: 'Transaktionen hinzufügen', icon: 'fas fa-euro-sign' },
     { id: 'settings', label: 'Team-Einstellungen', icon: 'fas fa-cog' },
+    { id: 'events', label: 'Events & Benachrichtigungen', icon: 'fas fa-bell' },
     { id: 'delete', label: 'Daten löschen', icon: 'fas fa-trash' },
   ];
 
@@ -34,6 +36,8 @@ export default function AdminTab({ onLogout, onNavigate, showHints = false }) { 
         return <AddTransactionTab />;
       case 'settings':
         return <TeamSettingsTab />;
+      case 'events':
+        return <EventsSettingsTab />;
       case 'delete':
         return <DeleteTab />;
       default:

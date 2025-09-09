@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSupabaseQuery } from '../../../hooks/useSupabase';
 import { MatchBusinessLogic } from '../../../utils/matchBusinessLogic';
+import { triggerNotification } from '../../NotificationSystem';
 import toast from 'react-hot-toast';
 
 export default function AddMatchTab() {
@@ -130,6 +131,16 @@ export default function AddMatchTab() {
       
       // Show success message with comprehensive feedback
       toast.success(result.message);
+      
+      // Trigger push notification for new match
+      triggerNotification('match-created', {
+        date: formData.date,
+        teama: formData.teama,
+        teamb: formData.teamb,
+        goalsa: formData.goalsa,
+        goalsb: formData.goalsb,
+        manofthematch: formData.manofthematch
+      });
     } catch (error) {
       console.error('Match submission error:', error);
       toast.error(error.message || 'Fehler beim Hinzufügen des Spiels');
@@ -268,7 +279,7 @@ export default function AddMatchTab() {
       {/* Match Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-2 sm:p-4">
-          <div className="bg-bg-secondary rounded-lg w-full max-w-lg modal-content match-modal-content">
+          <div className="bg-bg-secondary rounded-lg w-full max-w-lg modal-content match-modal-content modal-mobile-safe">
             <div className="p-4 sm:p-6">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-semibold text-text-primary">Neues Spiel</h3>
