@@ -144,7 +144,8 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
   // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
-      animationTimeouts.current.forEach(timeout => clearTimeout(timeout));
+      const timeouts = animationTimeouts.current;
+      timeouts.forEach(timeout => clearTimeout(timeout));
     };
   }, []);
 

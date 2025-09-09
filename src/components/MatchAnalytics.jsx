@@ -168,7 +168,7 @@ export function LiveMatchTracker({ onStartMatch, onEndMatch }) {
           
           <div className="text-center">
             <div className="text-gray-500 text-sm">
-              {liveData.startTime && Math.floor((new Date() - liveData.startTime) / 60000)}'
+              {liveData.startTime && Math.floor((new Date() - liveData.startTime) / 60000)}&apos;
             </div>
             <div className="text-4xl font-bold text-gray-600">:</div>
           </div>
@@ -193,7 +193,7 @@ export function LiveMatchTracker({ onStartMatch, onEndMatch }) {
           <div className="space-y-1 max-h-32 overflow-y-auto">
             {liveData.events.slice(-5).reverse().map((event, idx) => (
               <div key={idx} className="text-sm p-2 bg-white/60 rounded flex items-center gap-2">
-                <span className="font-mono text-xs">{event.minute}'</span>
+                <span className="font-mono text-xs">{event.minute}&apos;</span>
                 <span>⚽</span>
                 <span className={`font-semibold ${event.team === 'aek' ? 'text-blue-600' : 'text-red-600'}`}>
                   {event.team.toUpperCase()} Tor!
@@ -290,7 +290,7 @@ export function MatchComparison({ match1, match2 }) {
 }
 
 // Helper function to calculate match analytics
-function calculateMatchAnalytics(matches, currentMatch) {
+function calculateMatchAnalytics(matches) {
   if (!matches || matches.length === 0) return null;
 
   const totalMatches = matches.length;
