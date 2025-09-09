@@ -2348,22 +2348,26 @@ export class FIFADataService {
                 console.log('🌐 Attempting to fetch live data from MSMC API...');
                 const liveData = await MSMCApiService.searchPlayerByName(cleanPlayerName);
                 
-                if (liveData) {
-                    // Merge live data with mock data (live data takes precedence)
-                    const enhancedData = {
-                        ...mockData,
-                        ...liveData,
-                        searchName: cleanPlayerName,
-                        found: true,
-                        source: 'msmc_api_enhanced',
-                        lastUpdated: new Date().toISOString(),
-                        mockDataAvailable: !!mockData
-                    };
+                if (liveData && !liveData.mockData) {
+                    // Only use real API data, not mock data from MSMC service
+                    // Merge with FIFA database data intelligently (prioritize higher quality values)
+                    const enhancedData = this.mergePlayerData(mockData, liveData, cleanPlayerName);
+                    enhancedData.source = 'msmc_api_enhanced';
+                    enhancedData.lastUpdated = new Date().toISOString();
+                    enhancedData.mockDataAvailable = !!mockData;
                     
-                    console.log(`✅ Enhanced with live MSMC API data for: ${cleanPlayerName}`);
+                    console.log(`✅ Enhanced with real MSMC API data for: ${cleanPlayerName}`);
                     return enhancedData;
+                } else if (liveData && liveData.mockData && mockData) {
+                    // MSMC API returned mock data, but we have good FIFA database data
+                    // Prefer FIFA database data over generated mock data
+                    console.log('⚠️ MSMC API returned mock data, preferring FIFA database data');
+                    mockData.source = 'fifa_database_preferred';
+                    mockData.apiAttempted = true;
+                    mockData.apiFetchTime = new Date().toISOString();
+                    mockData.apiMockDataRejected = true;
                 } else {
-                    console.log('⚠️ Live data fetch failed, using mock data or fallback');
+                    console.log('⚠️ Live data fetch failed or returned mock data, using FIFA database or fallback');
                     if (mockData) {
                         mockData.source = 'mock_fallback';
                         mockData.apiAttempted = true;
@@ -2393,6 +2397,101 @@ export class FIFADataService {
         // No data found
         console.log(`❌ No data found for player: ${cleanPlayerName}`);
         return null;
+    }
+
+    /**
+     * Intelligently merge FIFA database data with API data
+     * @param {Object} fifaData - Data from FIFA database
+     * @param {Object} apiData - Data from MSMC API
+     * @param {string} searchName - Original search name
+     * @returns {Object} Merged player data
+     */
+    static mergePlayerData(fifaData, apiData, searchName) {
+        // Helper function to choose better value
+        const chooseBetter = (fifa, api, preferFifa = false) => {
+            if (fifa && api) {
+                // If both exist, prefer FIFA database for certain fields unless API has clearly better data
+                if (preferFifa) return fifa;
+                // For strings, prefer non-"Unknown" values
+                if (typeof fifa === 'string' && typeof api === 'string') {
+                    if (fifa !== 'Unknown' && api === 'Unknown') return fifa;
+                    if (api !== 'Unknown' && fifa === 'Unknown') return api;
+                }
+                // For arrays, prefer non-empty and non-"Unknown" arrays
+                if (Array.isArray(fifa) && Array.isArray(api)) {
+                    const fifaValid = fifa.length > 0 && !fifa.includes('Unknown');
+                    const apiValid = api.length > 0 && !api.includes('Unknown');
+                    if (fifaValid && !apiValid) return fifa;
+                    if (apiValid && !fifaValid) return api;
+                    return fifa; // Prefer FIFA if both valid
+                }
+                // For numbers, prefer higher quality (non-zero, reasonable values)
+                if (typeof fifa === 'number' && typeof api === 'number') {
+                    if (fifa > 0 && api <= 0) return fifa;
+                    if (api > 0 && fifa <= 0) return api;
+                    // For ratings, prefer FIFA database values as they're curated
+                    return fifa;
+                }
+                return fifa; // Default to FIFA data
+            }
+            return fifa || api; // Return whichever exists
+        };
+
+        const merged = {
+            // Basic info
+            searchName: searchName,
+            found: true,
+            playerName: chooseBetter(fifaData?.playerName, apiData?.playerName) || searchName,
+            playerId: apiData?.playerId || fifaData?.playerId,
+            
+            // Core stats - prefer FIFA database values
+            overall: chooseBetter(fifaData?.overall, apiData?.overall, true),
+            potential: chooseBetter(fifaData?.potential, apiData?.potential, true),
+            
+            // Player details - intelligently merge
+            age: chooseBetter(fifaData?.age, apiData?.age),
+            nationality: chooseBetter(fifaData?.nationality, apiData?.nationality),
+            club: chooseBetter(fifaData?.club, apiData?.club),
+            positions: chooseBetter(fifaData?.positions, apiData?.positions),
+            
+            // Physical attributes
+            height: chooseBetter(fifaData?.height, apiData?.height),
+            weight: chooseBetter(fifaData?.weight, apiData?.weight),
+            preferredFoot: chooseBetter(fifaData?.foot || fifaData?.preferredFoot, apiData?.preferredFoot),
+            
+            // Game attributes - prefer FIFA database
+            weakFoot: chooseBetter(fifaData?.weakFoot, apiData?.weakFoot, true),
+            skillMoves: chooseBetter(fifaData?.skillMoves, apiData?.skillMoves, true),
+            workRate: chooseBetter(fifaData?.workrates || fifaData?.workRate, apiData?.workRate),
+            
+            // Main stats - prefer FIFA database
+            pace: chooseBetter(fifaData?.pace, apiData?.pace, true),
+            shooting: chooseBetter(fifaData?.shooting, apiData?.shooting, true),
+            passing: chooseBetter(fifaData?.passing, apiData?.passing, true),
+            dribbling: chooseBetter(fifaData?.dribbling, apiData?.dribbling, true),
+            defending: chooseBetter(fifaData?.defending, apiData?.defending, true),
+            physical: chooseBetter(fifaData?.physical, apiData?.physical, true),
+            
+            // Detailed skills - prefer FIFA database
+            skills: {
+                ...(apiData?.skills || {}),
+                ...(fifaData?.skills || {}) // FIFA skills override API skills
+            },
+            
+            // Financial info
+            value: chooseBetter(fifaData?.value, apiData?.value),
+            wage: chooseBetter(fifaData?.wage, apiData?.wage),
+            contract: fifaData?.contract,
+            
+            // Legacy fields
+            sofifaId: fifaData?.sofifaId,
+            sofifaUrl: fifaData?.sofifaUrl,
+            
+            // Suggested name for display
+            suggestedName: fifaData?.searchName || fifaData?.playerName || apiData?.playerName || searchName
+        };
+
+        return merged;
     }
 
     /**

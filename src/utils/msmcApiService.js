@@ -335,7 +335,8 @@ export class MSMCApiService {
         
         console.log(`🎲 Generating mock data for: ${playerName} (MSMC API not available)`);
         
-        return {
+        // Try to generate more realistic data based on player name patterns
+        const playerData = {
             overall: overall,
             potential: Math.min(overall + Math.floor(Math.random() * 8), 95),
             source: 'msmc_api_mock',
@@ -364,8 +365,46 @@ export class MSMCApiService {
             
             found: true,
             searchName: playerName,
-            mockData: true
+            mockData: true // Important flag to identify this as mock data
         };
+
+        // Try to make some educated guesses for well-known players
+        const nameLower = playerName.toLowerCase();
+        if (nameLower.includes('messi')) {
+            Object.assign(playerData, {
+                overall: 90,
+                nationality: 'Argentina',
+                positions: ['RW', 'CAM'],
+                club: 'Inter Miami',
+                age: 37
+            });
+        } else if (nameLower.includes('haaland')) {
+            Object.assign(playerData, {
+                overall: 91,
+                nationality: 'Norway', 
+                positions: ['ST'],
+                club: 'Manchester City',
+                age: 23
+            });
+        } else if (nameLower.includes('mbappe') || nameLower.includes('mbappé')) {
+            Object.assign(playerData, {
+                overall: 91,
+                nationality: 'France',
+                positions: ['LW', 'ST', 'RW'],
+                club: 'Real Madrid',
+                age: 25
+            });
+        } else if (nameLower.includes('ronaldo')) {
+            Object.assign(playerData, {
+                overall: 88,
+                nationality: 'Portugal',
+                positions: ['ST', 'LW'],
+                club: 'Al Nassr',
+                age: 39
+            });
+        }
+
+        return playerData;
     }
 
     /**
