@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { dataManager } from '../../../../dataManager.js';
+import ThemeSettings from '../../ThemeSettings';
+import ColorCustomization from '../../ColorCustomization';
 
 export default function TeamSettingsTab() {
   const [managers, setManagers] = useState({
@@ -108,6 +110,12 @@ export default function TeamSettingsTab() {
 
   return (
     <div className="p-4 space-y-6">
+      {/* Theme Settings Section */}
+      <ThemeSettings />
+      
+      {/* Color Customization Section */}
+      <ColorCustomization />
+      
       {loading ? (
         <div className="modern-card">
           <div className="flex justify-center items-center p-8">

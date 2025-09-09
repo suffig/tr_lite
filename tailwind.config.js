@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: ['class'],
   theme: {
     extend: {
       colors: {
@@ -18,19 +19,19 @@ export default {
           blue: '#3B82F6',
         },
         bg: {
-          primary: '#F8FAFC',
-          secondary: '#FFFFFF',
-          tertiary: '#F1F5F9',
+          primary: 'var(--bg-primary)',
+          secondary: 'var(--bg-secondary)',
+          tertiary: 'var(--bg-tertiary)',
         },
         text: {
-          primary: '#1E293B',
-          secondary: '#475569',
-          muted: '#64748B',
+          primary: 'var(--text-primary)',
+          secondary: 'var(--text-secondary)',
+          muted: 'var(--text-muted)',
         },
         border: {
-          light: '#E2E8F0',
-          medium: '#CBD5E1',
-          dark: '#94A3B8',
+          light: 'var(--border-light)',
+          medium: 'var(--border-medium)',
+          dark: 'var(--border-dark)',
         }
       },
       fontFamily: {
@@ -40,6 +41,9 @@ export default {
         'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
         'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
         'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        'dark-sm': '0 1px 2px 0 rgba(0, 0, 0, 0.2)',
+        'dark-md': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
+        'dark-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3)',
       },
       borderRadius: {
         'lg': '12px',

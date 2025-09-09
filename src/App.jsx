@@ -3,6 +3,7 @@ import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './hooks/useAuth';
 import { OfflineIndicator } from './hooks/useOfflineManager.jsx';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Login from './components/Login';
 import BottomNavigation from './components/BottomNavigation';
 import LoadingSpinner, { FullScreenLoader } from './components/LoadingSpinner';
@@ -16,6 +17,7 @@ const KaderTab = lazy(() => import('./components/tabs/KaderTab'));
 const BansTab = lazy(() => import('./components/tabs/BansTab'));
 const FinanzenTab = lazy(() => import('./components/tabs/FinanzenTab'));
 const StatsTab = lazy(() => import('./components/tabs/StatsTab'));
+const EventsTab = lazy(() => import('./components/tabs/EventsTab'));
 const AlcoholTrackerTab = lazy(() => import('./components/tabs/AlcoholTrackerTab'));
 const AdminTab = lazy(() => import('./components/tabs/AdminTab'));
 
@@ -118,6 +120,8 @@ function App() {
         return <KaderTab {...props} />;
       case 'stats':
         return <StatsTab {...props} />;
+      case 'events':
+        return <EventsTab {...props} />;
       case 'alcohol':
         return <AlcoholTrackerTab {...props} />;
       case 'admin':
@@ -133,124 +137,128 @@ function App() {
 
   if (!user) {
     return (
-      <>
+      <ThemeProvider>
         <Login />
         <Toaster
           position="top-center"
           toastOptions={{
             duration: 4000,
             style: {
-              background: '#FFFFFF',
-              color: '#1E293B',
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-primary)',
               borderRadius: '12px',
               padding: '16px',
               fontSize: '14px',
+              border: '1px solid var(--border-light)',
             },
             success: {
               iconTheme: {
                 primary: '#10B981',
-                secondary: '#FFFFFF',
+                secondary: 'var(--bg-secondary)',
               },
             },
             error: {
               iconTheme: {
                 primary: '#EF4444',
-                secondary: '#FFFFFF',
+                secondary: 'var(--bg-secondary)',
               },
             },
           }}
         />
-      </>
+      </ThemeProvider>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-bg-primary">
-      {/* Offline Status Indicator - Only show on admin page */}
-      {activeTab === 'admin' && <OfflineIndicator />}
-      
-      {/* Connection Status Indicator - Only show on admin page */}
-      {isDemoMode && activeTab === 'admin' && (
-        <div className="bg-warning border-yellow-400 text-yellow-900 px-4 py-2 text-center text-sm font-medium" role="alert">
-          <span className="inline-flex items-center gap-2">
-            <span aria-hidden="true">⚠️</span>
-            Demo-Modus aktiv - Supabase CDN blockiert
-          </span>
-        </div>
-      )}
-      
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto scroll-smooth" role="main">
-        <Suspense fallback={<LoadingSpinner message="Lade Tab..." />}>
-          {tabLoading ? (
-            <div className="flex items-center justify-center min-h-[50vh]">
-              <LoadingSpinner message="Wechsle Tab..." />
-            </div>
-          ) : (
-            <ErrorBoundary>
-              {renderTabContent()}
-            </ErrorBoundary>
-          )}
-        </Suspense>
-      </main>
+    <ThemeProvider>
+      <div className="flex flex-col min-h-screen bg-bg-primary transition-colors duration-300">
+        {/* Offline Status Indicator - Only show on admin page */}
+        {activeTab === 'admin' && <OfflineIndicator />}
+        
+        {/* Connection Status Indicator - Only show on admin page */}
+        {isDemoMode && activeTab === 'admin' && (
+          <div className="bg-warning border-yellow-400 text-yellow-900 px-4 py-2 text-center text-sm font-medium" role="alert">
+            <span className="inline-flex items-center gap-2">
+              <span aria-hidden="true">⚠️</span>
+              Demo-Modus aktiv - Supabase CDN blockiert
+            </span>
+          </div>
+        )}
+        
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto scroll-smooth" role="main">
+          <Suspense fallback={<LoadingSpinner message="Lade Tab..." />}>
+            {tabLoading ? (
+              <div className="flex items-center justify-center min-h-[50vh]">
+                <LoadingSpinner message="Wechsle Tab..." />
+              </div>
+            ) : (
+              <ErrorBoundary>
+                {renderTabContent()}
+              </ErrorBoundary>
+            )}
+          </Suspense>
+        </main>
 
-      {/* Bottom Navigation */}
-      <BottomNavigation 
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-      />
-
-      {/* Toast Notifications */}
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#FFFFFF',
-            color: '#1E293B',
-            borderRadius: '12px',
-            padding: '16px',
-            fontSize: '14px',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-          },
-          success: {
-            iconTheme: {
-              primary: '#10B981',
-              secondary: '#FFFFFF',
-            },
-          },
-          error: {
-            iconTheme: {
-              primary: '#EF4444',
-              secondary: '#FFFFFF',
-            },
-          },
-          loading: {
-            iconTheme: {
-              primary: '#6B7280',
-              secondary: '#FFFFFF',
-            },
-          },
-        }}
-        containerStyle={{
-          zIndex: 9999,
-        }}
-      />
-
-      {/* Global Search Modal - Only available on admin page */}
-      {showGlobalSearch && activeTab === 'admin' && (
-        <GlobalSearch 
-          onNavigate={handleGlobalSearchNavigate}
-          onClose={() => setShowGlobalSearch(false)}
+        {/* Bottom Navigation */}
+        <BottomNavigation 
+          activeTab={activeTab}
+          onTabChange={handleTabChange}
         />
-      )}
 
-      {/* Performance Monitor - Only show on admin page */}
-      {activeTab === 'admin' && <PerformanceMonitor />}
+        {/* Toast Notifications */}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-primary)',
+              borderRadius: '12px',
+              padding: '16px',
+              fontSize: '14px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+              border: '1px solid var(--border-light)',
+            },
+            success: {
+              iconTheme: {
+                primary: '#10B981',
+                secondary: 'var(--bg-secondary)',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#EF4444',
+                secondary: 'var(--bg-secondary)',
+              },
+            },
+            loading: {
+              iconTheme: {
+                primary: '#6B7280',
+                secondary: 'var(--bg-secondary)',
+              },
+            },
+          }}
+          containerStyle={{
+            zIndex: 9999,
+          }}
+        />
 
-      {/* Global Notification System */}
-      <NotificationSystem />
-    </div>
+        {/* Global Search Modal - Only available on admin page */}
+        {showGlobalSearch && activeTab === 'admin' && (
+          <GlobalSearch 
+            onNavigate={handleGlobalSearchNavigate}
+            onClose={() => setShowGlobalSearch(false)}
+          />
+        )}
+
+        {/* Performance Monitor - Only show on admin page */}
+        {activeTab === 'admin' && <PerformanceMonitor />}
+
+        {/* Global Notification System */}
+        <NotificationSystem />
+      </div>
+    </ThemeProvider>
   );
 }
 
