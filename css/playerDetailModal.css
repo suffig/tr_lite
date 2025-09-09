@@ -15,6 +15,8 @@
     padding: 20px;
     padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px)); /* Account for bottom navigation and safe area */
     box-sizing: border-box;
+    /* Ensure modal stays centered and doesn't overflow */
+    overflow: hidden;
 }
 
 .player-detail-modal.show {
@@ -54,6 +56,9 @@
     transform: scale(0.8) translateY(40px);
     transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
     border: 1px solid var(--border-light);
+    /* Ensure content fits within viewport */
+    display: flex;
+    flex-direction: column;
 }
 
 .player-detail-modal.show .modal-content {
@@ -68,6 +73,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    /* Ensure header doesn't shrink */
+    flex-shrink: 0;
 }
 
 .player-title-section h2 {
@@ -162,6 +169,9 @@
     /* Enhanced scrollbar styling */
     scrollbar-width: thin;
     scrollbar-color: rgba(59, 130, 246, 0.5) rgba(255, 255, 255, 0.1);
+    /* Ensure body can grow and shrink as needed */
+    flex: 1;
+    min-height: 0; /* Allow flexbox to shrink */
 }
 
 .modal-body::-webkit-scrollbar {
@@ -729,15 +739,50 @@
     .player-detail-modal {
         padding: 5px;
         padding-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+        /* Force proper alignment on short screens */
+        align-items: flex-start;
+        padding-top: 10px;
     }
     
     .modal-content {
         max-height: calc(100vh - 7rem - env(safe-area-inset-bottom, 0px));
         border-radius: 12px;
+        /* Ensure content stays within bounds */
+        min-height: 0;
     }
     
     .modal-body {
         max-height: calc(100vh - 9rem - env(safe-area-inset-bottom, 0px));
+        /* Ensure scrolling works on short screens */
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}
+
+/* Additional safety for extremely short screens */
+@media (max-height: 500px) {
+    .player-detail-modal {
+        padding: 2px;
+        padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+        align-items: flex-start;
+        padding-top: 5px;
+    }
+    
+    .modal-content {
+        max-height: calc(100vh - 5rem - env(safe-area-inset-bottom, 0px));
+        border-radius: 8px;
+    }
+    
+    .modal-header {
+        padding: 8px 12px;
+    }
+    
+    .modal-body {
+        max-height: calc(100vh - 7rem - env(safe-area-inset-bottom, 0px));
+    }
+    
+    .player-content {
+        padding: 8px;
     }
 }
 
