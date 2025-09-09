@@ -144,7 +144,8 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
   // Cleanup timeouts on unmount
   useEffect(() => {
     return () => {
-      animationTimeouts.current.forEach(timeout => clearTimeout(timeout));
+      const timeouts = animationTimeouts.current;
+      timeouts.forEach(timeout => clearTimeout(timeout));
     };
   }, []);
 
@@ -570,9 +571,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                                       <span>👕 {playerInfo.team}</span>
                                                     </div>
                                                   </div>
-                                                  <div className="text-2xl text-blue-500 group-hover:scale-110 transition-transform">
-                                                    ⚽
-                                                  </div>
+
                                                 </div>
                                               </div>
                                             );
@@ -626,9 +625,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                                       <span>👕 {playerInfo.team}</span>
                                                     </div>
                                                   </div>
-                                                  <div className="text-2xl text-red-500 group-hover:scale-110 transition-transform">
-                                                    ⚽
-                                                  </div>
+
                                                 </div>
                                               </div>
                                             );

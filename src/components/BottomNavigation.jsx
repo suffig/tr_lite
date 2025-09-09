@@ -1,14 +1,32 @@
-const tabs = [
+import { useState, useEffect } from 'react';
+
+const baseTabs = [
   { id: 'matches', icon: '⚽', label: 'Spiele', ariaLabel: 'Zu Spiele-Übersicht wechseln' },
   { id: 'bans', icon: '🚫', label: 'Bans', ariaLabel: 'Zu Bans-Übersicht wechseln' },
   { id: 'finanzen', icon: '€', label: 'Finanzen', ariaLabel: 'Zu Finanzen-Übersicht wechseln' },
   { id: 'squad', icon: '👥', label: 'Kader', ariaLabel: 'Zu Kader-Übersicht wechseln' },
   { id: 'stats', icon: '📊', label: 'Stats', ariaLabel: 'Zu Statistik-Übersicht wechseln' },
+  { id: 'events', icon: '🎉', label: 'Events', ariaLabel: 'Zu Events-Übersicht wechseln' },
   { id: 'alcohol', icon: '🍺🃏', label: 'Alkohol & Blackjack', ariaLabel: 'Zu Alkohol & Blackjack-Tracker wechseln' },
   { id: 'admin', icon: '⚙️', label: 'Verwaltung', ariaLabel: 'Zu Verwaltung wechseln' },
 ];
 
 export default function BottomNavigation({ activeTab, onTabChange }) {
+  const [tabs, setTabs] = useState(baseTabs);
+
+  useEffect(() => {
+    // Check if events tab should be shown
+    const eventsEnabled = localStorage.getItem('eventsTabEnabled');
+    const showEvents = eventsEnabled !== null ? JSON.parse(eventsEnabled) : false;
+    
+    if (showEvents) {
+      setTabs(baseTabs);
+    } else {
+      // Filter out the events tab
+      setTabs(baseTabs.filter(tab => tab.id !== 'events'));
+    }
+  }, []);
+
   return (
     <nav 
       className="enhanced-bottom-nav fixed bottom-0 left-0 right-0 bg-bg-secondary border-t border-border-light shadow-lg z-50 safe-area-bottom"

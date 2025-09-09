@@ -204,7 +204,7 @@ function renderTransactions() {
     const container = document.getElementById('transactions-list');
     console.log('renderTransactions called with:', transactions.length, 'transactions');
     if (!transactions.length) {
-        container.innerHTML = `<div class="text-slate-800 dark:text-slate-200 text-sm font-medium">Keine Transaktionen vorhanden.</div>`;
+        container.innerHTML = `<div class="text-text-primary text-sm font-medium">Keine Transaktionen vorhanden.</div>`;
         return;
     }
 
@@ -215,7 +215,7 @@ function renderTransactions() {
 
     // Check if we have any valid transaction groups (transactions with dates)
     if (transactionGroups.length === 0) {
-        container.innerHTML = `<div class="text-slate-800 dark:text-slate-200 text-sm font-medium">Keine gültigen Transaktionen mit Datum vorhanden.</div>`;
+        container.innerHTML = `<div class="text-text-primary text-sm font-medium">Keine gültigen Transaktionen mit Datum vorhanden.</div>`;
         return;
     }
 
@@ -251,16 +251,16 @@ function renderTransactions() {
     let html = "";
 
     function getCellBgClass(team) {
-        if (team === "AEK") return "bg-blue-700 text-blue-100 border-l-4 border-blue-400 shadow-sm";
-        if (team === "Real") return "bg-red-700 text-red-100 border-l-4 border-red-400 shadow-sm";
-        return "bg-slate-600 text-slate-100 shadow-sm";
+        if (team === "AEK") return "bg-blue-700 dark:bg-blue-600 text-blue-100 dark:text-blue-200 border-l-4 border-blue-400 dark:border-blue-300 shadow-sm";
+        if (team === "Real") return "bg-red-700 dark:bg-red-600 text-red-100 dark:text-red-200 border-l-4 border-red-400 dark:border-red-300 shadow-sm";
+        return "bg-bg-tertiary text-text-primary border-l-4 border-border-medium shadow-sm";
     }
 
     // Enhanced function to get team indicator styling
     function getTeamIndicatorClass(team) {
-        if (team === "AEK") return "w-3 h-3 bg-blue-400 rounded-full inline-block mr-2";
-        if (team === "Real") return "w-3 h-3 bg-red-400 rounded-full inline-block mr-2";
-        return "w-3 h-3 bg-slate-400 rounded-full inline-block mr-2";
+        if (team === "AEK") return "w-3 h-3 bg-blue-400 dark:bg-blue-300 rounded-full inline-block mr-2";
+        if (team === "Real") return "w-3 h-3 bg-red-400 dark:bg-red-300 rounded-full inline-block mr-2";
+        return "w-3 h-3 bg-border-medium rounded-full inline-block mr-2";
     }
 
     // Generate unique colors for each match based on match number
@@ -269,38 +269,38 @@ function renderTransactions() {
         const colorSchemes = [
             {
                 // Blue theme  
-                container: "border-blue-400 bg-blue-50 dark:bg-blue-700",
-                header: "text-blue-800 dark:text-blue-100",
+                container: "border-blue-400 dark:border-blue-300 bg-blue-50 dark:bg-blue-900/20",
+                header: "text-blue-800 dark:text-blue-200",
                 accent: "blue-500"
             },
             {
                 // Green theme
-                container: "border-green-600 bg-gray-100 dark:bg-green-600", 
-                header: "text-green-800 dark:text-green-300",
+                container: "border-green-600 dark:border-green-400 bg-green-50 dark:bg-green-900/20", 
+                header: "text-green-800 dark:text-green-200",
                 accent: "green-600"
             },
             {
                 // Red theme
-                container: "border-red-500 bg-red-50 dark:bg-red-500",
-                header: "text-red-800 dark:text-red-100", 
+                container: "border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-900/20",
+                header: "text-red-800 dark:text-red-200", 
                 accent: "red-500"
             },
             {
                 // Sky theme
-                container: "border-sky-500 bg-blue-100 dark:bg-sky-500",
-                header: "text-blue-700 dark:text-blue-100",
+                container: "border-sky-500 dark:border-sky-400 bg-blue-100 dark:bg-sky-900/20",
+                header: "text-blue-700 dark:text-sky-200",
                 accent: "sky-500"
             },
             {
                 // Rose theme using red colors
-                container: "border-rose-600 bg-red-100 dark:bg-rose-600",
-                header: "text-red-700 dark:text-red-100",
+                container: "border-rose-600 dark:border-rose-400 bg-red-100 dark:bg-rose-900/20",
+                header: "text-red-700 dark:text-rose-200",
                 accent: "red-500"
             },
             {
                 // Yellow theme (original)
-                container: "border-yellow-400 bg-yellow-100 dark:bg-yellow-900",
-                header: "text-yellow-800 dark:text-yellow-300",
+                container: "border-yellow-400 dark:border-yellow-300 bg-yellow-100 dark:bg-yellow-900/20",
+                header: "text-yellow-800 dark:text-yellow-200",
                 accent: "yellow-400"
             }
         ];
@@ -424,26 +424,26 @@ function renderTransactions() {
             </div>
             <div class="overflow-x-auto">
                 <!-- Desktop Table View -->
-                <table class="hidden md:table w-full text-sm bg-gray-100 text-gray-900 rounded-lg overflow-hidden shadow">
-                    <thead class="bg-gray-200">
+                <table class="hidden md:table w-full text-sm bg-bg-secondary text-text-primary rounded-lg overflow-hidden shadow">
+                    <thead class="bg-bg-tertiary">
                         <tr>
-                            <th class="p-3 text-left font-semibold text-gray-900">Datum</th>
-                            <th class="p-3 text-left font-semibold text-gray-900">Typ</th>
-                            <th class="p-3 text-left font-semibold text-gray-900">Team</th>
-                            <th class="p-3 text-left font-semibold text-gray-900">Info</th>
-                            <th class="p-3 text-left font-semibold text-gray-900">Betrag (€)</th>
+                            <th class="p-3 text-left font-semibold text-text-primary">Datum</th>
+                            <th class="p-3 text-left font-semibold text-text-primary">Typ</th>
+                            <th class="p-3 text-left font-semibold text-text-primary">Team</th>
+                            <th class="p-3 text-left font-semibold text-text-primary">Info</th>
+                            <th class="p-3 text-left font-semibold text-text-primary">Betrag (€)</th>
                         </tr>
                     </thead>
                     <tbody>
         `;
         nonMatchTransactions.forEach(t => {
             html += `
-                <tr class="border-b border-slate-600 hover:bg-slate-600 transition-colors">
+                <tr class="border-b border-border-light hover:bg-bg-tertiary transition-colors">
                     <td class="p-3 ${getCellBgClass(t.team)}">${new Date(t.date).toLocaleDateString('de-DE')}</td>
                     <td class="p-3 ${getCellBgClass(t.team)}">${t.type}</td>
                     <td class="p-3 ${getCellBgClass(t.team)} font-semibold">${t.team}</td>
                     <td class="p-3 ${getCellBgClass(t.team)}">${t.info || '-'}</td>
-                    <td class="p-3 font-bold ${getCellBgClass(t.team)} ${t.amount >= 0 ? 'text-green-400 dark:text-green-400' : 'text-red-400 dark:text-red-400'}">
+                    <td class="p-3 font-bold ${getCellBgClass(t.team)} ${t.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
                         ${t.amount >= 0 ? '+' : ''}${Math.round(t.amount).toLocaleString('de-DE')}
                     </td>
                 </tr>
@@ -458,16 +458,16 @@ function renderTransactions() {
         `;
         nonMatchTransactions.forEach(t => {
             html += `
-                <div class="bg-gray-50 rounded-lg p-4 shadow border-l-4 ${t.team === 'AEK' ? 'border-blue-400' : t.team === 'Real' ? 'border-red-400' : 'border-gray-400'}">
+                <div class="bg-bg-secondary rounded-lg p-4 shadow border-l-4 ${t.team === 'AEK' ? 'border-blue-400 dark:border-blue-300' : t.team === 'Real' ? 'border-red-400 dark:border-red-300' : 'border-border-medium'}">
                     <div class="flex justify-between items-start mb-2">
-                        <div class="text-sm transaction-description">${new Date(t.date).toLocaleDateString('de-DE')}</div>
-                        <div class="text-lg font-bold ${t.amount >= 0 ? 'text-green-700' : 'text-red-700'}">
+                        <div class="text-sm text-text-secondary">${new Date(t.date).toLocaleDateString('de-DE')}</div>
+                        <div class="text-lg font-bold ${t.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}">
                             ${t.amount >= 0 ? '+' : ''}${Math.round(t.amount).toLocaleString('de-DE')}€
                         </div>
                     </div>
-                    <div class="text-base font-semibold transaction-description mb-1">${t.type}</div>
-                    <div class="text-sm transaction-description mb-1">Team: <span class="font-semibold ${t.team === 'AEK' ? 'text-blue-900' : t.team === 'Real' ? 'text-red-900' : 'text-gray-900'}">${t.team}</span></div>
-                    ${t.info ? `<div class="text-sm transaction-info">${t.info}</div>` : ''}
+                    <div class="text-base font-semibold text-text-primary mb-1">${t.type}</div>
+                    <div class="text-sm text-text-secondary mb-1">Team: <span class="font-semibold ${t.team === 'AEK' ? 'text-blue-600 dark:text-blue-400' : t.team === 'Real' ? 'text-red-600 dark:text-red-400' : 'text-text-primary'}">${t.team}</span></div>
+                    ${t.info ? `<div class="text-sm text-text-muted">${t.info}</div>` : ''}
                 </div>
             `;
         });
@@ -609,29 +609,29 @@ window.exportFinancialData = async function() {
 // Show import modal
 window.showImportModal = function() {
     const modalHTML = `
-        <div id="import-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div class="modal-content bg-slate-800 rounded-lg max-w-md w-full p-6">
+        <div id="import-modal" class="modal modal-mobile-safe fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div class="modal-content bg-bg-secondary text-text-primary rounded-lg max-w-md w-full p-6">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-white font-semibold text-lg">Finanzdaten importieren</h3>
-                    <button onclick="hideImportModal()" class="text-gray-400 hover:text-white">
+                    <h3 class="text-text-primary font-semibold text-lg">Finanzdaten importieren</h3>
+                    <button onclick="hideImportModal()" class="text-text-secondary hover:text-text-primary">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
                 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-gray-300 text-sm font-medium mb-2">
+                        <label class="block text-text-secondary text-sm font-medium mb-2">
                             JSON-Datei auswählen
                         </label>
                         <input 
                             type="file" 
                             id="import-file-input" 
                             accept=".json"
-                            class="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white"
+                            class="w-full bg-bg-tertiary border border-border-medium rounded-lg px-3 py-2 text-text-primary"
                         >
                     </div>
                     
-                    <div class="bg-orange-100 border border-orange-400 text-orange-800 px-4 py-3 rounded text-sm">
+                    <div class="bg-orange-100 dark:bg-orange-900/20 border border-orange-400 dark:border-orange-600 text-orange-800 dark:text-orange-300 px-4 py-3 rounded text-sm">
                         <strong>Warnung:</strong> Der Import überschreibt alle aktuellen Finanzdaten!
                     </div>
                     
@@ -644,7 +644,7 @@ window.showImportModal = function() {
                         </button>
                         <button 
                             onclick="hideImportModal()" 
-                            class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                            class="flex-1 bg-bg-tertiary hover:bg-border-medium text-text-primary border border-border-medium px-4 py-2 rounded-lg font-semibold transition-colors"
                         >
                             Abbrechen
                         </button>

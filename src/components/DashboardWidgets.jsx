@@ -1,15 +1,24 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSupabaseQuery } from '../hooks/useSupabase';
 import LoadingSpinner from './LoadingSpinner';
 
 export default function DashboardWidgets() {
-  const [selectedWidgets, setSelectedWidgets] = useState([
-    'quick-stats',
-    'recent-matches',
-    'top-scorers',
-    'team-comparison'
-  ]);
+  const [selectedWidgets, setSelectedWidgets] = useState(() => {
+    const saved = localStorage.getItem('fifa-tracker-dashboard-widgets');
+    return saved ? JSON.parse(saved) : [
+      'quick-stats',
+      'recent-matches',
+      'top-scorers',
+      'team-comparison'
+    ];
+  });
   const [isCustomizing, setIsCustomizing] = useState(false);
+  const [draggedWidget, setDraggedWidget] = useState(null);
+
+  // Save widget preferences
+  useEffect(() => {
+    localStorage.setItem('fifa-tracker-dashboard-widgets', JSON.stringify(selectedWidgets));
+  }, [selectedWidgets]);
 
   const { data: matches, loading: matchesLoading } = useSupabaseQuery('matches', '*', {
     order: { column: 'date', ascending: false }
@@ -107,6 +116,36 @@ export default function DashboardWidgets() {
     );
   };
 
+  // Drag and drop handlers
+  const handleDragStart = (e, widgetId) => {
+    setDraggedWidget(widgetId);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e, targetWidgetId) => {
+    e.preventDefault();
+    if (draggedWidget && draggedWidget !== targetWidgetId) {
+      const draggedIndex = selectedWidgets.indexOf(draggedWidget);
+      const targetIndex = selectedWidgets.indexOf(targetWidgetId);
+      
+      const newOrder = [...selectedWidgets];
+      newOrder.splice(draggedIndex, 1);
+      newOrder.splice(targetIndex, 0, draggedWidget);
+      
+      setSelectedWidgets(newOrder);
+    }
+    setDraggedWidget(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedWidget(null);
+  };
+
   if (loading) {
     return <LoadingSpinner message="Lade Dashboard..." />;
   }
@@ -115,31 +154,31 @@ export default function DashboardWidgets() {
     switch (widgetId) {
       case 'quick-stats':
         return (
-          <div className="bg-white rounded-lg shadow border p-6">
-            <h3 className="text-lg font-bold mb-4 flex items-center">
+          <div className="modern-card p-6">
+            <h3 className="text-lg font-bold mb-4 flex items-center text-text-primary">
               <i className="fas fa-chart-line text-blue-500 mr-2" />
               Schnellstatistiken
             </h3>
             <div className="grid grid-cols-2 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-blue-600">{dashboardData.totalMatches}</div>
-                <div className="text-sm text-gray-600">Gesamt Spiele</div>
+                <div className="text-sm text-text-muted">Gesamt Spiele</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">{dashboardData.totalPlayers}</div>
-                <div className="text-sm text-gray-600">Gesamt Spieler</div>
+                <div className="text-sm text-text-muted">Gesamt Spieler</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-purple-600">
                   {dashboardData.aekStats.totalGoals + dashboardData.realStats.totalGoals}
                 </div>
-                <div className="text-sm text-gray-600">Gesamt Tore</div>
+                <div className="text-sm text-text-muted">Gesamt Tore</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-yellow-600">
                   {dashboardData.aekBalance + dashboardData.realBalance}M €
                 </div>
-                <div className="text-sm text-gray-600">Gesamt Wert</div>
+                <div className="text-sm text-text-muted">Gesamt Wert</div>
               </div>
             </div>
           </div>
@@ -147,18 +186,18 @@ export default function DashboardWidgets() {
 
       case 'recent-matches':
         return (
-          <div className="bg-white rounded-lg shadow border p-6">
-            <h3 className="text-lg font-bold mb-4 flex items-center">
+          <div className="modern-card p-6">
+            <h3 className="text-lg font-bold mb-4 flex items-center text-text-primary">
               <i className="fas fa-futbol text-green-500 mr-2" />
               Letzte Spiele
             </h3>
             <div className="space-y-3">
               {dashboardData.recentMatches.slice(0, 5).map((match) => (
-                <div key={match.id} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                  <div className="text-sm text-gray-600">
+                <div key={match.id} className="flex items-center justify-between p-3 bg-bg-tertiary rounded">
+                  <div className="text-sm text-text-muted">
                     {new Date(match.date).toLocaleDateString('de-DE')}
                   </div>
-                  <div className="font-medium">
+                  <div className="font-medium text-text-primary">
                     AEK {match.goalsa || 0} - {match.goalsb || 0} Real
                   </div>
                   <div className={`w-3 h-3 rounded-full ${
@@ -445,7 +484,7 @@ export default function DashboardWidgets() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-2xl font-bold text-text-primary">
           📊 Dashboard
         </h2>
         <button
@@ -459,19 +498,33 @@ export default function DashboardWidgets() {
 
       {/* Widget Customization */}
       {isCustomizing && (
-        <div className="bg-white rounded-lg shadow border p-6">
-          <h3 className="text-lg font-bold mb-4">Widgets anpassen</h3>
+        <div className="modern-card p-6">
+          <h3 className="text-lg font-bold mb-4 text-text-primary">Widgets anpassen</h3>
+          <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="flex items-start space-x-3">
+              <div className="text-blue-500 text-xl flex-shrink-0">🎛️</div>
+              <div>
+                <div className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
+                  Drag & Drop verfügbar
+                </div>
+                <div className="text-xs text-blue-700 dark:text-blue-300">
+                  Ziehen Sie Widgets in der Dashboard-Ansicht um sie neu anzuordnen. 
+                  Verwenden Sie die Checkboxen unten um Widgets hinzuzufügen oder zu entfernen.
+                </div>
+              </div>
+            </div>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {availableWidgets.map(widget => (
-              <label key={widget.id} className="flex items-center space-x-2 cursor-pointer">
+              <label key={widget.id} className="flex items-center space-x-2 cursor-pointer p-3 bg-bg-tertiary rounded-lg hover:bg-border-light transition-colors">
                 <input
                   type="checkbox"
                   checked={selectedWidgets.includes(widget.id)}
                   onChange={() => toggleWidget(widget.id)}
-                  className="rounded"
+                  className="rounded border-border-medium"
                 />
-                <i className={`${widget.icon} text-gray-600`} />
-                <span className="text-sm">{widget.name}</span>
+                <i className={`${widget.icon} text-primary-green`} />
+                <span className="text-sm text-text-primary">{widget.name}</span>
               </label>
             ))}
           </div>
@@ -481,14 +534,30 @@ export default function DashboardWidgets() {
       {/* Dashboard Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {selectedWidgets.map(widgetId => (
-          <div key={widgetId}>
+          <div 
+            key={widgetId}
+            draggable={isCustomizing}
+            onDragStart={(e) => handleDragStart(e, widgetId)}
+            onDragOver={handleDragOver}
+            onDrop={(e) => handleDrop(e, widgetId)}
+            onDragEnd={handleDragEnd}
+            className={`transition-all duration-300 ${
+              isCustomizing ? 'cursor-move hover:scale-105 hover:shadow-lg' : ''
+            } ${draggedWidget === widgetId ? 'opacity-50 scale-95' : ''}`}
+          >
+            {isCustomizing && (
+              <div className="absolute top-2 right-2 z-10 bg-primary-green text-white text-xs px-2 py-1 rounded-full opacity-90">
+                <i className="fas fa-arrows-alt mr-1" />
+                Drag
+              </div>
+            )}
             {renderWidget(widgetId)}
           </div>
         ))}
       </div>
 
       {selectedWidgets.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-text-muted">
           <i className="fas fa-puzzle-piece text-4xl mb-4" />
           <p>Keine Widgets ausgewählt. Klicken Sie auf &quot;Anpassen&quot; um Widgets hinzuzufügen.</p>
         </div>

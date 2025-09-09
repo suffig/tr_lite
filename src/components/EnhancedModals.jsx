@@ -95,7 +95,7 @@ export default function EnhancedModal({
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isVisible, closeOnEscape, triggerHaptic, onClose]);
+  }, [isVisible, closeOnEscape, triggerHaptic, onClose, handleClose]);
 
   const handleBackdropClick = (e) => {
     if (closeOnBackdrop && e.target === e.currentTarget) {

@@ -31,12 +31,14 @@ export class PlayerDetailModal {
     hide() {
         if (this.modal) {
             this.modal.classList.add('fade-out');
+            this.removeResizeListener();
             setTimeout(() => {
                 if (this.modal && this.modal.parentNode) {
                     this.modal.parentNode.removeChild(this.modal);
                 }
                 this.modal = null;
                 this.isVisible = false;
+                document.body.style.overflow = '';
             }, 300);
         }
     }
@@ -46,7 +48,7 @@ export class PlayerDetailModal {
      */
     createModal() {
         this.modal = document.createElement('div');
-        this.modal.className = 'player-detail-modal';
+        this.modal.className = 'player-detail-modal modal-mobile-safe';
         this.modal.innerHTML = `
             <div class="modal-backdrop" onclick="playerDetailModal.hide()"></div>
             <div class="modal-content">
@@ -107,6 +109,50 @@ export class PlayerDetailModal {
                 ${this.renderPlayerContent()}
             </div>
         `;
+        
+        // Ensure modal positioning is correct after content update
+        this.ensureModalPositioning();
+    }
+
+    /**
+     * Ensure proper modal positioning and height constraints
+     */
+    ensureModalPositioning() {
+        if (!this.modal) return;
+        
+        // Force a reflow to ensure height calculations are correct
+        requestAnimationFrame(() => {
+            const modalContent = this.modal.querySelector('.modal-content');
+            if (modalContent) {
+                // Ensure the modal content respects max-height constraints
+                const viewportHeight = window.innerHeight;
+                const safeAreaBottom = this.getSafeAreaBottom();
+                const availableHeight = viewportHeight - 128 - safeAreaBottom; // 8rem = 128px
+                
+                modalContent.style.maxHeight = `${availableHeight}px`;
+                
+                // Ensure modal body also respects height constraints
+                const modalBody = modalContent.querySelector('.modal-body');
+                if (modalBody) {
+                    const headerHeight = modalContent.querySelector('.modal-header')?.offsetHeight || 0;
+                    const bodyMaxHeight = availableHeight - headerHeight;
+                    modalBody.style.maxHeight = `${bodyMaxHeight}px`;
+                }
+            }
+        });
+    }
+
+    /**
+     * Get safe area bottom value in pixels
+     */
+    getSafeAreaBottom() {
+        // Try to get the CSS custom property value
+        const testEl = document.createElement('div');
+        testEl.style.paddingBottom = 'env(safe-area-inset-bottom, 0px)';
+        document.body.appendChild(testEl);
+        const computedPadding = getComputedStyle(testEl).paddingBottom;
+        document.body.removeChild(testEl);
+        return parseInt(computedPadding) || 0;
     }
 
     /**
@@ -435,6 +481,38 @@ export class PlayerDetailModal {
             this.modal.classList.add('show');
             this.isVisible = true;
             document.body.style.overflow = 'hidden';
+            
+            // Ensure proper positioning when shown
+            this.ensureModalPositioning();
+            
+            // Add resize listener to maintain positioning
+            this.addResizeListener();
+        }
+    }
+
+    /**
+     * Add window resize listener to maintain modal positioning
+     */
+    addResizeListener() {
+        if (!this.resizeListener) {
+            this.resizeListener = () => {
+                if (this.isVisible) {
+                    this.ensureModalPositioning();
+                }
+            };
+            window.addEventListener('resize', this.resizeListener);
+            window.addEventListener('orientationchange', this.resizeListener);
+        }
+    }
+
+    /**
+     * Remove resize listener
+     */
+    removeResizeListener() {
+        if (this.resizeListener) {
+            window.removeEventListener('resize', this.resizeListener);
+            window.removeEventListener('orientationchange', this.resizeListener);
+            this.resizeListener = null;
         }
     }
 
