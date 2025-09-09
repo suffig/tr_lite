@@ -46,7 +46,7 @@ export class PlayerDetailModal {
      */
     createModal() {
         this.modal = document.createElement('div');
-        this.modal.className = 'player-detail-modal';
+        this.modal.className = 'player-detail-modal modal-mobile-safe';
         this.modal.innerHTML = `
             <div class="modal-backdrop" onclick="playerDetailModal.hide()"></div>
             <div class="modal-content">

@@ -106,7 +106,7 @@ class ModalManager {
     // Create modal DOM element
     createModalElement(modal) {
         const overlay = document.createElement('div');
-        overlay.className = `modal-overlay ${modal.options.className}`;
+        overlay.className = `modal-overlay modal-mobile-safe ${modal.options.className}`;
         overlay.dataset.modalId = modal.id;
         
         const content = document.createElement('div');
