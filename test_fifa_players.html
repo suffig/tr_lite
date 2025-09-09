@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA Players Test - All Requested Players</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .player-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+        .player-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .fifa-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 280px;
+        }
+        .fifa-card.purple { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .fifa-card.gold { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .fifa-card.silver { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .fifa-card.bronze { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .fifa-card.common { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        
+        .error-highlight {
+            border-left: 4px solid #ef4444;
+            background-color: #fef2f2;
+        }
+        .success-highlight {
+            border-left: 4px solid #10b981;
+            background-color: #f0fdf4;
+        }
+        .warning-highlight {
+            border-left: 4px solid #f59e0b;
+            background-color: #fffbeb;
+        }
+        .progress-bar {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg p-6 mb-8">
+            <h1 class="text-3xl font-bold mb-2">🎮 FIFA Players Test</h1>
+            <p class="text-lg opacity-90">Testing all requested FIFA players with MSMC API integration</p>
+            <div class="mt-4 text-sm bg-white bg-opacity-20 rounded p-3">
+                <strong>🎯 Testing 43 FIFA Players:</strong> Data accuracy, card display, API integration
+            </div>
+        </div>
+
+        <!-- Test Controls -->
+        <div class="bg-white rounded-lg p-6 mb-8 shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">Test Controls</h2>
+            <div class="flex gap-4 mb-4">
+                <button onclick="testAllFifaPlayers()" class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                    🧪 Test All FIFA Players
+                </button>
+                <button onclick="testSampleCards()" class="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600">
+                    🎴 Test Card Display
+                </button>
+                <button onclick="clearResults()" class="px-6 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+                    🗑️ Clear Results
+                </button>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="mb-4">
+                <div class="flex justify-between text-sm text-gray-600 mb-1">
+                    <span>Testing Progress</span>
+                    <span id="progressText">0/43 Players</span>
+                </div>
+                <div class="progress-bar">
+                    <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+                </div>
+            </div>
+            
+            <div id="testStatus" class="text-sm text-gray-600">Ready to test 43 FIFA players</div>
+        </div>
+
+        <!-- Test Summary -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-3 text-green-600">✅ Successful</h3>
+                <div id="successCount" class="text-3xl font-bold text-green-600">0</div>
+                <div class="text-sm text-gray-600">Players found with data</div>
+            </div>
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-3 text-yellow-600">⚠️ Warnings</h3>
+                <div id="warningCount" class="text-3xl font-bold text-yellow-600">0</div>
+                <div class="text-sm text-gray-600">Players with issues</div>
+            </div>
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-3 text-red-600">❌ Failed</h3>
+                <div id="errorCount" class="text-3xl font-bold text-red-600">0</div>
+                <div class="text-sm text-gray-600">Players not found</div>
+            </div>
+        </div>
+
+        <!-- Test Results -->
+        <div class="bg-white rounded-lg p-6 mb-8 shadow-lg">
+            <h3 class="text-lg font-semibold mb-4">📊 Test Results</h3>
+            <div id="testResults" class="space-y-3">
+                No tests run yet. Click "Test All FIFA Players" to start.
+            </div>
+        </div>
+
+        <!-- Player Cards Display Area -->
+        <div class="bg-white rounded-lg p-6 shadow-lg">
+            <h3 class="text-lg font-semibold mb-4">🎴 Player Cards Display</h3>
+            <div id="playerCardsArea" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <!-- Player cards will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Import services -->
+    <script type="module">
+        import { FIFADataService } from './src/utils/fifaDataService.js';
+        import MSMCApiService from './src/utils/msmcApiService.js';
+        
+        // Make available globally
+        window.FIFADataService = FIFADataService;
+        window.MSMCApiService = MSMCApiService;
+        
+        // List of all FIFA players to test (from user comment)
+        const fifaPlayers = [
+            "Virgil van Dijk",
+            "Karim Benzema", 
+            "Iago Aspas",
+            "Kylian Mbappé",
+            "Erling Haaland",
+            "Viktor Gyökeres",
+            "Kevin De Bruyne",
+            "Lionel Messi",
+            "Frank Acheampong",
+            "Nestory Irankunda",
+            "Pepe Reina",
+            "Amor Layouni",
+            "Luis Advíncula",
+            "Mohamed Salah",
+            "Luis Suárez",
+            "Antonio Rüdiger",
+            "Kalidou Koulibaly",
+            "N'Golo Kanté",
+            "Luka Modrić",
+            "Kyle Walker",
+            "Dominik Kohr",
+            "Robert Lewandowski",
+            "Cristiano Ronaldo",
+            "Iñaki Williams",
+            "Francesco Acerbi",
+            "Nordin Amrabat",
+            "Federico Chiesa",
+            "İlkay Gündoğan",
+            "Theo Hernández",
+            "Jordi Alba",
+            "Nicolò Barella",
+            "Ferland Mendy",
+            "Raphaël Varane",
+            "Wojciech Szczęsny",
+            "Jonathan Tah",
+            "Manuel Neuer",
+            "Manuel Lazzari",
+            "Jonathan Clauss",
+            "Jeremiah St. Juste",
+            "David Alaba",
+            "Saud Abdulhamid",
+            "Lukáš Hrádecký",
+            "Alisson"
+        ];
+        
+        // Test data
+        let testResults = [];
+        let currentTestIndex = 0;
+
+        function updateTestStatus(message) {
+            document.getElementById('testStatus').textContent = message;
+        }
+
+        function updateProgress(current, total) {
+            const percentage = Math.round((current / total) * 100);
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+            document.getElementById('progressText').textContent = `${current}/${total} Players`;
+        }
+
+        function updateSummaryCounters() {
+            const successful = testResults.filter(r => r.success && !r.hasWarnings).length;
+            const warnings = testResults.filter(r => r.success && r.hasWarnings).length;
+            const failed = testResults.filter(r => !r.success).length;
+            
+            document.getElementById('successCount').textContent = successful;
+            document.getElementById('warningCount').textContent = warnings;
+            document.getElementById('errorCount').textContent = failed;
+        }
+
+        function displayTestResults() {
+            const container = document.getElementById('testResults');
+            if (!testResults.length) {
+                container.innerHTML = '<div class="text-gray-500">No test results yet</div>';
+                return;
+            }
+
+            const html = testResults.map((result, index) => {
+                const highlightClass = result.success 
+                    ? (result.hasWarnings ? 'warning-highlight' : 'success-highlight')
+                    : 'error-highlight';
+                    
+                const icon = result.success 
+                    ? (result.hasWarnings ? '⚠️' : '✅')
+                    : '❌';
+
+                return `
+                    <div class="border rounded p-3 ${highlightClass}">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="font-medium">${result.playerName}</span>
+                            <span class="text-sm">${icon}</span>
+                        </div>
+                        <div class="text-sm space-y-1">
+                            <div class="flex justify-between">
+                                <span>Overall Rating:</span>
+                                <span class="font-medium">${result.playerData?.overall || 'N/A'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Position:</span>
+                                <span class="font-medium">${Array.isArray(result.playerData?.positions) ? result.playerData.positions.join(', ') : (result.playerData?.position || 'N/A')}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Club:</span>
+                                <span class="font-medium">${result.playerData?.club || 'N/A'}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Data Source:</span>
+                                <span class="text-xs">${result.playerData?.source || 'Unknown'}</span>
+                            </div>
+                            ${result.issues && result.issues.length > 0 ? `
+                                <div class="mt-2 pt-2 border-t">
+                                    <div class="text-xs text-gray-600">Issues:</div>
+                                    ${result.issues.map(issue => `<div class="text-xs text-red-600">• ${issue}</div>`).join('')}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+            updateSummaryCounters();
+        }
+
+        // Test all FIFA players
+        window.testAllFifaPlayers = async function() {
+            updateTestStatus('Starting comprehensive FIFA players test...');
+            testResults = [];
+            currentTestIndex = 0;
+            updateProgress(0, fifaPlayers.length);
+            
+            // Clear previous cards
+            document.getElementById('playerCardsArea').innerHTML = '';
+            
+            for (let i = 0; i < fifaPlayers.length; i++) {
+                const playerName = fifaPlayers[i];
+                currentTestIndex = i + 1;
+                
+                updateTestStatus(`Testing player ${currentTestIndex}/${fifaPlayers.length}: ${playerName}`);
+                updateProgress(currentTestIndex, fifaPlayers.length);
+                
+                try {
+                    // Test FIFA data service
+                    const playerData = await FIFADataService.getPlayerData(playerName, {
+                        useLiveData: true,
+                        fallbackToMock: true
+                    });
+                    
+                    const result = {
+                        playerName: playerName,
+                        playerData: playerData,
+                        success: !!playerData,
+                        issues: [],
+                        hasWarnings: false
+                    };
+
+                    // Analyze the data quality
+                    if (playerData) {
+                        // Check for potential data issues
+                        if (playerData.mockData) {
+                            result.issues.push('Using generated mock data');
+                            result.hasWarnings = true;
+                        }
+
+                        if (playerData.source === 'mock_fallback' || playerData.source === 'mock_error_fallback') {
+                            result.issues.push('API data not available, using fallback');
+                            result.hasWarnings = true;
+                        }
+
+                        if (playerData.club === 'Unknown' || playerData.nationality === 'Unknown') {
+                            result.issues.push('Contains placeholder data (Unknown club/nationality)');
+                            result.hasWarnings = true;
+                        }
+
+                        if (!playerData.overall || playerData.overall < 50 || playerData.overall > 99) {
+                            result.issues.push('Suspicious overall rating: ' + playerData.overall);
+                            result.hasWarnings = true;
+                        }
+
+                        if (!playerData.positions && !playerData.position) {
+                            result.issues.push('Missing position information');
+                            result.hasWarnings = true;
+                        }
+
+                        // Check if this is actually a known FIFA player vs generated data
+                        if (playerData.source === 'generated_default') {
+                            result.issues.push('Player not found in database, using generated data');
+                            result.hasWarnings = true;
+                        }
+                    } else {
+                        result.issues.push('No player data returned');
+                        result.success = false;
+                    }
+
+                    testResults.push(result);
+                } catch (error) {
+                    testResults.push({
+                        playerName: playerName,
+                        playerData: null,
+                        success: false,
+                        issues: ['Error: ' + error.message],
+                        hasWarnings: false
+                    });
+                }
+                
+                // Update display every 5 players or at the end
+                if (i % 5 === 0 || i === fifaPlayers.length - 1) {
+                    displayTestResults();
+                }
+                
+                // Small delay to prevent overwhelming the API
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+            
+            const successCount = testResults.filter(r => r.success).length;
+            const warningCount = testResults.filter(r => r.success && r.hasWarnings).length;
+            updateTestStatus(`Testing complete: ${successCount}/${fifaPlayers.length} players found (${warningCount} with warnings)`);
+        };
+
+        // Test sample cards display
+        window.testSampleCards = async function() {
+            updateTestStatus('Testing player cards display with sample players...');
+            
+            const cardsArea = document.getElementById('playerCardsArea');
+            cardsArea.innerHTML = '<div class="col-span-full text-center py-8">Loading sample player cards...</div>';
+
+            // Test with a few high-profile players
+            const samplePlayers = ['Lionel Messi', 'Cristiano Ronaldo', 'Kylian Mbappé', 'Erling Haaland', 'Kevin De Bruyne', 'Virgil van Dijk'];
+            
+            cardsArea.innerHTML = '';
+            
+            for (const playerName of samplePlayers) {
+                try {
+                    const playerData = await FIFADataService.getPlayerData(playerName, {
+                        useLiveData: true,
+                        fallbackToMock: true
+                    });
+                    
+                    if (playerData) {
+                        const cardElement = createPlayerCard(playerData);
+                        cardsArea.appendChild(cardElement);
+                    }
+                } catch (error) {
+                    console.error('Error loading player card:', error);
+                }
+                
+                // Small delay between cards
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+            
+            updateTestStatus('Sample player cards loaded successfully');
+        };
+
+        function createPlayerCard(playerData) {
+            const card = document.createElement('div');
+            
+            // Determine card color based on overall rating
+            let cardColorClass = 'common';
+            if (playerData.overall >= 90) cardColorClass = 'purple';
+            else if (playerData.overall >= 85) cardColorClass = 'gold';
+            else if (playerData.overall >= 80) cardColorClass = 'silver';
+            else if (playerData.overall >= 75) cardColorClass = 'bronze';
+            
+            card.className = `fifa-card ${cardColorClass} rounded-lg p-4 text-center shadow-lg hover:shadow-xl transition-all duration-300`;
+            
+            const positions = Array.isArray(playerData.positions) 
+                ? playerData.positions.join(', ')
+                : (playerData.position || 'N/A');
+            
+            card.innerHTML = `
+                <div class="mb-3">
+                    <div class="text-lg font-bold mb-1">${playerData.suggestedName || playerData.searchName || 'Unknown'}</div>
+                    <div class="text-3xl font-bold mb-2">${playerData.overall || 'N/A'}</div>
+                </div>
+                
+                <div class="space-y-2 text-sm">
+                    <div>
+                        <span class="font-semibold">Position:</span><br>
+                        ${positions}
+                    </div>
+                    <div>
+                        <span class="font-semibold">Club:</span><br>
+                        ${playerData.club || 'N/A'}
+                    </div>
+                    <div>
+                        <span class="font-semibold">Nation:</span><br>
+                        ${playerData.nationality || 'N/A'}
+                    </div>
+                    <div>
+                        <span class="font-semibold">Age:</span><br>
+                        ${playerData.age || 'N/A'}
+                    </div>
+                </div>
+                
+                <div class="mt-3 pt-3 border-t border-white border-opacity-30">
+                    <div class="text-xs opacity-75">
+                        Source: ${playerData.source || 'Unknown'}<br>
+                        ${playerData.mockData ? '<span class="text-yellow-300">⚠️ Mock Data</span>' : ''}
+                        ${playerData.lastUpdated ? `<br>Updated: ${new Date(playerData.lastUpdated).toLocaleDateString()}` : ''}
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // Clear results
+        window.clearResults = function() {
+            testResults = [];
+            currentTestIndex = 0;
+            updateProgress(0, fifaPlayers.length);
+            document.getElementById('testResults').innerHTML = '<div class="text-gray-500">No test results yet</div>';
+            document.getElementById('playerCardsArea').innerHTML = '';
+            document.getElementById('successCount').textContent = '0';
+            document.getElementById('warningCount').textContent = '0';
+            document.getElementById('errorCount').textContent = '0';
+            updateTestStatus('Results cleared - ready to test 43 FIFA players');
+        };
+
+        // Initialize page
+        updateTestStatus('Ready to test 43 FIFA players');
+    </script>
+</body>
+</html>
