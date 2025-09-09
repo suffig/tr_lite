@@ -6,11 +6,13 @@ import AddTransactionTab from './admin/AddTransactionTab';
 import DeleteTab from './admin/DeleteTab';
 import SearchTab from './admin/SearchTab';
 import TeamSettingsTab from './admin/TeamSettingsTab';
+import EnhancedFeaturesDashboard from '../EnhancedFeaturesDashboard';
 
-export default function AdminTab({ onLogout, onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
-  const [activeSubTab, setActiveSubTab] = useState('search');
+export default function AdminTab({ onLogout, onNavigate, showHints = false, onShowSlotMachine, onShowThemeSettings }) { // eslint-disable-line no-unused-vars
+  const [activeSubTab, setActiveSubTab] = useState('features');
 
   const subTabs = [
+    { id: 'features', label: 'Neue Features', icon: 'fas fa-star' },
     { id: 'search', label: 'Globale Suche', icon: 'fas fa-search' },
     { id: 'matches', label: 'Spiele hinzufügen', icon: 'fas fa-futbol' },
     { id: 'bans', label: 'Sperren hinzufügen', icon: 'fas fa-ban' },
@@ -22,6 +24,8 @@ export default function AdminTab({ onLogout, onNavigate, showHints = false }) { 
 
   const renderSubTabContent = () => {
     switch (activeSubTab) {
+      case 'features':
+        return <EnhancedFeaturesDashboard onShowSlotMachine={onShowSlotMachine} onShowThemeSettings={onShowThemeSettings} />;
       case 'search':
         return <SearchTab onNavigate={onNavigate} />;
       case 'matches':
@@ -37,7 +41,7 @@ export default function AdminTab({ onLogout, onNavigate, showHints = false }) { 
       case 'delete':
         return <DeleteTab />;
       default:
-        return <SearchTab onNavigate={onNavigate} />;
+        return <EnhancedFeaturesDashboard onShowSlotMachine={onShowSlotMachine} onShowThemeSettings={onShowThemeSettings} />;
     }
   };
 

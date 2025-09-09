@@ -3,12 +3,18 @@ import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './hooks/useAuth';
 import { OfflineIndicator } from './hooks/useOfflineManager.jsx';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { LiveUpdatesProvider } from './contexts/LiveUpdatesContext';
+import { ReportsProvider } from './contexts/ReportsContext';
 import Login from './components/Login';
 import BottomNavigation from './components/BottomNavigation';
 import LoadingSpinner, { FullScreenLoader } from './components/LoadingSpinner';
 import GlobalSearch from './components/GlobalSearch';
 import PerformanceMonitor from './components/PerformanceMonitor';
 import NotificationSystem from './components/NotificationSystem';
+import LiveScoreWidget from './components/LiveScoreWidget';
+import ThemeSettings from './components/ThemeSettings';
+import SlotMachine from './components/SlotMachine';
 
 // Lazy load tab components for better performance
 const MatchesTab = lazy(() => import('./components/tabs/MatchesTab'));
@@ -25,6 +31,24 @@ function App() {
   const [tabLoading, setTabLoading] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [showGlobalSearch, setShowGlobalSearch] = useState(false);
+  const [showThemeSettings, setShowThemeSettings] = useState(false);
+  const [showLiveScores, setShowLiveScores] = useState(true);
+  const [isLiveScoresMinimized, setIsLiveScoresMinimized] = useState(false);
+  const [showSlotMachine, setShowSlotMachine] = useState(false);
+  const [accountBalance, setAccountBalance] = useState(1000); // Mock account balance
+
+  // Load account balance from localStorage
+  useEffect(() => {
+    const savedBalance = localStorage.getItem('fifa-tracker-account-balance');
+    if (savedBalance) {
+      setAccountBalance(parseFloat(savedBalance));
+    }
+  }, []);
+
+  // Save account balance
+  useEffect(() => {
+    localStorage.setItem('fifa-tracker-account-balance', accountBalance.toString());
+  }, [accountBalance]);
 
   // Check if we're in demo mode
   useEffect(() => {
@@ -73,6 +97,16 @@ function App() {
         e.preventDefault();
         setShowGlobalSearch(true);
       }
+      // Theme settings shortcut
+      if (e.ctrlKey && e.key === 't') {
+        e.preventDefault();
+        setShowThemeSettings(true);
+      }
+      // Slot machine shortcut
+      if (e.ctrlKey && e.key === 's') {
+        e.preventDefault();
+        setShowSlotMachine(true);
+      }
     };
 
     const handleGlobalSearchToggle = () => {
@@ -81,12 +115,20 @@ function App() {
       }
     };
 
+    // Listen for custom events
+    const handleShowSlotMachine = () => setShowSlotMachine(true);
+    const handleShowThemeSettings = () => setShowThemeSettings(true);
+
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('global-search-toggle', handleGlobalSearchToggle);
+    window.addEventListener('show-slot-machine', handleShowSlotMachine);
+    window.addEventListener('show-theme-settings', handleShowThemeSettings);
     
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('global-search-toggle', handleGlobalSearchToggle);
+      window.removeEventListener('show-slot-machine', handleShowSlotMachine);
+      window.removeEventListener('show-theme-settings', handleShowThemeSettings);
     };
   }, [activeTab]);
 
@@ -105,7 +147,13 @@ function App() {
 
   const renderTabContent = () => {
     const showHints = activeTab === 'admin';
-    const props = { onNavigate: handleTabChange, showHints };
+    const props = { 
+      onNavigate: handleTabChange, 
+      showHints,
+      accountBalance,
+      onShowSlotMachine: () => setShowSlotMachine(true),
+      onShowThemeSettings: () => setShowThemeSettings(true),
+    };
     
     switch (activeTab) {
       case 'matches':
@@ -121,7 +169,7 @@ function App() {
       case 'alcohol':
         return <AlcoholTrackerTab {...props} />;
       case 'admin':
-        return <AdminTab onLogout={handleLogout} {...props} />;
+        return <AdminTab onLogout={handleLogout} onShowSlotMachine={() => setShowSlotMachine(true)} onShowThemeSettings={() => setShowThemeSettings(true)} {...props} />;
       default:
         return <MatchesTab {...props} />;
     }
@@ -133,7 +181,7 @@ function App() {
 
   if (!user) {
     return (
-      <>
+      <ThemeProvider>
         <Login />
         <Toaster
           position="top-center"
@@ -160,97 +208,126 @@ function App() {
             },
           }}
         />
-      </>
+      </ThemeProvider>
     );
   }
 
   return (
-    <div className="flex flex-col min-h-screen bg-bg-primary">
-      {/* Offline Status Indicator - Only show on admin page */}
-      {activeTab === 'admin' && <OfflineIndicator />}
-      
-      {/* Connection Status Indicator - Only show on admin page */}
-      {isDemoMode && activeTab === 'admin' && (
-        <div className="bg-warning border-yellow-400 text-yellow-900 px-4 py-2 text-center text-sm font-medium" role="alert">
-          <span className="inline-flex items-center gap-2">
-            <span aria-hidden="true">⚠️</span>
-            Demo-Modus aktiv - Supabase CDN blockiert
-          </span>
-        </div>
-      )}
-      
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto scroll-smooth" role="main">
-        <Suspense fallback={<LoadingSpinner message="Lade Tab..." />}>
-          {tabLoading ? (
-            <div className="flex items-center justify-center min-h-[50vh]">
-              <LoadingSpinner message="Wechsle Tab..." />
-            </div>
-          ) : (
-            <ErrorBoundary>
-              {renderTabContent()}
-            </ErrorBoundary>
-          )}
-        </Suspense>
-      </main>
+    <ThemeProvider>
+      <LiveUpdatesProvider>
+        <ReportsProvider>
+          <div className="flex flex-col min-h-screen bg-bg-primary">
+            {/* Offline Status Indicator - Only show on admin page */}
+            {activeTab === 'admin' && <OfflineIndicator />}
+            
+            {/* Connection Status Indicator - Only show on admin page */}
+            {isDemoMode && activeTab === 'admin' && (
+              <div className="bg-warning border-yellow-400 text-yellow-900 px-4 py-2 text-center text-sm font-medium" role="alert">
+                <span className="inline-flex items-center gap-2">
+                  <span aria-hidden="true">⚠️</span>
+                  Demo-Modus aktiv - Supabase CDN blockiert
+                </span>
+              </div>
+            )}
+            
+            {/* Live Score Widget */}
+            {showLiveScores && (
+              <LiveScoreWidget
+                isMinimized={isLiveScoresMinimized}
+                onToggleMinimize={() => setIsLiveScoresMinimized(!isLiveScoresMinimized)}
+              />
+            )}
+            
+            {/* Main Content */}
+            <main className="flex-1 overflow-y-auto scroll-smooth" role="main">
+              <Suspense fallback={<LoadingSpinner message="Lade Tab..." />}>
+                {tabLoading ? (
+                  <div className="flex items-center justify-center min-h-[50vh]">
+                    <LoadingSpinner message="Wechsle Tab..." />
+                  </div>
+                ) : (
+                  <ErrorBoundary>
+                    {renderTabContent()}
+                  </ErrorBoundary>
+                )}
+              </Suspense>
+            </main>
 
-      {/* Bottom Navigation */}
-      <BottomNavigation 
-        activeTab={activeTab}
-        onTabChange={handleTabChange}
-      />
+            {/* Bottom Navigation */}
+            <BottomNavigation 
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+            />
 
-      {/* Toast Notifications */}
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: '#FFFFFF',
-            color: '#1E293B',
-            borderRadius: '12px',
-            padding: '16px',
-            fontSize: '14px',
-            boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-          },
-          success: {
-            iconTheme: {
-              primary: '#10B981',
-              secondary: '#FFFFFF',
-            },
-          },
-          error: {
-            iconTheme: {
-              primary: '#EF4444',
-              secondary: '#FFFFFF',
-            },
-          },
-          loading: {
-            iconTheme: {
-              primary: '#6B7280',
-              secondary: '#FFFFFF',
-            },
-          },
-        }}
-        containerStyle={{
-          zIndex: 9999,
-        }}
-      />
+            {/* Toast Notifications */}
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 4000,
+                style: {
+                  background: '#FFFFFF',
+                  color: '#1E293B',
+                  borderRadius: '12px',
+                  padding: '16px',
+                  fontSize: '14px',
+                  boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+                },
+                success: {
+                  iconTheme: {
+                    primary: '#10B981',
+                    secondary: '#FFFFFF',
+                  },
+                },
+                error: {
+                  iconTheme: {
+                    primary: '#EF4444',
+                    secondary: '#FFFFFF',
+                  },
+                },
+                loading: {
+                  iconTheme: {
+                    primary: '#6B7280',
+                    secondary: '#FFFFFF',
+                  },
+                },
+              }}
+              containerStyle={{
+                zIndex: 9999,
+              }}
+            />
 
-      {/* Global Search Modal - Only available on admin page */}
-      {showGlobalSearch && activeTab === 'admin' && (
-        <GlobalSearch 
-          onNavigate={handleGlobalSearchNavigate}
-          onClose={() => setShowGlobalSearch(false)}
-        />
-      )}
+            {/* Global Search Modal - Only available on admin page */}
+            {showGlobalSearch && activeTab === 'admin' && (
+              <GlobalSearch 
+                onNavigate={handleGlobalSearchNavigate}
+                onClose={() => setShowGlobalSearch(false)}
+              />
+            )}
 
-      {/* Performance Monitor - Only show on admin page */}
-      {activeTab === 'admin' && <PerformanceMonitor />}
+            {/* Theme Settings Modal */}
+            {showThemeSettings && (
+              <ThemeSettings onClose={() => setShowThemeSettings(false)} />
+            )}
 
-      {/* Global Notification System */}
-      <NotificationSystem />
-    </div>
+            {/* Slot Machine Modal */}
+            {showSlotMachine && (
+              <SlotMachine
+                isOpen={showSlotMachine}
+                onClose={() => setShowSlotMachine(false)}
+                accountBalance={accountBalance}
+                onBalanceUpdate={setAccountBalance}
+              />
+            )}
+
+            {/* Performance Monitor - Only show on admin page */}
+            {activeTab === 'admin' && <PerformanceMonitor />}
+
+            {/* Global Notification System */}
+            <NotificationSystem />
+          </div>
+        </ReportsProvider>
+      </LiveUpdatesProvider>
+    </ThemeProvider>
   );
 }
 
