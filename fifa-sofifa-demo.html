@@ -40,10 +40,11 @@
     <div class="container mx-auto px-4 py-8">
         <!-- Header -->
         <div class="gradient-bg text-white rounded-lg p-6 mb-8">
-            <h1 class="text-3xl font-bold mb-2">🎮 FIFA SoFIFA Integration Demo</h1>
-            <p class="text-lg opacity-90">Erweiterte FIFA-Spielerdatenbank mit SoFIFA-Integration</p>
+            <h1 class="text-3xl font-bold mb-2">🎮 FIFA MSMC API Integration Demo</h1>
+            <p class="text-lg opacity-90">Erweiterte FIFA-Spielerdatenbank mit MSMC API Integration</p>
             <div class="mt-4 text-sm bg-white bg-opacity-20 rounded p-3">
-                <strong>✨ Neue Features:</strong> Echte SoFIFA-Integration, Fuzzy-Suche, Batch-Processing, CORS-Handling, Caching & mehr!
+                <strong>✨ Neue Features:</strong> MSMC FC25 API Integration, Player Cards maintained, Enhanced search & mehr!
+                <br><a href="msmc-api-test.html" class="underline opacity-90">→ MSMC API Test Page</a>
             </div>
         </div>
 
@@ -248,11 +249,19 @@
             \`;
         }
 
+        // Import both services for the demo
+        import('./src/utils/fifaDataService.js').then(module => {
+            window.FIFADataService = module.FIFADataService;
+        });
+        import('./src/utils/msmcApiService.js').then(module => {
+            window.MSMCApiService = module.default;
+        });
+
         // System stats
         async function loadSystemStats() {
             try {
-                const stats = FIFADataService.getSofifaStats();
-                const cacheStats = SofifaIntegration.getCacheStats();
+                const stats = FIFADataService.getApiStats();
+                const cacheStats = MSMCApiService.getCacheStats();
                 
                 document.getElementById('systemStats').innerHTML = \`
                     <div class="flex justify-between">
@@ -260,8 +269,8 @@
                         <span class="font-semibold">\${stats.database.totalPlayers}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span>SoFIFA Coverage:</span>
-                        <span class="font-semibold">\${stats.database.sofifaUrlCoverage}</span>
+                        <span>API Coverage:</span>
+                        <span class="font-semibold">\${stats.database.apiDataCoverage}</span>
                     </div>
                     <div class="flex justify-between">
                         <span>Cache Einträge:</span>
@@ -271,8 +280,8 @@
                         <span>Rate Limit:</span>
                         <span class="font-semibold">\${cacheStats.rateLimit.requests}/\${cacheStats.rateLimit.maxRequests}</span>
                     </div>
-                    <div class="mt-3 p-2 bg-green-100 rounded text-green-800 text-xs">
-                        ✅ System bereit für SoFIFA Integration
+                    <div class="mt-3 p-2 bg-blue-100 rounded text-blue-800 text-xs">
+                        ✅ System bereit für MSMC API Integration
                     </div>
                 \`;
             } catch (error) {

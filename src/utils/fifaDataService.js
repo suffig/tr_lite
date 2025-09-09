@@ -1,19 +1,19 @@
 /**
  * FIFA Database Service for React Application
  * Provides integration with FIFA player statistics and ratings
- * Based on FIFA/SoFIFA data structure
- * Enhanced with real SoFIFA integration
+ * Enhanced with MSMC API integration (https://api.msmc.cc/fc25/)
+ * Replaces previous SoFIFA integration
  */
 
-import SofifaIntegration from './sofifaIntegration.js';
+import MSMCApiService from './msmcApiService.js';
 // Import database access functions - using relative path from src/utils to root
 import { getAllPlayers } from '../../data.js';
 
 export class FIFADataService {
     
     /**
-     * Mock FIFA database - in production this would connect to SoFIFA API or similar
-     * Data structure based on https://sofifa.com player profiles
+     * Mock FIFA database - in production this would connect to MSMC API or similar
+     * Data structure based on FIFA player profiles
      */
     static fifaDatabase = {
         "Virgil van Dijk": {
@@ -2297,7 +2297,7 @@ export class FIFADataService {
     };
 
     /**
-     * Search for a player in the FIFA database with SoFIFA integration
+     * Search for a player in the FIFA database with MSMC API integration
      * @param {string} playerName - Name of the player to search for
      * @param {Object} options - Search options
      * @param {boolean} options.useLiveData - Whether to attempt SoFIFA fetch
@@ -2342,11 +2342,11 @@ export class FIFADataService {
             }
         }
 
-        // If we have mock data and should attempt live fetch
-        if (mockData && options.useLiveData && mockData.sofifaUrl) {
+        // If we should attempt live fetch from MSMC API
+        if (options.useLiveData) {
             try {
-                console.log('🌐 Attempting to fetch live data from SoFIFA...');
-                const liveData = await SofifaIntegration.fetchPlayerData(mockData.sofifaUrl, mockData.sofifaId);
+                console.log('🌐 Attempting to fetch live data from MSMC API...');
+                const liveData = await MSMCApiService.searchPlayerByName(cleanPlayerName);
                 
                 if (liveData) {
                     // Merge live data with mock data (live data takes precedence)
@@ -2355,18 +2355,20 @@ export class FIFADataService {
                         ...liveData,
                         searchName: cleanPlayerName,
                         found: true,
-                        source: 'sofifa_enhanced',
+                        source: 'msmc_api_enhanced',
                         lastUpdated: new Date().toISOString(),
-                        mockDataAvailable: true
+                        mockDataAvailable: !!mockData
                     };
                     
-                    console.log(`✅ Enhanced with live SoFIFA data for: ${cleanPlayerName}`);
+                    console.log(`✅ Enhanced with live MSMC API data for: ${cleanPlayerName}`);
                     return enhancedData;
                 } else {
-                    console.log('⚠️ Live data fetch failed, using mock data');
-                    mockData.source = 'mock_fallback';
-                    mockData.sofifaAttempted = true;
-                    mockData.sofifaFetchTime = new Date().toISOString();
+                    console.log('⚠️ Live data fetch failed, using mock data or fallback');
+                    if (mockData) {
+                        mockData.source = 'mock_fallback';
+                        mockData.apiAttempted = true;
+                        mockData.apiFetchTime = new Date().toISOString();
+                    }
                 }
             } catch (error) {
                 console.error('❌ Error fetching live data:', error.message);
@@ -2697,7 +2699,7 @@ export class FIFADataService {
     }
 
     /**
-     * Batch fetch multiple players with SoFIFA integration
+     * Batch fetch multiple players with MSMC API integration
      * @param {Array<string>} playerNames - Array of player names
      * @param {Object} options - Fetch options
      * @returns {Promise<Array<Object>>} Array of player data
@@ -2760,24 +2762,25 @@ export class FIFADataService {
     }
 
     /**
-     * Get SoFIFA integration statistics
+     * Get MSMC API integration statistics
      * @returns {Object} Integration stats
      */
-    static getSofifaStats() {
-        const cacheStats = SofifaIntegration.getCacheStats();
+    static getApiStats() {
+        const cacheStats = MSMCApiService.getCacheStats();
         const totalPlayers = Object.keys(this.fifaDatabase).length;
-        const playersWithSofifaUrls = Object.values(this.fifaDatabase)
-            .filter(player => player.sofifaUrl).length;
+        const playersWithApiData = Object.values(this.fifaDatabase)
+            .filter(player => player.sofifaUrl || player.playerId).length; // Keep legacy data for now
 
         return {
             cache: cacheStats,
             database: {
                 totalPlayers,
-                playersWithSofifaUrls,
-                sofifaUrlCoverage: `${((playersWithSofifaUrls / totalPlayers) * 100).toFixed(1)}%`
+                playersWithApiData,
+                apiDataCoverage: `${((playersWithApiData / totalPlayers) * 100).toFixed(1)}%`
             },
             integration: {
                 status: 'active',
+                apiType: 'MSMC FC25',
                 lastCheck: new Date().toISOString()
             }
         };
@@ -2929,7 +2932,7 @@ export class FIFADataService {
      * Clear all caches
      */
     static clearAllCaches() {
-        SofifaIntegration.clearCache();
+        MSMCApiService.clearCache();
         console.log('🗑️ All FIFA service caches cleared');
     }
 
@@ -2937,42 +2940,21 @@ export class FIFADataService {
      * Test SoFIFA connectivity
      * @returns {Promise<Object>} Test results
      */
-    static async testSofifaConnectivity() {
-        console.log('🧪 Testing SoFIFA connectivity...');
-        
-        const testPlayer = Object.entries(this.fifaDatabase)
-            .find(([name, data]) => data.sofifaUrl);
-
-        if (!testPlayer) {
-            return {
-                success: false,
-                error: 'No players with SoFIFA URLs available for testing'
-            };
-        }
-
-        const [playerName, playerData] = testPlayer;
+    static async testApiConnectivity() {
+        console.log('🧪 Testing MSMC API connectivity...');
         
         try {
-            const startTime = Date.now();
-            const result = await SofifaIntegration.fetchPlayerData(
-                playerData.sofifaUrl, 
-                playerData.sofifaId
-            );
-            const endTime = Date.now();
-
+            const result = await MSMCApiService.testConnectivity();
             return {
-                success: !!result,
-                testPlayer: playerName,
-                responseTime: `${endTime - startTime}ms`,
-                result: result,
-                timestamp: new Date().toISOString()
+                ...result,
+                apiType: 'MSMC FC25'
             };
         } catch (error) {
             return {
                 success: false,
-                testPlayer: playerName,
                 error: error.message,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                apiType: 'MSMC FC25'
             };
         }
     }
@@ -3048,27 +3030,27 @@ export class FIFADataService {
      * @param {string} playerName - Name of the player to search for
      * @returns {Promise<Object|null>} Player data or null if not found
      */
-    static async searchSofifaByName(playerName) {
-        console.log(`🔍 Searching SoFIFA for player: ${playerName}`);
+    static async searchApiByName(playerName) {
+        console.log(`🔍 Searching MSMC API for player: ${playerName}`);
         
         try {
-            // Use SoFIFA search functionality
-            const searchResult = await SofifaIntegration.searchPlayerByName(playerName);
+            // Use MSMC API search functionality
+            const searchResult = await MSMCApiService.searchPlayerByName(playerName);
             
             if (searchResult) {
-                console.log(`✅ Found player on SoFIFA: ${searchResult.name || playerName}`);
+                console.log(`✅ Found player on MSMC API: ${searchResult.playerName || playerName}`);
                 return {
                     ...searchResult,
                     searchName: playerName,
                     found: true,
-                    source: 'sofifa_search'
+                    source: 'msmc_api_search'
                 };
             } else {
-                console.log(`❌ Player not found on SoFIFA: ${playerName}`);
+                console.log(`❌ Player not found on MSMC API: ${playerName}`);
                 return null;
             }
         } catch (error) {
-            console.error(`❌ Error searching SoFIFA for ${playerName}:`, error.message);
+            console.error(`❌ Error searching MSMC API for ${playerName}:`, error.message);
             return null;
         }
     }
@@ -3089,9 +3071,9 @@ export class FIFADataService {
                 fallbackToMock: false // Don't fallback immediately
             });
 
-            // If no FIFA data found and we should search SoFIFA
+            // If no FIFA data found and we should search MSMC API
             if (!fifaData && options.useLiveData) {
-                fifaData = await this.searchSofifaByName(databasePlayer.name);
+                fifaData = await this.searchApiByName(databasePlayer.name);
             }
 
             // If still no data, generate default
@@ -3131,7 +3113,7 @@ export class FIFADataService {
         };
         const finalOptions = { ...defaultOptions, ...options };
         
-        console.log('🚀 Processing all stored players with SoFIFA integration...');
+        console.log('🚀 Processing all stored players with MSMC API integration...');
         const startTime = Date.now();
         
         try {
