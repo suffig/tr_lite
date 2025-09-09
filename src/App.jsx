@@ -22,6 +22,7 @@ const KaderTab = lazy(() => import('./components/tabs/KaderTab'));
 const BansTab = lazy(() => import('./components/tabs/BansTab'));
 const FinanzenTab = lazy(() => import('./components/tabs/FinanzenTab'));
 const StatsTab = lazy(() => import('./components/tabs/StatsTab'));
+const FeaturesTab = lazy(() => import('./components/tabs/FeaturesTab'));
 const AlcoholTrackerTab = lazy(() => import('./components/tabs/AlcoholTrackerTab'));
 const AdminTab = lazy(() => import('./components/tabs/AdminTab'));
 
@@ -90,10 +91,10 @@ function App() {
     }
   };
 
-  // Global search shortcut and event listener - only work on admin page
+  // Global search shortcut and event listener - only work on admin and features page
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.ctrlKey && e.key === 'k' && activeTab === 'admin') {
+      if (e.ctrlKey && e.key === 'k' && (activeTab === 'admin' || activeTab === 'features')) {
         e.preventDefault();
         setShowGlobalSearch(true);
       }
@@ -110,7 +111,7 @@ function App() {
     };
 
     const handleGlobalSearchToggle = () => {
-      if (activeTab === 'admin') {
+      if (activeTab === 'admin' || activeTab === 'features') {
         setShowGlobalSearch(true);
       }
     };
@@ -166,6 +167,8 @@ function App() {
         return <KaderTab {...props} />;
       case 'stats':
         return <StatsTab {...props} />;
+      case 'features':
+        return <FeaturesTab {...props} />;
       case 'alcohol':
         return <AlcoholTrackerTab {...props} />;
       case 'admin':
@@ -296,8 +299,8 @@ function App() {
               }}
             />
 
-            {/* Global Search Modal - Only available on admin page */}
-            {showGlobalSearch && activeTab === 'admin' && (
+            {/* Global Search Modal - Available on admin and features page */}
+            {showGlobalSearch && (activeTab === 'admin' || activeTab === 'features') && (
               <GlobalSearch 
                 onNavigate={handleGlobalSearchNavigate}
                 onClose={() => setShowGlobalSearch(false)}
