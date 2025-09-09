@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSMC API Integration Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .fifa-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .fifa-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg p-6 mb-8">
+            <h1 class="text-3xl font-bold mb-2">🎮 MSMC API Integration Test</h1>
+            <p class="text-lg opacity-90">Testing the new MSMC FC25 API integration</p>
+            <div class="mt-4 text-sm bg-white bg-opacity-20 rounded p-3">
+                <strong>✨ New Features:</strong> MSMC API integration, Player Cards maintained, Enhanced search!
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="bg-white rounded-lg p-6 mb-8 shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">🔍 Player Search</h2>
+            <div class="flex gap-4 mb-4">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    placeholder="Spieler suchen (z.B. Messi, Haaland, Mbappe...)" 
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                    onkeypress="if(event.key==='Enter') searchPlayer()"
+                >
+                <button 
+                    onclick="searchPlayer()" 
+                    class="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                >
+                    Suchen
+                </button>
+            </div>
+            
+            <!-- Quick Search Buttons -->
+            <div class="flex flex-wrap gap-2 mb-4">
+                <button onclick="quickSearch('Messi')" class="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">Messi</button>
+                <button onclick="quickSearch('Haaland')" class="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">Haaland</button>
+                <button onclick="quickSearch('Mbappe')" class="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">Mbappé</button>
+                <button onclick="quickSearch('Ronaldo')" class="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300">Ronaldo</button>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Player Card -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">Player Card</h3>
+                <div id="playerCard" class="text-center text-gray-500">
+                    Suchen Sie nach einem Spieler, um die Karte anzuzeigen
+                </div>
+            </div>
+
+            <!-- System Status -->
+            <div class="bg-white rounded-lg p-6 shadow-lg">
+                <h3 class="text-lg font-semibold mb-4">System Status</h3>
+                <div id="systemStats" class="space-y-2">
+                    Loading...
+                </div>
+            </div>
+        </div>
+
+        <!-- API Test Section -->
+        <div class="bg-white rounded-lg p-6 mt-8 shadow-lg">
+            <h3 class="text-lg font-semibold mb-4">🧪 API Test</h3>
+            <div class="flex gap-4 mb-4">
+                <button onclick="testApiConnectivity()" class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                    Test API Connection
+                </button>
+                <button onclick="clearCaches()" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600">
+                    Clear Cache
+                </button>
+            </div>
+            <div id="testResults" class="bg-gray-50 p-4 rounded text-sm"></div>
+        </div>
+    </div>
+
+    <!-- Import the FIFA service -->
+    <script type="module">
+        import { FIFADataService } from './src/utils/fifaDataService.js';
+        import MSMCApiService from './src/utils/msmcApiService.js';
+        
+        // Make services available globally for the test
+        window.FIFADataService = FIFADataService;
+        window.MSMCApiService = MSMCApiService;
+        
+        // Initialize the page
+        loadSystemStats();
+        
+        window.searchPlayer = async function() {
+            const searchInput = document.getElementById('searchInput');
+            const playerName = searchInput.value.trim();
+            
+            if (!playerName) {
+                alert('Bitte geben Sie einen Spielernamen ein');
+                return;
+            }
+            
+            displaySearching();
+            
+            try {
+                const playerData = await FIFADataService.getPlayerData(playerName, {
+                    useLiveData: true,
+                    fallbackToMock: true
+                });
+                
+                displayPlayer(playerData);
+            } catch (error) {
+                console.error('Search error:', error);
+                displayError('Fehler beim Suchen des Spielers');
+            }
+        }
+        
+        window.quickSearch = function(playerName) {
+            document.getElementById('searchInput').value = playerName;
+            searchPlayer();
+        }
+        
+        function displaySearching() {
+            document.getElementById('playerCard').innerHTML = `
+                <div class="flex flex-col items-center py-8">
+                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mb-4"></div>
+                    <p class="text-gray-600">Searching player...</p>
+                </div>
+            `;
+        }
+        
+        function displayPlayer(playerData) {
+            const playerCard = document.getElementById('playerCard');
+            
+            if (!playerData || !playerData.found) {
+                playerCard.innerHTML = `
+                    <div class="text-gray-500">
+                        <p>❌ Spieler nicht gefunden</p>
+                        <p class="text-sm">Versuchen Sie einen anderen Namen</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const cardColor = FIFADataService.getPlayerCardColor(playerData.overall);
+            const ratingColor = FIFADataService.getRatingColor(playerData.overall);
+            
+            playerCard.innerHTML = `
+                <div class="fifa-card ${cardColor} rounded-lg p-6 text-center">
+                    <h4 class="text-xl font-bold mb-2">${playerData.suggestedName || playerData.searchName}</h4>
+                    <div class="text-3xl font-bold ${ratingColor} mb-4">${playerData.overall}</div>
+                    
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <span class="font-semibold">Position:</span><br>
+                            ${Array.isArray(playerData.positions) ? playerData.positions.join(', ') : 'N/A'}
+                        </div>
+                        <div>
+                            <span class="font-semibold">Verein:</span><br>
+                            ${playerData.club || 'N/A'}
+                        </div>
+                        <div>
+                            <span class="font-semibold">Nationalität:</span><br>
+                            ${playerData.nationality || 'N/A'}
+                        </div>
+                        <div>
+                            <span class="font-semibold">Alter:</span><br>
+                            ${playerData.age || 'N/A'}
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 pt-4 border-t border-white border-opacity-20">
+                        <div class="text-xs opacity-75">
+                            Quelle: ${playerData.source}<br>
+                            ${playerData.mockData ? '<span class="text-yellow-400">⚠️ Mock-Daten (API nicht verfügbar)</span>' : ''}
+                            ${playerData.lastUpdated ? `<br>Aktualisiert: ${new Date(playerData.lastUpdated).toLocaleString()}` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function displayError(message) {
+            document.getElementById('playerCard').innerHTML = `
+                <div class="text-red-500">
+                    <p>❌ ${message}</p>
+                </div>
+            `;
+        }
+        
+        async function loadSystemStats() {
+            try {
+                const stats = FIFADataService.getApiStats();
+                const cacheStats = MSMCApiService.getCacheStats();
+                
+                document.getElementById('systemStats').innerHTML = `
+                    <div class="flex justify-between">
+                        <span>Spieler in DB:</span>
+                        <span class="font-semibold">${stats.database.totalPlayers}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>API Coverage:</span>
+                        <span class="font-semibold">${stats.database.apiDataCoverage}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Cache Einträge:</span>
+                        <span class="font-semibold">${cacheStats.size}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Rate Limit:</span>
+                        <span class="font-semibold">${cacheStats.rateLimit.requests}/${cacheStats.rateLimit.maxRequests}</span>
+                    </div>
+                    <div class="mt-3 p-2 bg-blue-100 rounded text-blue-800 text-xs">
+                        ✅ System bereit für MSMC API Integration
+                    </div>
+                `;
+            } catch (error) {
+                console.error('❌ Fehler beim Laden der Stats:', error.message);
+                document.getElementById('systemStats').innerHTML = `
+                    <div class="text-red-500">Fehler beim Laden der Statistiken</div>
+                `;
+            }
+        }
+        
+        window.testApiConnectivity = async function() {
+            const testResults = document.getElementById('testResults');
+            testResults.innerHTML = 'Testing API connectivity...';
+            
+            try {
+                const result = await FIFADataService.testApiConnectivity();
+                testResults.innerHTML = `
+                    <div class="${result.success ? 'text-green-600' : 'text-red-600'}">
+                        <strong>API Test Result:</strong><br>
+                        Status: ${result.success ? '✅ Success' : '❌ Failed'}<br>
+                        ${result.responseTime ? `Response Time: ${result.responseTime}<br>` : ''}
+                        ${result.error ? `Error: ${result.error}<br>` : ''}
+                        API Type: ${result.apiType}<br>
+                        Timestamp: ${new Date(result.timestamp).toLocaleString()}
+                    </div>
+                `;
+            } catch (error) {
+                testResults.innerHTML = `
+                    <div class="text-red-600">
+                        <strong>Test failed:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        window.clearCaches = function() {
+            FIFADataService.clearAllCaches();
+            loadSystemStats();
+            document.getElementById('testResults').innerHTML = `
+                <div class="text-green-600">
+                    ✅ Caches cleared successfully
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

@@ -1,19 +1,19 @@
 /**
  * FIFA Database Service for React Application
  * Provides integration with FIFA player statistics and ratings
- * Based on FIFA/SoFIFA data structure
- * Enhanced with real SoFIFA integration
+ * Enhanced with MSMC API integration (https://api.msmc.cc/fc25/)
+ * Replaces previous SoFIFA integration
  */
 
-import SofifaIntegration from './sofifaIntegration.js';
+import MSMCApiService from './msmcApiService.js';
 // Import database access functions - using relative path from src/utils to root
 import { getAllPlayers } from '../../data.js';
 
 export class FIFADataService {
     
     /**
-     * Mock FIFA database - in production this would connect to SoFIFA API or similar
-     * Data structure based on https://sofifa.com player profiles
+     * Mock FIFA database - in production this would connect to MSMC API or similar
+     * Data structure based on FIFA player profiles
      */
     static fifaDatabase = {
         "Virgil van Dijk": {
@@ -2293,11 +2293,64 @@ export class FIFADataService {
             contract: "2025",
             sofifaId: 212831,
             sofifaUrl: "https://sofifa.com/player/212831/?r=250001"
+        },
+
+        "Nordin Amrabat": {
+            overall: 76,
+            potential: 76,
+            positions: ["RW", "RM"],
+            age: 37,
+            height: 173,
+            weight: 65,
+            foot: "Right",
+            pace: 76,
+            shooting: 68,
+            passing: 75,
+            dribbling: 78,
+            defending: 54,
+            physical: 73,
+            skills: {
+                crossing: 78,
+                finishing: 64,
+                headingAccuracy: 65,
+                shortPassing: 75,
+                volleys: 67,
+                curve: 73,
+                fkAccuracy: 75,
+                longPassing: 74,
+                ballControl: 79,
+                acceleration: 74,
+                sprintSpeed: 78,
+                agility: 80,
+                reactions: 76,
+                balance: 75,
+                shotPower: 70,
+                jumping: 68,
+                stamina: 78,
+                strength: 68,
+                longShots: 71,
+                aggression: 62,
+                interceptions: 55,
+                positioning: 68,
+                vision: 72,
+                penalties: 65,
+                composure: 74,
+            },
+            workrates: "High/Medium",
+            weakFoot: 4,
+            skillMoves: 4,
+            nationality: "Morocco",
+            club: "AEK Athens",
+            value: "€2.0M",
+            wage: "€25K",
+            contract: "2024",
+            sofifaId: 183108,
+            sofifaUrl: "https://sofifa.com/player/183108/nordin-amrabat/250001/"
         }
     };
 
     /**
-     * Search for a player in the FIFA database with SoFIFA integration
+     * Search for a player in the FIFA database with MSMC API integration
      * @param {string} playerName - Name of the player to search for
      * @param {Object} options - Search options
      * @param {boolean} options.useLiveData - Whether to attempt SoFIFA fetch
@@ -2342,31 +2395,37 @@ export class FIFADataService {
             }
         }
 
-        // If we have mock data and should attempt live fetch
-        if (mockData && options.useLiveData && mockData.sofifaUrl) {
+        // If we should attempt live fetch from MSMC API
+        if (options.useLiveData) {
             try {
-                console.log('🌐 Attempting to fetch live data from SoFIFA...');
-                const liveData = await SofifaIntegration.fetchPlayerData(mockData.sofifaUrl, mockData.sofifaId);
+                console.log('🌐 Attempting to fetch live data from MSMC API...');
+                const liveData = await MSMCApiService.searchPlayerByName(cleanPlayerName);
                 
-                if (liveData) {
-                    // Merge live data with mock data (live data takes precedence)
-                    const enhancedData = {
-                        ...mockData,
-                        ...liveData,
-                        searchName: cleanPlayerName,
-                        found: true,
-                        source: 'sofifa_enhanced',
-                        lastUpdated: new Date().toISOString(),
-                        mockDataAvailable: true
-                    };
+                if (liveData && !liveData.mockData) {
+                    // Only use real API data, not mock data from MSMC service
+                    // Merge with FIFA database data intelligently (prioritize higher quality values)
+                    const enhancedData = this.mergePlayerData(mockData, liveData, cleanPlayerName);
+                    enhancedData.source = 'msmc_api_enhanced';
+                    enhancedData.lastUpdated = new Date().toISOString();
+                    enhancedData.mockDataAvailable = !!mockData;
                     
-                    console.log(`✅ Enhanced with live SoFIFA data for: ${cleanPlayerName}`);
+                    console.log(`✅ Enhanced with real MSMC API data for: ${cleanPlayerName}`);
                     return enhancedData;
+                } else if (liveData && liveData.mockData && mockData) {
+                    // MSMC API returned mock data, but we have good FIFA database data
+                    // Prefer FIFA database data over generated mock data
+                    console.log('⚠️ MSMC API returned mock data, preferring FIFA database data');
+                    mockData.source = 'fifa_database_preferred';
+                    mockData.apiAttempted = true;
+                    mockData.apiFetchTime = new Date().toISOString();
+                    mockData.apiMockDataRejected = true;
                 } else {
-                    console.log('⚠️ Live data fetch failed, using mock data');
-                    mockData.source = 'mock_fallback';
-                    mockData.sofifaAttempted = true;
-                    mockData.sofifaFetchTime = new Date().toISOString();
+                    console.log('⚠️ Live data fetch failed or returned mock data, using FIFA database or fallback');
+                    if (mockData) {
+                        mockData.source = 'mock_fallback';
+                        mockData.apiAttempted = true;
+                        mockData.apiFetchTime = new Date().toISOString();
+                    }
                 }
             } catch (error) {
                 console.error('❌ Error fetching live data:', error.message);
@@ -2391,6 +2450,101 @@ export class FIFADataService {
         // No data found
         console.log(`❌ No data found for player: ${cleanPlayerName}`);
         return null;
+    }
+
+    /**
+     * Intelligently merge FIFA database data with API data
+     * @param {Object} fifaData - Data from FIFA database
+     * @param {Object} apiData - Data from MSMC API
+     * @param {string} searchName - Original search name
+     * @returns {Object} Merged player data
+     */
+    static mergePlayerData(fifaData, apiData, searchName) {
+        // Helper function to choose better value
+        const chooseBetter = (fifa, api, preferFifa = false) => {
+            if (fifa && api) {
+                // If both exist, prefer FIFA database for certain fields unless API has clearly better data
+                if (preferFifa) return fifa;
+                // For strings, prefer non-"Unknown" values
+                if (typeof fifa === 'string' && typeof api === 'string') {
+                    if (fifa !== 'Unknown' && api === 'Unknown') return fifa;
+                    if (api !== 'Unknown' && fifa === 'Unknown') return api;
+                }
+                // For arrays, prefer non-empty and non-"Unknown" arrays
+                if (Array.isArray(fifa) && Array.isArray(api)) {
+                    const fifaValid = fifa.length > 0 && !fifa.includes('Unknown');
+                    const apiValid = api.length > 0 && !api.includes('Unknown');
+                    if (fifaValid && !apiValid) return fifa;
+                    if (apiValid && !fifaValid) return api;
+                    return fifa; // Prefer FIFA if both valid
+                }
+                // For numbers, prefer higher quality (non-zero, reasonable values)
+                if (typeof fifa === 'number' && typeof api === 'number') {
+                    if (fifa > 0 && api <= 0) return fifa;
+                    if (api > 0 && fifa <= 0) return api;
+                    // For ratings, prefer FIFA database values as they're curated
+                    return fifa;
+                }
+                return fifa; // Default to FIFA data
+            }
+            return fifa || api; // Return whichever exists
+        };
+
+        const merged = {
+            // Basic info
+            searchName: searchName,
+            found: true,
+            playerName: chooseBetter(fifaData?.playerName, apiData?.playerName) || searchName,
+            playerId: apiData?.playerId || fifaData?.playerId,
+            
+            // Core stats - prefer FIFA database values
+            overall: chooseBetter(fifaData?.overall, apiData?.overall, true),
+            potential: chooseBetter(fifaData?.potential, apiData?.potential, true),
+            
+            // Player details - intelligently merge
+            age: chooseBetter(fifaData?.age, apiData?.age),
+            nationality: chooseBetter(fifaData?.nationality, apiData?.nationality),
+            club: chooseBetter(fifaData?.club, apiData?.club),
+            positions: chooseBetter(fifaData?.positions, apiData?.positions),
+            
+            // Physical attributes
+            height: chooseBetter(fifaData?.height, apiData?.height),
+            weight: chooseBetter(fifaData?.weight, apiData?.weight),
+            preferredFoot: chooseBetter(fifaData?.foot || fifaData?.preferredFoot, apiData?.preferredFoot),
+            
+            // Game attributes - prefer FIFA database
+            weakFoot: chooseBetter(fifaData?.weakFoot, apiData?.weakFoot, true),
+            skillMoves: chooseBetter(fifaData?.skillMoves, apiData?.skillMoves, true),
+            workRate: chooseBetter(fifaData?.workrates || fifaData?.workRate, apiData?.workRate),
+            
+            // Main stats - prefer FIFA database
+            pace: chooseBetter(fifaData?.pace, apiData?.pace, true),
+            shooting: chooseBetter(fifaData?.shooting, apiData?.shooting, true),
+            passing: chooseBetter(fifaData?.passing, apiData?.passing, true),
+            dribbling: chooseBetter(fifaData?.dribbling, apiData?.dribbling, true),
+            defending: chooseBetter(fifaData?.defending, apiData?.defending, true),
+            physical: chooseBetter(fifaData?.physical, apiData?.physical, true),
+            
+            // Detailed skills - prefer FIFA database
+            skills: {
+                ...(apiData?.skills || {}),
+                ...(fifaData?.skills || {}) // FIFA skills override API skills
+            },
+            
+            // Financial info
+            value: chooseBetter(fifaData?.value, apiData?.value),
+            wage: chooseBetter(fifaData?.wage, apiData?.wage),
+            contract: fifaData?.contract,
+            
+            // Legacy fields
+            sofifaId: fifaData?.sofifaId,
+            sofifaUrl: fifaData?.sofifaUrl,
+            
+            // Suggested name for display
+            suggestedName: fifaData?.searchName || fifaData?.playerName || apiData?.playerName || searchName
+        };
+
+        return merged;
     }
 
     /**
@@ -2697,7 +2851,7 @@ export class FIFADataService {
     }
 
     /**
-     * Batch fetch multiple players with SoFIFA integration
+     * Batch fetch multiple players with MSMC API integration
      * @param {Array<string>} playerNames - Array of player names
      * @param {Object} options - Fetch options
      * @returns {Promise<Array<Object>>} Array of player data
@@ -2760,24 +2914,25 @@ export class FIFADataService {
     }
 
     /**
-     * Get SoFIFA integration statistics
+     * Get MSMC API integration statistics
      * @returns {Object} Integration stats
      */
-    static getSofifaStats() {
-        const cacheStats = SofifaIntegration.getCacheStats();
+    static getApiStats() {
+        const cacheStats = MSMCApiService.getCacheStats();
         const totalPlayers = Object.keys(this.fifaDatabase).length;
-        const playersWithSofifaUrls = Object.values(this.fifaDatabase)
-            .filter(player => player.sofifaUrl).length;
+        const playersWithApiData = Object.values(this.fifaDatabase)
+            .filter(player => player.sofifaUrl || player.playerId).length; // Keep legacy data for now
 
         return {
             cache: cacheStats,
             database: {
                 totalPlayers,
-                playersWithSofifaUrls,
-                sofifaUrlCoverage: `${((playersWithSofifaUrls / totalPlayers) * 100).toFixed(1)}%`
+                playersWithApiData,
+                apiDataCoverage: `${((playersWithApiData / totalPlayers) * 100).toFixed(1)}%`
             },
             integration: {
                 status: 'active',
+                apiType: 'MSMC FC25',
                 lastCheck: new Date().toISOString()
             }
         };
@@ -2929,7 +3084,7 @@ export class FIFADataService {
      * Clear all caches
      */
     static clearAllCaches() {
-        SofifaIntegration.clearCache();
+        MSMCApiService.clearCache();
         console.log('🗑️ All FIFA service caches cleared');
     }
 
@@ -2937,42 +3092,21 @@ export class FIFADataService {
      * Test SoFIFA connectivity
      * @returns {Promise<Object>} Test results
      */
-    static async testSofifaConnectivity() {
-        console.log('🧪 Testing SoFIFA connectivity...');
-        
-        const testPlayer = Object.entries(this.fifaDatabase)
-            .find(([name, data]) => data.sofifaUrl);
-
-        if (!testPlayer) {
-            return {
-                success: false,
-                error: 'No players with SoFIFA URLs available for testing'
-            };
-        }
-
-        const [playerName, playerData] = testPlayer;
+    static async testApiConnectivity() {
+        console.log('🧪 Testing MSMC API connectivity...');
         
         try {
-            const startTime = Date.now();
-            const result = await SofifaIntegration.fetchPlayerData(
-                playerData.sofifaUrl, 
-                playerData.sofifaId
-            );
-            const endTime = Date.now();
-
+            const result = await MSMCApiService.testConnectivity();
             return {
-                success: !!result,
-                testPlayer: playerName,
-                responseTime: `${endTime - startTime}ms`,
-                result: result,
-                timestamp: new Date().toISOString()
+                ...result,
+                apiType: 'MSMC FC25'
             };
         } catch (error) {
             return {
                 success: false,
-                testPlayer: playerName,
                 error: error.message,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                apiType: 'MSMC FC25'
             };
         }
     }
@@ -3048,27 +3182,27 @@ export class FIFADataService {
      * @param {string} playerName - Name of the player to search for
      * @returns {Promise<Object|null>} Player data or null if not found
      */
-    static async searchSofifaByName(playerName) {
-        console.log(`🔍 Searching SoFIFA for player: ${playerName}`);
+    static async searchApiByName(playerName) {
+        console.log(`🔍 Searching MSMC API for player: ${playerName}`);
         
         try {
-            // Use SoFIFA search functionality
-            const searchResult = await SofifaIntegration.searchPlayerByName(playerName);
+            // Use MSMC API search functionality
+            const searchResult = await MSMCApiService.searchPlayerByName(playerName);
             
             if (searchResult) {
-                console.log(`✅ Found player on SoFIFA: ${searchResult.name || playerName}`);
+                console.log(`✅ Found player on MSMC API: ${searchResult.playerName || playerName}`);
                 return {
                     ...searchResult,
                     searchName: playerName,
                     found: true,
-                    source: 'sofifa_search'
+                    source: 'msmc_api_search'
                 };
             } else {
-                console.log(`❌ Player not found on SoFIFA: ${playerName}`);
+                console.log(`❌ Player not found on MSMC API: ${playerName}`);
                 return null;
             }
         } catch (error) {
-            console.error(`❌ Error searching SoFIFA for ${playerName}:`, error.message);
+            console.error(`❌ Error searching MSMC API for ${playerName}:`, error.message);
             return null;
         }
     }
@@ -3089,9 +3223,9 @@ export class FIFADataService {
                 fallbackToMock: false // Don't fallback immediately
             });
 
-            // If no FIFA data found and we should search SoFIFA
+            // If no FIFA data found and we should search MSMC API
             if (!fifaData && options.useLiveData) {
-                fifaData = await this.searchSofifaByName(databasePlayer.name);
+                fifaData = await this.searchApiByName(databasePlayer.name);
             }
 
             // If still no data, generate default
@@ -3131,7 +3265,7 @@ export class FIFADataService {
         };
         const finalOptions = { ...defaultOptions, ...options };
         
-        console.log('🚀 Processing all stored players with SoFIFA integration...');
+        console.log('🚀 Processing all stored players with MSMC API integration...');
         const startTime = Date.now();
         
         try {
