@@ -70,7 +70,7 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
       <div className="basic-info-section mb-8">
         <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-3">
           <i className="fas fa-user text-blue-400"></i>
-          Basic Information
+          Spieler-Informationen
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white/5 rounded-lg p-4 border border-white/10">
@@ -147,35 +147,45 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
     if (!fifaData) return null;
 
     const attributes = [
-      { name: 'Pace', value: fifaData.pace, icon: '🏃' },
-      { name: 'Shooting', value: fifaData.shooting, icon: '⚽' },
-      { name: 'Passing', value: fifaData.passing, icon: '🎯' },
-      { name: 'Dribbling', value: fifaData.dribbling, icon: '⚡' },
-      { name: 'Defending', value: fifaData.defending, icon: '🛡️' },
-      { name: 'Physical', value: fifaData.physical, icon: '💪' }
+      { name: 'PAC', fullName: 'Pace', value: fifaData.pace, icon: '🏃', color: 'from-green-400 to-emerald-500' },
+      { name: 'SHO', fullName: 'Shooting', value: fifaData.shooting, icon: '⚽', color: 'from-red-400 to-rose-500' },
+      { name: 'PAS', fullName: 'Passing', value: fifaData.passing, icon: '🎯', color: 'from-blue-400 to-cyan-500' },
+      { name: 'DRI', fullName: 'Dribbling', value: fifaData.dribbling, icon: '⚡', color: 'from-yellow-400 to-amber-500' },
+      { name: 'DEF', fullName: 'Defending', value: fifaData.defending, icon: '🛡️', color: 'from-purple-400 to-violet-500' },
+      { name: 'PHY', fullName: 'Physical', value: fifaData.physical, icon: '💪', color: 'from-orange-400 to-red-500' }
     ];
 
     return (
       <div className="fifa-attributes mb-8">
-        <h4 className="text-lg font-semibold text-white mb-4">Main Attributes</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <h4 className="text-xl font-semibold text-white mb-6 flex items-center gap-3">
+          <i className="fas fa-chart-bar text-blue-400"></i>
+          FIFA Main Attributes
+        </h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {attributes.map((attr, index) => (
-            <div key={index} className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-lg">{attr.icon}</span>
-                  <span className="text-white font-medium">{attr.name}</span>
+            <div key={index} className="bg-white/5 rounded-xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300 transform hover:scale-105">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">{attr.icon}</span>
+                  <div>
+                    <span className="text-white font-bold text-xl">{attr.name}</span>
+                    <div className="text-slate-400 text-sm">{attr.fullName}</div>
+                  </div>
                 </div>
-                <span className="text-white font-bold text-lg">{attr.value}</span>
+                <div className={`bg-gradient-to-br ${attr.color} text-white font-bold text-2xl px-4 py-2 rounded-lg shadow-lg`}>
+                  {attr.value}
+                </div>
               </div>
-              <div className="w-full bg-white/10 rounded-full h-2">
+              <div className="w-full bg-white/10 rounded-full h-3">
                 <div 
-                  className="h-2 rounded-full transition-all duration-500"
-                  style={{ 
-                    width: `${attr.value}%`, 
-                    backgroundColor: getAttributeColor(attr.value)
-                  }}
+                  className={`h-3 rounded-full transition-all duration-500 bg-gradient-to-r ${attr.color} shadow-lg`}
+                  style={{ width: `${attr.value}%` }}
                 />
+              </div>
+              <div className="flex justify-between text-xs text-slate-400 mt-2">
+                <span>0</span>
+                <span>50</span>
+                <span>99</span>
               </div>
             </div>
           ))}
@@ -189,58 +199,78 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
 
     const skillGroups = [
       {
-        name: 'Shooting',
+        name: 'Shooting Skills',
+        icon: '⚽',
+        color: 'from-red-400 to-rose-500',
         skills: ['finishing', 'volleys', 'penalties', 'shotPower', 'longShots']
       },
       {
-        name: 'Passing',
+        name: 'Passing Skills',
+        icon: '🎯',
+        color: 'from-blue-400 to-cyan-500',
         skills: ['vision', 'crossing', 'curve', 'shortPassing', 'longPassing']
       },
       {
-        name: 'Movement',
+        name: 'Movement Skills',
+        icon: '🏃',
+        color: 'from-green-400 to-emerald-500',
         skills: ['acceleration', 'sprintSpeed', 'agility', 'reactions', 'balance']
       },
       {
-        name: 'Physical',
+        name: 'Physical Skills',
+        icon: '💪',
+        color: 'from-orange-400 to-red-500',
         skills: ['jumping', 'stamina', 'strength', 'aggression']
       },
       {
-        name: 'Mentality',
+        name: 'Mental Skills',
+        icon: '🧠',
+        color: 'from-purple-400 to-violet-500',
         skills: ['positioning', 'composure', 'interceptions']
       },
       {
-        name: 'Technical',
+        name: 'Technical Skills',
+        icon: '⚡',
+        color: 'from-yellow-400 to-amber-500',
         skills: ['ballControl', 'headingAccuracy', 'fkAccuracy']
       }
     ];
 
     return (
       <div className="fifa-skills">
-        <h4 className="text-lg font-semibold text-white mb-4">Detailed Skills</h4>
-        <div className="space-y-2">
+        <h4 className="text-xl font-semibold text-white mb-6 flex items-center gap-3">
+          <i className="fas fa-cogs text-blue-400"></i>
+          Detailed Skills & Attributes
+        </h4>
+        <div className="space-y-3">
           {skillGroups.map((group, index) => (
-            <div key={index} className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+            <div key={index} className="bg-white/5 rounded-xl border border-white/10 overflow-hidden hover:bg-white/10 transition-all duration-300">
               <button 
                 className="w-full px-6 py-4 text-left flex justify-between items-center text-white font-medium hover:bg-white/5 transition-colors"
                 onClick={() => toggleSkillGroup(index)}
               >
-                <span>{group.name}</span>
-                <i className={`fas fa-chevron-${activeSkillGroup === index ? 'up' : 'down'} text-slate-400`}></i>
+                <div className="flex items-center gap-3">
+                  <span className="text-xl">{group.icon}</span>
+                  <span className="text-lg">{group.name}</span>
+                  <span className="text-sm text-slate-400">
+                    ({group.skills.filter(skill => fifaData.skills[skill] !== undefined).length} skills)
+                  </span>
+                </div>
+                <i className={`fas fa-chevron-${activeSkillGroup === index ? 'up' : 'down'} text-slate-400 transition-transform duration-200`}></i>
               </button>
               {activeSkillGroup === index && (
-                <div className="px-6 pb-4 border-t border-white/10">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                <div className="px-6 pb-6 border-t border-white/10">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                     {group.skills.filter(skill => fifaData.skills[skill] !== undefined).map(skill => (
-                      <div key={skill} className="flex items-center gap-3">
-                        <span className="text-slate-400 text-sm flex-1">{formatSkillName(skill)}</span>
-                        <span className="text-white font-semibold text-sm w-8 text-right">{fifaData.skills[skill]}</span>
-                        <div className="w-16 h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div key={skill} className="flex items-center gap-4 bg-white/5 rounded-lg p-3 hover:bg-white/10 transition-colors">
+                        <span className="text-slate-300 text-sm flex-1 font-medium">{formatSkillName(skill)}</span>
+                        <div className={`bg-gradient-to-r ${group.color} text-white font-bold text-lg px-3 py-1 rounded-lg shadow-lg min-w-[3rem] text-center`}>
+                          {fifaData.skills[skill]}
+                        </div>
+                        <div className="w-20 h-3 bg-white/10 rounded-full overflow-hidden">
                           <div 
-                            className="h-full rounded-full transition-all duration-300"
-                            style={{ 
-                              width: `${fifaData.skills[skill]}%`, 
-                              backgroundColor: getAttributeColor(fifaData.skills[skill])
-                            }}
+                            className={`h-full rounded-full transition-all duration-300 bg-gradient-to-r ${group.color} shadow-lg`}
+                            style={{ width: `${fifaData.skills[skill]}%` }}
                           />
                         </div>
                       </div>
@@ -346,15 +376,17 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
             </div>
           ) : (
             <div className="modal-content-wrapper">
-              <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
+              {/* Basic Info */}
+              <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 {renderBasicInfo()}
               </div>
+              
               {fifaData?.found ? (
-                <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
                   <div className="fifa-stats-section">
                     <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-3">
-                      <i className="fas fa-chart-bar text-blue-400"></i>
-                      FIFA Statistics
+                      <i className="fas fa-chart-bar text-yellow-400"></i>
+                      FIFA Attribute & Statistiken
                       {fifaData.sofifaUrl && (
                         <a 
                           href={fifaData.sofifaUrl} 
@@ -367,19 +399,19 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
                         </a>
                       )}
                     </h3>
-                    <div className="animate-fade-in" style={{ animationDelay: '0.8s' }}>
+                    <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
                       {renderFIFAOverview()}
                     </div>
-                    <div className="animate-fade-in" style={{ animationDelay: '1.0s' }}>
+                    <div className="animate-fade-in" style={{ animationDelay: '0.8s' }}>
                       {renderFIFAAttributes()}
                     </div>
-                    <div className="animate-fade-in" style={{ animationDelay: '1.2s' }}>
+                    <div className="animate-fade-in" style={{ animationDelay: '1.0s' }}>
                       {renderFIFASkills()}
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
                   {renderNoFIFAData()}
                 </div>
               )}

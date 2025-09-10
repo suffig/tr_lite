@@ -21,15 +21,15 @@ export class FIFADataService {
             potential: 90,
             positions: ["CB"],
             age: 32,
-            height: 185,
-            weight: 65,
+            height: 193,
+            weight: 92,
             foot: "Right",
-            pace: 92,
-            shooting: 91,
-            passing: 97,
-            dribbling: 96,
-            defending: 93,
-            physical: 97,
+            pace: 77,  // Corrected from 92 - realistic for CB
+            shooting: 60, // Corrected from 91 - CB don't have high shooting
+            passing: 91,  // Corrected from 97 - good but not 97
+            dribbling: 72, // Corrected from 96 - too high for CB
+            defending: 95, // High defending for top CB
+            physical: 86,  // Corrected from 97
             skills: {
                 crossing: 76,
                 finishing: 60,
@@ -74,15 +74,15 @@ export class FIFADataService {
             potential: 91,
             positions: ["ST"],
             age: 36,
-            height: 172,
-            weight: 75,
+            height: 185,
+            weight: 81,
             foot: "Right",
-            pace: 92,
-            shooting: 97,
-            passing: 94,
-            dribbling: 87,
-            defending: 90,
-            physical: 92,
+            pace: 77,     // Reduced due to age
+            shooting: 90, // Corrected from 97
+            passing: 83,  // Corrected from 94 
+            dribbling: 88, // Corrected from 87
+            defending: 39, // Corrected from 90 - striker
+            physical: 78,  // Corrected from 92
             skills: {
                 crossing: 71,
                 finishing: 92,
@@ -180,15 +180,15 @@ export class FIFADataService {
             potential: 95,
             positions: ["LW","ST","RW"],
             age: 25,
-            height: 171,
-            weight: 66,
-            foot: "Left",
-            pace: 88,
-            shooting: 95,
-            passing: 95,
-            dribbling: 83,
-            defending: 83,
-            physical: 86,
+            height: 178,
+            weight: 73,
+            foot: "Right",
+            pace: 97,  // High pace makes sense for Mbappé 
+            shooting: 89,  // Corrected from 95
+            passing: 80,   // Corrected from 95 - way too high before
+            dribbling: 92, // Corrected from 83 - this should be higher
+            defending: 36, // Corrected from 83 - wingers don't defend much
+            physical: 77,  // Corrected from 86
             skills: {
                 crossing: 80,
                 finishing: 98,
@@ -233,15 +233,15 @@ export class FIFADataService {
             potential: 94,
             positions: ["ST","CF"],
             age: 23,
-            height: 176,
-            weight: 83,
-            foot: "Right",
-            pace: 94,
-            shooting: 99,
-            passing: 89,
-            dribbling: 85,
-            defending: 98,
-            physical: 87,
+            height: 194,
+            weight: 88,
+            foot: "Left",
+            pace: 89,     // High pace for striker
+            shooting: 94, // Corrected from 99 - very high but not max
+            passing: 65,  // Corrected from 89 - strikers don't need high passing
+            dribbling: 80, // Corrected from 85 
+            defending: 45, // Corrected from 98 - strikers don't defend
+            physical: 88,  // Corrected from 87 - good for big striker
             skills: {
                 crossing: 73,
                 finishing: 94,
@@ -339,15 +339,15 @@ export class FIFADataService {
             potential: 91,
             positions: ["CAM","CM"],
             age: 33,
-            height: 171,
-            weight: 78,
-            foot: "Left",
-            pace: 96,
-            shooting: 92,
-            passing: 96,
-            dribbling: 93,
-            defending: 84,
-            physical: 98,
+            height: 181,
+            weight: 70,
+            foot: "Right",
+            pace: 66,    // Corrected from 96 to real EA value
+            shooting: 86, // Corrected from 92
+            passing: 93,  // Corrected from 96
+            dribbling: 88, // Corrected from 93
+            defending: 64, // Corrected from 84
+            physical: 78,  // Corrected from 98
             skills: {
                 crossing: 75,
                 finishing: 71,
@@ -392,15 +392,15 @@ export class FIFADataService {
             potential: 90,
             positions: ["RW","CAM"],
             age: 37,
-            height: 174,
-            weight: 76,
+            height: 170,
+            weight: 72,
             foot: "Left",
-            pace: 91,
-            shooting: 83,
-            passing: 99,
-            dribbling: 99,
-            defending: 92,
-            physical: 86,
+            pace: 81,     // Reduced due to age
+            shooting: 89, // Corrected from 83 - should be higher
+            passing: 91,  // Corrected from 99 - very high but not max
+            dribbling: 94, // Corrected from 99 - very high but not max
+            defending: 34, // Corrected from 92 - attacking player
+            physical: 65,  // Corrected from 86 - not very physical
             skills: {
                 crossing: 84,
                 finishing: 84,
@@ -1134,15 +1134,15 @@ export class FIFADataService {
             potential: 90,
             positions: ["ST"],
             age: 35,
-            height: 177,
-            weight: 84,
+            height: 185,
+            weight: 81,
             foot: "Right",
-            pace: 94,
-            shooting: 98,
-            passing: 89,
-            dribbling: 87,
-            defending: 88,
-            physical: 88,
+            pace: 78,     // Corrected from 94 - age factor
+            shooting: 91, // Corrected from 98
+            passing: 79,  // Corrected from 89
+            dribbling: 85, // Corrected from 87
+            defending: 44, // Corrected from 88 - striker
+            physical: 82,  // Corrected from 88
             skills: {
                 crossing: 70,
                 finishing: 93,
@@ -1187,15 +1187,15 @@ export class FIFADataService {
             potential: 88,
             positions: ["ST","LW"],
             age: 39,
-            height: 194,
-            weight: 78,
-            foot: "Left",
-            pace: 85,
-            shooting: 98,
-            passing: 93,
-            dribbling: 89,
-            defending: 87,
-            physical: 91,
+            height: 187,
+            weight: 83,
+            foot: "Right",
+            pace: 81,     // Corrected from 85 - still good for age
+            shooting: 92, // Corrected from 98
+            passing: 82,  // Corrected from 93
+            dribbling: 85, // Corrected from 89
+            defending: 34, // Corrected from 87 - forward
+            physical: 77,  // Corrected from 91
             skills: {
                 crossing: 78,
                 finishing: 87,
@@ -2301,16 +2301,15 @@ export class FIFADataService {
      * @param {string} playerName - Name of the player to search for
      * @param {Object} options - Search options
      * @param {boolean} options.useLiveData - Whether to attempt SoFIFA fetch
-     * @param {boolean} options.fallbackToMock - Whether to fallback to mock data
      * @returns {Object|null} FIFA player data or null if not found
      */
-    static async getPlayerData(playerName, options = { useLiveData: true, fallbackToMock: true }) {
+    static async getPlayerData(playerName, options = { useLiveData: true }) {
         console.log(`🔍 Searching for player: ${playerName}`);
         
         // Validate input
         if (!playerName || typeof playerName !== 'string' || playerName.trim().length === 0) {
             console.warn('⚠️ Invalid player name provided');
-            return this.generateDefaultPlayerData('Unknown Player');
+            return null;
         }
 
         const cleanPlayerName = playerName.trim();
@@ -2380,12 +2379,6 @@ export class FIFADataService {
         // Return mock data if available
         if (mockData) {
             return mockData;
-        }
-
-        // If no mock data found and fallback is enabled, generate default
-        if (options.fallbackToMock) {
-            console.log(`🔄 Generating default data for unknown player: ${cleanPlayerName}`);
-            return this.generateDefaultPlayerData(cleanPlayerName);
         }
 
         // No data found
@@ -2554,80 +2547,6 @@ export class FIFADataService {
         }
         
         return matrix[str2.length][str1.length];
-    }
-
-    /**
-     * Generate default FIFA-style data for unknown players
-     * @param {string} playerName - Name of the player
-     * @returns {Object} Default FIFA player data structure
-     */
-    static generateDefaultPlayerData(playerName) {
-        // Generate realistic but modest ratings for unknown players
-        const baseRating = 65 + Math.floor(Math.random() * 15); // 65-79 overall
-        
-        return {
-            overall: baseRating,
-            potential: Math.min(baseRating + Math.floor(Math.random() * 8), 85),
-            positions: ["Unknown"],
-            age: 25,
-            height: 175 + Math.floor(Math.random() * 15),
-            weight: 70 + Math.floor(Math.random() * 15),
-            foot: Math.random() > 0.5 ? "Right" : "Left",
-            pace: this.generateAttribute(baseRating),
-            shooting: this.generateAttribute(baseRating),
-            passing: this.generateAttribute(baseRating),
-            dribbling: this.generateAttribute(baseRating),
-            defending: this.generateAttribute(baseRating),
-            physical: this.generateAttribute(baseRating),
-            skills: this.generateDetailedSkills(baseRating),
-            workrates: "Medium/Medium",
-            weakFoot: 2 + Math.floor(Math.random() * 3),
-            skillMoves: 2 + Math.floor(Math.random() * 3),
-            nationality: "Unknown",
-            club: "Unknown",
-            value: "€" + (Math.random() * 5 + 0.5).toFixed(1) + "M",
-            wage: "€" + Math.floor(Math.random() * 20 + 5) + "K",
-            contract: "2025",
-            sofifaId: null,
-            sofifaUrl: null,
-            searchName: playerName,
-            found: false,
-            generated: true
-        };
-    }
-
-    /**
-     * Generate a realistic attribute value based on overall rating
-     * @param {number} overall - Overall player rating
-     * @returns {number} Attribute value
-     */
-    static generateAttribute(overall) {
-        const variance = 15; // Attributes can vary +/- 15 from overall
-        const min = Math.max(35, overall - variance);
-        const max = Math.min(90, overall + variance);
-        return min + Math.floor(Math.random() * (max - min));
-    }
-
-    /**
-     * Generate detailed skills object
-     * @param {number} baseRating - Base rating to derive skills from
-     * @returns {Object} Detailed skills object
-     */
-    static generateDetailedSkills(baseRating) {
-        const skills = {};
-        const skillNames = [
-            'crossing', 'finishing', 'headingAccuracy', 'shortPassing', 'volleys',
-            'curve', 'fkAccuracy', 'longPassing', 'ballControl', 'acceleration',
-            'sprintSpeed', 'agility', 'reactions', 'balance', 'shotPower',
-            'jumping', 'stamina', 'strength', 'longShots', 'aggression',
-            'interceptions', 'positioning', 'vision', 'penalties', 'composure'
-        ];
-
-        skillNames.forEach(skill => {
-            skills[skill] = this.generateAttribute(baseRating);
-        });
-
-        return skills;
     }
 
     /**
@@ -3003,22 +2922,21 @@ export class FIFADataService {
                     try {
                         // Try to get FIFA data for this player
                         const fifaData = await this.getPlayerData(dbPlayer.name, {
-                            useLiveData: options.useLiveData,
-                            fallbackToMock: true
+                            useLiveData: options.useLiveData
                         });
 
                         // Merge database player data with FIFA data
                         return {
                             ...dbPlayer,
                             fifaData: fifaData,
-                            enhanced: true,
+                            enhanced: !!fifaData,
                             source: fifaData?.source || 'database_only'
                         };
                     } catch (error) {
                         console.warn(`❌ Failed to enhance player ${dbPlayer.name}:`, error.message);
                         return {
                             ...dbPlayer,
-                            fifaData: this.generateDefaultPlayerData(dbPlayer.name),
+                            fifaData: null,
                             enhanced: false,
                             error: error.message
                         };
@@ -3085,8 +3003,7 @@ export class FIFADataService {
         try {
             // First try to get FIFA data using existing method
             let fifaData = await this.getPlayerData(databasePlayer.name, {
-                useLiveData: options.useLiveData,
-                fallbackToMock: false // Don't fallback immediately
+                useLiveData: options.useLiveData
             });
 
             // If no FIFA data found and we should search SoFIFA
@@ -3094,16 +3011,10 @@ export class FIFADataService {
                 fifaData = await this.searchSofifaByName(databasePlayer.name);
             }
 
-            // If still no data, generate default
-            if (!fifaData) {
-                fifaData = this.generateDefaultPlayerData(databasePlayer.name);
-                fifaData.source = 'generated_default';
-            }
-
             return {
                 ...databasePlayer,
                 fifaData: fifaData,
-                enhanced: true,
+                enhanced: !!fifaData,
                 enhancedAt: new Date().toISOString()
             };
             
@@ -3111,7 +3022,7 @@ export class FIFADataService {
             console.error(`❌ Error enhancing player ${databasePlayer.name}:`, error.message);
             return {
                 ...databasePlayer,
-                fifaData: this.generateDefaultPlayerData(databasePlayer.name),
+                fifaData: null,
                 enhanced: false,
                 error: error.message
             };
