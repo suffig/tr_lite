@@ -3,7 +3,6 @@ import { useSupabaseQuery, useSupabaseMutation } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import ExportImportManager from '../ExportImportManager';
 import PlayerDetailModal from '../PlayerDetailModal';
-import EASquadOverview from '../EASquadOverview';
 import { POSITIONS } from '../../utils/errorHandling';
 import toast from 'react-hot-toast';
 
@@ -13,7 +12,6 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [showPlayerDetail, setShowPlayerDetail] = useState(false);
-  const [viewMode, setViewMode] = useState('classic'); // 'classic' or 'ea'
   
   const { data: players, loading, error, refetch } = useSupabaseQuery('players', '*');
   const { update } = useSupabaseMutation('players');
@@ -174,32 +172,6 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
               Kader-Management
             </h3>
           </div>
-          
-          {/* View Mode Toggle */}
-          <div className="flex rounded-lg bg-bg-secondary p-1">
-            <button
-              onClick={() => setViewMode('classic')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'classic' 
-                  ? 'bg-primary-blue text-white' 
-                  : 'text-text-muted hover:text-text-primary'
-              }`}
-            >
-              <i className="fas fa-list mr-1"></i>
-              Classic View
-            </button>
-            <button
-              onClick={() => setViewMode('ea')}
-              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                viewMode === 'ea' 
-                  ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
-                  : 'text-text-muted hover:text-text-primary'
-              }`}
-            >
-              <i className="fas fa-gamepad mr-1"></i>
-              EA Sports FC
-            </button>
-          </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -240,17 +212,8 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
         </div>
       </div>
 
-      {/* Main Content - Conditional View */}
-      {viewMode === 'ea' ? (
-        <EASquadOverview 
-          players={players} 
-          loading={loading} 
-          onPlayerClick={handleShowPlayerDetail}
-        />
-      ) : (
-        <>
-          {/* Team Accordions - Classic View */}
-          <div className="space-y-4">
+      {/* Team Accordions */}
+      <div className="space-y-4">
             {teams.map((team) => (
               <div key={team.id} className={getTeamCardClass(team.name)}>
                 {/* Team Header */}
@@ -366,7 +329,7 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
             ))}
           </div>
 
-          {/* Summary Cards - Classic View Only */}
+          {/* Summary Cards */}
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div className="modern-card text-center">
               <div className="text-2xl font-bold text-primary-green">
@@ -381,8 +344,6 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
               <div className="text-sm text-text-muted">Positionen</div>
             </div>
           </div>
-        </>
-      )}
 
       {/* New Feature Modals */}
       {showExportImport && (

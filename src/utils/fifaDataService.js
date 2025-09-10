@@ -21,15 +21,15 @@ export class FIFADataService {
             potential: 90,
             positions: ["CB"],
             age: 32,
-            height: 185,
-            weight: 65,
+            height: 193,
+            weight: 92,
             foot: "Right",
-            pace: 92,
-            shooting: 91,
-            passing: 97,
-            dribbling: 96,
-            defending: 93,
-            physical: 97,
+            pace: 77,  // Corrected from 92 - realistic for CB
+            shooting: 60, // Corrected from 91 - CB don't have high shooting
+            passing: 91,  // Corrected from 97 - good but not 97
+            dribbling: 72, // Corrected from 96 - too high for CB
+            defending: 95, // High defending for top CB
+            physical: 86,  // Corrected from 97
             skills: {
                 crossing: 76,
                 finishing: 60,
@@ -74,15 +74,15 @@ export class FIFADataService {
             potential: 91,
             positions: ["ST"],
             age: 36,
-            height: 172,
-            weight: 75,
+            height: 185,
+            weight: 81,
             foot: "Right",
-            pace: 92,
-            shooting: 97,
-            passing: 94,
-            dribbling: 87,
-            defending: 90,
-            physical: 92,
+            pace: 77,     // Reduced due to age
+            shooting: 90, // Corrected from 97
+            passing: 83,  // Corrected from 94 
+            dribbling: 88, // Corrected from 87
+            defending: 39, // Corrected from 90 - striker
+            physical: 78,  // Corrected from 92
             skills: {
                 crossing: 71,
                 finishing: 92,
@@ -180,15 +180,15 @@ export class FIFADataService {
             potential: 95,
             positions: ["LW","ST","RW"],
             age: 25,
-            height: 171,
-            weight: 66,
-            foot: "Left",
-            pace: 88,
-            shooting: 95,
-            passing: 95,
-            dribbling: 83,
-            defending: 83,
-            physical: 86,
+            height: 178,
+            weight: 73,
+            foot: "Right",
+            pace: 97,  // High pace makes sense for Mbappé 
+            shooting: 89,  // Corrected from 95
+            passing: 80,   // Corrected from 95 - way too high before
+            dribbling: 92, // Corrected from 83 - this should be higher
+            defending: 36, // Corrected from 83 - wingers don't defend much
+            physical: 77,  // Corrected from 86
             skills: {
                 crossing: 80,
                 finishing: 98,
@@ -233,15 +233,15 @@ export class FIFADataService {
             potential: 94,
             positions: ["ST","CF"],
             age: 23,
-            height: 176,
-            weight: 83,
-            foot: "Right",
-            pace: 94,
-            shooting: 99,
-            passing: 89,
-            dribbling: 85,
-            defending: 98,
-            physical: 87,
+            height: 194,
+            weight: 88,
+            foot: "Left",
+            pace: 89,     // High pace for striker
+            shooting: 94, // Corrected from 99 - very high but not max
+            passing: 65,  // Corrected from 89 - strikers don't need high passing
+            dribbling: 80, // Corrected from 85 
+            defending: 45, // Corrected from 98 - strikers don't defend
+            physical: 88,  // Corrected from 87 - good for big striker
             skills: {
                 crossing: 73,
                 finishing: 94,
@@ -339,15 +339,15 @@ export class FIFADataService {
             potential: 91,
             positions: ["CAM","CM"],
             age: 33,
-            height: 171,
-            weight: 78,
-            foot: "Left",
-            pace: 96,
-            shooting: 92,
-            passing: 96,
-            dribbling: 93,
-            defending: 84,
-            physical: 98,
+            height: 181,
+            weight: 70,
+            foot: "Right",
+            pace: 66,    // Corrected from 96 to real EA value
+            shooting: 86, // Corrected from 92
+            passing: 93,  // Corrected from 96
+            dribbling: 88, // Corrected from 93
+            defending: 64, // Corrected from 84
+            physical: 78,  // Corrected from 98
             skills: {
                 crossing: 75,
                 finishing: 71,
@@ -392,15 +392,15 @@ export class FIFADataService {
             potential: 90,
             positions: ["RW","CAM"],
             age: 37,
-            height: 174,
-            weight: 76,
+            height: 170,
+            weight: 72,
             foot: "Left",
-            pace: 91,
-            shooting: 83,
-            passing: 99,
-            dribbling: 99,
-            defending: 92,
-            physical: 86,
+            pace: 81,     // Reduced due to age
+            shooting: 89, // Corrected from 83 - should be higher
+            passing: 91,  // Corrected from 99 - very high but not max
+            dribbling: 94, // Corrected from 99 - very high but not max
+            defending: 34, // Corrected from 92 - attacking player
+            physical: 65,  // Corrected from 86 - not very physical
             skills: {
                 crossing: 84,
                 finishing: 84,
@@ -1134,15 +1134,15 @@ export class FIFADataService {
             potential: 90,
             positions: ["ST"],
             age: 35,
-            height: 177,
-            weight: 84,
+            height: 185,
+            weight: 81,
             foot: "Right",
-            pace: 94,
-            shooting: 98,
-            passing: 89,
-            dribbling: 87,
-            defending: 88,
-            physical: 88,
+            pace: 78,     // Corrected from 94 - age factor
+            shooting: 91, // Corrected from 98
+            passing: 79,  // Corrected from 89
+            dribbling: 85, // Corrected from 87
+            defending: 44, // Corrected from 88 - striker
+            physical: 82,  // Corrected from 88
             skills: {
                 crossing: 70,
                 finishing: 93,
@@ -1187,15 +1187,15 @@ export class FIFADataService {
             potential: 88,
             positions: ["ST","LW"],
             age: 39,
-            height: 194,
-            weight: 78,
-            foot: "Left",
-            pace: 85,
-            shooting: 98,
-            passing: 93,
-            dribbling: 89,
-            defending: 87,
-            physical: 91,
+            height: 187,
+            weight: 83,
+            foot: "Right",
+            pace: 81,     // Corrected from 85 - still good for age
+            shooting: 92, // Corrected from 98
+            passing: 82,  // Corrected from 93
+            dribbling: 85, // Corrected from 89
+            defending: 34, // Corrected from 87 - forward
+            physical: 77,  // Corrected from 91
             skills: {
                 crossing: 78,
                 finishing: 87,

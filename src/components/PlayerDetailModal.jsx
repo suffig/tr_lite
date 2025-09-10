@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FIFADataService } from '../utils/fifaDataService';
-import EAPlayerCard from './EAPlayerCard';
 
 const PlayerDetailModal = ({ player, isOpen, onClose }) => {
   const [fifaData, setFifaData] = useState(null);
@@ -62,26 +61,6 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
     setActiveSkillGroup(activeSkillGroup === index ? null : index);
   };
 
-  const renderEAPlayerCard = () => {
-    return (
-      <div className="ea-player-card-section mb-8">
-        <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-3">
-          <i className="fas fa-gamepad text-blue-400"></i>
-          EA Sports FC Player Card
-        </h3>
-        <div className="flex justify-center mb-6">
-          <div className="transform scale-125">
-            <EAPlayerCard 
-              player={player} 
-              size="large" 
-              showDetails={true}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   const renderBasicInfo = () => {
     const marketValue = typeof player.value === 'number' 
       ? player.value 
@@ -91,7 +70,7 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
       <div className="basic-info-section mb-8">
         <h3 className="text-xl font-semibold text-white mb-4 flex items-center gap-3">
           <i className="fas fa-user text-blue-400"></i>
-          Additional Information
+          Spieler-Informationen
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white/5 rounded-lg p-4 border border-white/10">
@@ -397,22 +376,17 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
             </div>
           ) : (
             <div className="modal-content-wrapper">
-              {/* EA Sports FC Player Card - Always show */}
+              {/* Basic Info */}
               <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-                {renderEAPlayerCard()}
-              </div>
-              
-              {/* Additional Basic Info */}
-              <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
                 {renderBasicInfo()}
               </div>
               
               {fifaData?.found ? (
-                <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
                   <div className="fifa-stats-section">
                     <h3 className="text-xl font-semibold text-white mb-6 flex items-center gap-3">
-                      <i className="fas fa-trophy text-yellow-400"></i>
-                      FIFA Statistics & Analysis
+                      <i className="fas fa-chart-bar text-yellow-400"></i>
+                      FIFA Attribute & Statistiken
                       {fifaData.sofifaUrl && (
                         <a 
                           href={fifaData.sofifaUrl} 
@@ -425,19 +399,19 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
                         </a>
                       )}
                     </h3>
-                    <div className="animate-fade-in" style={{ animationDelay: '0.8s' }}>
+                    <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
                       {renderFIFAOverview()}
                     </div>
-                    <div className="animate-fade-in" style={{ animationDelay: '1.0s' }}>
+                    <div className="animate-fade-in" style={{ animationDelay: '0.8s' }}>
                       {renderFIFAAttributes()}
                     </div>
-                    <div className="animate-fade-in" style={{ animationDelay: '1.2s' }}>
+                    <div className="animate-fade-in" style={{ animationDelay: '1.0s' }}>
                       {renderFIFASkills()}
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className="animate-fade-in" style={{ animationDelay: '0.6s' }}>
+                <div className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
                   {renderNoFIFAData()}
                 </div>
               )}
