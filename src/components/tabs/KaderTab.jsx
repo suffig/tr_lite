@@ -242,7 +242,11 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
 
       {/* Main Content - Conditional View */}
       {viewMode === 'ea' ? (
-        <EASquadOverview players={players} loading={loading} />
+        <EASquadOverview 
+          players={players} 
+          loading={loading} 
+          onPlayerClick={handleShowPlayerDetail}
+        />
       ) : (
         <>
           {/* Team Accordions - Classic View */}

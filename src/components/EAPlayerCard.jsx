@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FIFADataService } from '../utils/fifaDataService';
 
-const EAPlayerCard = ({ player, size = 'medium', showDetails = true }) => {
+const EAPlayerCard = ({ player, size = 'medium', showDetails = true, onPlayerClick }) => {
   const [fifaData, setFifaData] = useState(null);
   const [loading, setLoading] = useState(false);
 
@@ -84,6 +84,12 @@ const EAPlayerCard = ({ player, size = 'medium', showDetails = true }) => {
   const cardColorClass = getCardColor(overall);
   const textColorClass = getTextColor(overall);
 
+  const handleCardClick = () => {
+    if (onPlayerClick) {
+      onPlayerClick(player);
+    }
+  };
+
   if (loading) {
     return (
       <div className={`${sizeClasses.card} ea-card-loading rounded-lg flex items-center justify-center`}>
@@ -95,7 +101,10 @@ const EAPlayerCard = ({ player, size = 'medium', showDetails = true }) => {
   }
 
   return (
-    <div className={`ea-player-card ${sizeClasses.card} ${cardColorClass} rounded-lg shadow-lg relative overflow-hidden transform transition-all duration-200 hover:scale-105`}>
+    <div 
+      className={`ea-player-card ${sizeClasses.card} ${cardColorClass} rounded-lg shadow-lg relative overflow-hidden transform transition-all duration-200 hover:scale-105 ${onPlayerClick ? 'cursor-pointer' : ''}`}
+      onClick={handleCardClick}
+    >
       {/* Team Badge */}
       <div className="absolute top-2 left-2">
         <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import EAPlayerCard from './EAPlayerCard';
 
-const EASquadOverview = ({ players, loading }) => {
+const EASquadOverview = ({ players, loading, onPlayerClick }) => {
   const [viewMode, setViewMode] = useState('cards'); // 'cards' or 'table'
   const [sortBy, setSortBy] = useState('overall'); // 'overall', 'name', 'position', 'team', 'goals'
   const [filterTeam, setFilterTeam] = useState('all');
@@ -178,6 +178,7 @@ const EASquadOverview = ({ players, loading }) => {
                     player={player} 
                     size="medium" 
                     showDetails={true}
+                    onPlayerClick={onPlayerClick}
                   />
                 ))}
               </div>
