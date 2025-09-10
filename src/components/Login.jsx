@@ -143,12 +143,14 @@ export default function Login() {
           {/* Logo */}
           <div className="text-center mb-8 login-header">
             <div className="mb-4 animate-bounce-gentle">
-              <img 
-                src="/assets/logo.png" 
-                alt="FIFA Tracker Logo" 
-                className="w-16 h-16 mx-auto object-contain"
-                loading="eager"
-              />
+              <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary-green to-primary-green-dark rounded-full flex items-center justify-center shadow-lg">
+                <img 
+                  src="/assets/logo.png" 
+                  alt="FIFA Tracker Logo" 
+                  className="w-14 h-14 object-contain filter brightness-0 invert"
+                  loading="eager"
+                />
+              </div>
             </div>
             <h1 className="text-2xl font-bold text-text-primary slide-up-delay-1">
               FIFA Tracker

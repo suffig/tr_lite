@@ -395,6 +395,35 @@ button:focus {
   touch-action: manipulation;
 }
 
+/* Better header styling on iPhone */
+@media screen and (-webkit-min-device-pixel-ratio: 2) and (max-width: 414px) {
+  .modern-header {
+    padding: 0.75rem 1rem;
+  }
+  
+  .header-content {
+    justify-content: center;
+  }
+  
+  .header-brand {
+    gap: 0.5rem;
+  }
+  
+  .header-logo {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .header-logo img {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .header-title {
+    font-size: 1.125rem;
+  }
+}
+
 /* Better grid spacing on mobile */
 @media (max-width: 640px) {
   .grid.grid-cols-2.gap-2 {
