@@ -76,27 +76,27 @@ export async function testFIFAServiceFunctionality() {
         results.failed++;
     }
 
-    // Test 3: Generate default player data
+    // Test 3: Test unknown player handling (should return null)
     try {
-        const defaultData = FIFADataService.generateDefaultPlayerData('Test Player');
+        const unknownPlayer = await FIFADataService.getPlayerData('Unknown Test Player', { useLiveData: false });
         
-        if (defaultData && defaultData.overall && defaultData.generated) {
+        if (unknownPlayer === null) {
             results.tests.push({ 
-                name: 'Generate Default Data', 
+                name: 'Unknown Player Handling', 
                 status: 'PASS', 
-                details: `Generated data with overall ${defaultData.overall}` 
+                details: 'Correctly returns null for unknown players' 
             });
             results.passed++;
         } else {
             results.tests.push({ 
-                name: 'Generate Default Data', 
+                name: 'Unknown Player Handling', 
                 status: 'FAIL', 
-                details: 'Failed to generate valid default data' 
+                details: 'Should return null for unknown players' 
             });
             results.failed++;
         }
     } catch (error) {
-        results.tests.push({ name: 'Generate Default Data', status: 'FAIL', details: error.message });
+        results.tests.push({ name: 'Unknown Player Handling', status: 'FAIL', details: error.message });
         results.failed++;
     }
 

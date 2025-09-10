@@ -2301,16 +2301,15 @@ export class FIFADataService {
      * @param {string} playerName - Name of the player to search for
      * @param {Object} options - Search options
      * @param {boolean} options.useLiveData - Whether to attempt SoFIFA fetch
-     * @param {boolean} options.fallbackToMock - Whether to fallback to mock data
      * @returns {Object|null} FIFA player data or null if not found
      */
-    static async getPlayerData(playerName, options = { useLiveData: true, fallbackToMock: true }) {
+    static async getPlayerData(playerName, options = { useLiveData: true }) {
         console.log(`🔍 Searching for player: ${playerName}`);
         
         // Validate input
         if (!playerName || typeof playerName !== 'string' || playerName.trim().length === 0) {
             console.warn('⚠️ Invalid player name provided');
-            return this.generateDefaultPlayerData('Unknown Player');
+            return null;
         }
 
         const cleanPlayerName = playerName.trim();
@@ -2380,12 +2379,6 @@ export class FIFADataService {
         // Return mock data if available
         if (mockData) {
             return mockData;
-        }
-
-        // If no mock data found and fallback is enabled, generate default
-        if (options.fallbackToMock) {
-            console.log(`🔄 Generating default data for unknown player: ${cleanPlayerName}`);
-            return this.generateDefaultPlayerData(cleanPlayerName);
         }
 
         // No data found
@@ -2554,80 +2547,6 @@ export class FIFADataService {
         }
         
         return matrix[str2.length][str1.length];
-    }
-
-    /**
-     * Generate default FIFA-style data for unknown players
-     * @param {string} playerName - Name of the player
-     * @returns {Object} Default FIFA player data structure
-     */
-    static generateDefaultPlayerData(playerName) {
-        // Generate realistic but modest ratings for unknown players
-        const baseRating = 65 + Math.floor(Math.random() * 15); // 65-79 overall
-        
-        return {
-            overall: baseRating,
-            potential: Math.min(baseRating + Math.floor(Math.random() * 8), 85),
-            positions: ["Unknown"],
-            age: 25,
-            height: 175 + Math.floor(Math.random() * 15),
-            weight: 70 + Math.floor(Math.random() * 15),
-            foot: Math.random() > 0.5 ? "Right" : "Left",
-            pace: this.generateAttribute(baseRating),
-            shooting: this.generateAttribute(baseRating),
-            passing: this.generateAttribute(baseRating),
-            dribbling: this.generateAttribute(baseRating),
-            defending: this.generateAttribute(baseRating),
-            physical: this.generateAttribute(baseRating),
-            skills: this.generateDetailedSkills(baseRating),
-            workrates: "Medium/Medium",
-            weakFoot: 2 + Math.floor(Math.random() * 3),
-            skillMoves: 2 + Math.floor(Math.random() * 3),
-            nationality: "Unknown",
-            club: "Unknown",
-            value: "€" + (Math.random() * 5 + 0.5).toFixed(1) + "M",
-            wage: "€" + Math.floor(Math.random() * 20 + 5) + "K",
-            contract: "2025",
-            sofifaId: null,
-            sofifaUrl: null,
-            searchName: playerName,
-            found: false,
-            generated: true
-        };
-    }
-
-    /**
-     * Generate a realistic attribute value based on overall rating
-     * @param {number} overall - Overall player rating
-     * @returns {number} Attribute value
-     */
-    static generateAttribute(overall) {
-        const variance = 15; // Attributes can vary +/- 15 from overall
-        const min = Math.max(35, overall - variance);
-        const max = Math.min(90, overall + variance);
-        return min + Math.floor(Math.random() * (max - min));
-    }
-
-    /**
-     * Generate detailed skills object
-     * @param {number} baseRating - Base rating to derive skills from
-     * @returns {Object} Detailed skills object
-     */
-    static generateDetailedSkills(baseRating) {
-        const skills = {};
-        const skillNames = [
-            'crossing', 'finishing', 'headingAccuracy', 'shortPassing', 'volleys',
-            'curve', 'fkAccuracy', 'longPassing', 'ballControl', 'acceleration',
-            'sprintSpeed', 'agility', 'reactions', 'balance', 'shotPower',
-            'jumping', 'stamina', 'strength', 'longShots', 'aggression',
-            'interceptions', 'positioning', 'vision', 'penalties', 'composure'
-        ];
-
-        skillNames.forEach(skill => {
-            skills[skill] = this.generateAttribute(baseRating);
-        });
-
-        return skills;
     }
 
     /**
@@ -3003,22 +2922,21 @@ export class FIFADataService {
                     try {
                         // Try to get FIFA data for this player
                         const fifaData = await this.getPlayerData(dbPlayer.name, {
-                            useLiveData: options.useLiveData,
-                            fallbackToMock: true
+                            useLiveData: options.useLiveData
                         });
 
                         // Merge database player data with FIFA data
                         return {
                             ...dbPlayer,
                             fifaData: fifaData,
-                            enhanced: true,
+                            enhanced: !!fifaData,
                             source: fifaData?.source || 'database_only'
                         };
                     } catch (error) {
                         console.warn(`❌ Failed to enhance player ${dbPlayer.name}:`, error.message);
                         return {
                             ...dbPlayer,
-                            fifaData: this.generateDefaultPlayerData(dbPlayer.name),
+                            fifaData: null,
                             enhanced: false,
                             error: error.message
                         };
@@ -3085,8 +3003,7 @@ export class FIFADataService {
         try {
             // First try to get FIFA data using existing method
             let fifaData = await this.getPlayerData(databasePlayer.name, {
-                useLiveData: options.useLiveData,
-                fallbackToMock: false // Don't fallback immediately
+                useLiveData: options.useLiveData
             });
 
             // If no FIFA data found and we should search SoFIFA
@@ -3094,16 +3011,10 @@ export class FIFADataService {
                 fifaData = await this.searchSofifaByName(databasePlayer.name);
             }
 
-            // If still no data, generate default
-            if (!fifaData) {
-                fifaData = this.generateDefaultPlayerData(databasePlayer.name);
-                fifaData.source = 'generated_default';
-            }
-
             return {
                 ...databasePlayer,
                 fifaData: fifaData,
-                enhanced: true,
+                enhanced: !!fifaData,
                 enhancedAt: new Date().toISOString()
             };
             
@@ -3111,7 +3022,7 @@ export class FIFADataService {
             console.error(`❌ Error enhancing player ${databasePlayer.name}:`, error.message);
             return {
                 ...databasePlayer,
-                fifaData: this.generateDefaultPlayerData(databasePlayer.name),
+                fifaData: null,
                 enhanced: false,
                 error: error.message
             };

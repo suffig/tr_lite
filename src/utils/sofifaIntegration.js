@@ -531,8 +531,7 @@ export class SofifaIntegration {
             // Try different strategies to get search results
             const strategies = [
                 () => this.searchWithCorsProxy(searchUrl, playerName),
-                () => this.searchWithAllowOrigins(searchUrl, playerName),
-                () => this.generateSearchResult(playerName) // Fallback to generate basic data
+                () => this.searchWithAllowOrigins(searchUrl, playerName)
             ];
 
             for (const strategy of strategies) {
@@ -720,24 +719,6 @@ export class SofifaIntegration {
             console.error('❌ Error parsing search results:', error.message);
             return null;
         }
-    }
-
-    /**
-     * Generate a basic search result when parsing fails
-     * @param {string} playerName - Player name
-     * @returns {Object} Basic player data
-     */
-    static generateSearchResult(playerName) {
-        console.log(`🎲 Generating basic search result for: ${playerName}`);
-        
-        return {
-            name: playerName,
-            searchName: playerName,
-            overall: 70 + Math.floor(Math.random() * 15), // 70-84
-            source: 'search_generated',
-            timestamp: Date.now(),
-            generated: true
-        };
     }
 
     /**

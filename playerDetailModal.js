@@ -403,53 +403,14 @@ export class PlayerDetailModal {
                 </div>
                 <h3>FIFA Data Not Available</h3>
                 <p class="no-data-message">
-                    ${this.fifaData && this.fifaData.generated 
-                        ? 'This player was not found in our FIFA database. Showing estimated ratings.'
-                        : 'FIFA statistics for this player are not currently available.'
-                    }
+                    FIFA statistics for this player are not currently available in our database.
                 </p>
-                ${this.fifaData && this.fifaData.generated ? this.renderGeneratedStats() : ''}
                 <div class="fifa-info">
                     <p class="fifa-note">
                         <i class="fas fa-info-circle"></i>
                         FIFA ratings are sourced from <a href="https://sofifa.com" target="_blank">SoFIFA.com</a>
                     </p>
                 </div>
-            </div>
-        `;
-    }
-
-    /**
-     * Render generated/estimated stats
-     */
-    renderGeneratedStats() {
-        if (!this.fifaData || !this.fifaData.generated) return '';
-
-        return `
-            <div class="estimated-stats">
-                <h4>Estimated FIFA Stats</h4>
-                <div class="estimated-attributes">
-                    <div class="attr-item">
-                        <span>Overall</span>
-                        <span>${this.fifaData.overall} (Est.)</span>
-                    </div>
-                    <div class="attr-item">
-                        <span>Potential</span>
-                        <span>${this.fifaData.potential} (Est.)</span>
-                    </div>
-                    <div class="attr-item">
-                        <span>Height</span>
-                        <span>${this.fifaData.height}cm (Est.)</span>
-                    </div>
-                    <div class="attr-item">
-                        <span>Preferred Foot</span>
-                        <span>${this.fifaData.foot} (Est.)</span>
-                    </div>
-                </div>
-                <p class="estimation-note">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    These are estimated values and may not reflect actual FIFA ratings.
-                </p>
             </div>
         `;
     }
