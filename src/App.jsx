@@ -5,6 +5,7 @@ import { useAuth } from './hooks/useAuth';
 import { OfflineIndicator } from './hooks/useOfflineManager.jsx';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Login from './components/Login';
+import Header from './components/Header';
 import BottomNavigation from './components/BottomNavigation';
 import LoadingSpinner, { FullScreenLoader } from './components/LoadingSpinner';
 import GlobalSearch from './components/GlobalSearch';
@@ -172,6 +173,9 @@ function App() {
   return (
     <ThemeProvider>
       <div className="flex flex-col min-h-screen bg-bg-primary transition-colors duration-300">
+        {/* Header */}
+        <Header />
+        
         {/* Offline Status Indicator - Only show on admin page */}
         {activeTab === 'admin' && <OfflineIndicator />}
         
