@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIFA Kader Display Test</title>
+    <link rel="stylesheet" href="css/new-design.css">
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
+    <style>
+        body { padding: 20px; background: #f8fafc; }
+        .test-container { max-width: 600px; margin: 0 auto; }
+        .test-section { margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>FIFA Kader Display Test</h1>
+        
+        <div class="test-section">
+            <h2>Player with FIFA Data</h2>
+            <div class="modern-card fifa-enhanced">
+                <div class="card-header">
+                    <div class="flex items-center gap-3">
+                        <span class="position-badge badge-att">ST</span>
+                        <h3 class="card-title">Erling Haaland</h3>
+                        <span class="fifa-indicator" title="Click for FIFA stats">🎮</span>
+                        <span class="fifa-verified" title="FIFA-Daten verfügbar">✅</span>
+                    </div>
+                    <div class="text-xl font-bold text-blue-600">
+                        <span class="fifa-overall">91</span> <span class="fifa-label">OVR</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <p class="text-sm text-gray-500">Team: AEK Athen</p>
+                    <p class="text-sm text-blue-600"><strong>FIFA Overall:</strong> 91 | <strong>Potential:</strong> 94</p>
+                    <p class="text-sm text-gray-500">Marktwert: 32M €</p>
+                    <p class="text-xs text-blue-400 fifa-hint">
+                        <i class="fas fa-info-circle"></i>
+                        Click to view FIFA statistics
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="test-section">
+            <h2>Player without FIFA Data</h2>
+            <div class="modern-card fifa-enhanced">
+                <div class="card-header">
+                    <div class="flex items-center gap-3">
+                        <span class="position-badge badge-mid">ZM</span>
+                        <h3 class="card-title">Unknown Player</h3>
+                        <span class="fifa-indicator" title="Click for FIFA stats">🎮</span>
+                    </div>
+                    <div class="text-xl font-bold text-green-600">25M €</div>
+                </div>
+                <div class="card-content">
+                    <p class="text-sm text-gray-500">Team: Real Madrid</p>
+                    <p class="text-sm text-gray-500">Marktwert: 25M €</p>
+                    <p class="text-xs text-orange-500">⚠️ Keine FIFA-Daten gefunden</p>
+                    <p class="text-xs text-blue-400 fifa-hint">
+                        <i class="fas fa-info-circle"></i>
+                        Click to view FIFA statistics
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

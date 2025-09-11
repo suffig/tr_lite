@@ -570,7 +570,7 @@ async function renderEhemaligeList(containerId = "ehemalige-players") {
             movePlayerWithTransaction(player.id, 'Real');
         };
         c.appendChild(d);
-    });
+    }
 }
 
 function getKaderMarktwert(arr) {
