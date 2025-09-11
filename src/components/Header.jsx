@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Header() {
   return (
-    <header className="modern-header">
+    <header className="modern-header safe-area-top safe-area-x ios-touch">
       <div className="header-content">
         <div className="header-brand">
           <div className="header-logo">

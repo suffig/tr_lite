@@ -2297,7 +2297,204 @@ export class FIFADataService {
     };
 
     /**
-     * Search for a player in the FIFA database with SoFIFA integration
+     * Load FIFA database from JSON file
+     * @returns {Promise<boolean>} Success status
+     */
+    static async loadDatabase() {
+        try {
+            console.log('📥 Loading FIFA database from JSON...');
+            
+            // Try multiple paths for the JSON file
+            const possiblePaths = [
+                './sofifa_my_players_app.json',
+                '/sofifa_my_players_app.json',
+                'sofifa_my_players_app.json'
+            ];
+            
+            let response = null;
+            let loadedPath = null;
+            
+            for (const path of possiblePaths) {
+                try {
+                    response = await fetch(path);
+                    if (response.ok) {
+                        loadedPath = path;
+                        break;
+                    }
+                } catch (e) {
+                    console.warn(`Failed to fetch from ${path}:`, e.message);
+                }
+            }
+            
+            if (!response || !response.ok) {
+                throw new Error(`Failed to load JSON from any path. Last status: ${response?.status || 'No response'}`);
+            }
+            
+            const playersArray = await response.json();
+            console.log(`📊 Loaded ${playersArray.length} players from JSON at ${loadedPath}`);
+            
+            // Validate that we have an array
+            if (!Array.isArray(playersArray)) {
+                throw new Error('JSON file does not contain an array of players');
+            }
+            
+            // Merge JSON data with existing mock database
+            let successfulTransforms = 0;
+            
+            for (const player of playersArray) {
+                try {
+                    const transformedPlayer = this.transformPlayerData(player);
+                    this.fifaDatabase[player.name] = transformedPlayer;
+                    successfulTransforms++;
+                } catch (transformError) {
+                    console.warn(`Failed to transform player data for ${player.name}:`, transformError.message);
+                }
+            }
+            
+            console.log(`✅ FIFA database loaded successfully with ${successfulTransforms}/${playersArray.length} players transformed`);
+            console.log(`🎯 Sample player names:`, Object.keys(this.fifaDatabase).slice(0, 5));
+            
+            return true;
+        } catch (error) {
+            console.error('❌ Failed to load JSON database:', error.message);
+            console.log('🔄 Using mock database as fallback...');
+            return false;
+        }
+    }
+
+    /**
+     * Transform player data from JSON format to internal format
+     * @param {Object} jsonPlayer - Player data from JSON
+     * @returns {Object} Transformed player data
+     */
+    static transformPlayerData(jsonPlayer) {
+        // Calculate proper age from birth year (if it looks like a year)
+        let age = jsonPlayer.age;
+        if (age > 1900 && age < 2010) {
+            age = new Date().getFullYear() - age;
+        }
+        
+        // Parse positions from string to array
+        const positions = jsonPlayer.positions ? 
+            jsonPlayer.positions.split(',').map(p => p.trim()) : 
+            ["Unknown"];
+
+        // Flatten detailed skills into a single skills object
+        const skills = this.flattenDetailedSkills(jsonPlayer.detailed_skills || {});
+
+        return {
+            overall: jsonPlayer.overall || 65,
+            potential: jsonPlayer.potential || jsonPlayer.overall || 65,
+            positions: positions,
+            age: age,
+            height: jsonPlayer.height_cm || 175,
+            weight: jsonPlayer.weight_kg || 70,
+            foot: jsonPlayer.preferred_foot || "Right",
+            pace: jsonPlayer.main_attributes?.pace || 65,
+            shooting: jsonPlayer.main_attributes?.shooting || 65,
+            passing: jsonPlayer.main_attributes?.passing || 65,
+            dribbling: jsonPlayer.main_attributes?.dribbling || 65,
+            defending: jsonPlayer.main_attributes?.defending || 65,
+            physical: jsonPlayer.main_attributes?.physical || 65,
+            skills: skills,
+            workrates: jsonPlayer.work_rate || "Medium/Medium",
+            weakFoot: jsonPlayer.weak_foot || 3,
+            skillMoves: jsonPlayer.skill_moves || 3,
+            nationality: jsonPlayer.nationality || "Unknown",
+            club: "Unknown", // Not provided in JSON
+            value: "€1M", // Default value
+            wage: "€5K", // Default wage
+            contract: "2025", // Default contract
+            sofifaId: parseInt(jsonPlayer.id) || null,
+            sofifaUrl: jsonPlayer.id ? `https://sofifa.com/player/${jsonPlayer.id}/` : null,
+            source: 'json_database'
+        };
+    }
+
+    /**
+     * Flatten detailed skills from JSON structure to flat skills object
+     * @param {Object} detailedSkills - Detailed skills from JSON
+     * @returns {Object} Flat skills object
+     */
+    static flattenDetailedSkills(detailedSkills) {
+        const skills = {};
+        
+        // Default skill values
+        const defaultSkills = {
+            crossing: 65, finishing: 65, headingAccuracy: 65, shortPassing: 65,
+            volleys: 65, curve: 65, fkAccuracy: 65, longPassing: 65,
+            ballControl: 65, acceleration: 65, sprintSpeed: 65, agility: 65,
+            reactions: 65, balance: 65, shotPower: 65, jumping: 65,
+            stamina: 65, strength: 65, longShots: 65, aggression: 65,
+            interceptions: 65, positioning: 65, vision: 65, penalties: 65,
+            composure: 65
+        };
+
+        // Start with defaults
+        Object.assign(skills, defaultSkills);
+
+        // Extract skills from detailed structure
+        Object.values(detailedSkills).forEach(category => {
+            if (typeof category === 'object') {
+                Object.entries(category).forEach(([skillName, value]) => {
+                    if (typeof value === 'number') {
+                        // Map JSON skill names to our format
+                        const mappedName = this.mapSkillName(skillName);
+                        if (mappedName) {
+                            skills[mappedName] = value;
+                        }
+                    }
+                });
+            }
+        });
+
+        return skills;
+    }
+
+    /**
+     * Map skill names from JSON format to internal format
+     * @param {string} jsonSkillName - Skill name from JSON
+     * @returns {string|null} Mapped skill name or null
+     */
+    static mapSkillName(jsonSkillName) {
+        const mapping = {
+            // Direct mappings
+            'crossing': 'crossing',
+            'finishing': 'finishing',
+            'volleys': 'volleys',
+            'curve': 'curve',
+            'vision': 'vision',
+            'acceleration': 'acceleration',
+            'agility': 'agility',
+            'reactions': 'reactions',
+            'balance': 'balance',
+            'jumping': 'jumping',
+            'stamina': 'stamina',
+            'strength': 'strength',
+            'aggression': 'aggression',
+            'interceptions': 'interceptions',
+            'positioning': 'positioning',
+            'penalties': 'penalties',
+            'composure': 'composure',
+            
+            // Name translations
+            'short_passing': 'shortPassing',
+            'long_passing': 'longPassing',
+            'fk_accuracy': 'fkAccuracy',
+            'ball_control': 'ballControl',
+            'sprint_speed': 'sprintSpeed',
+            'shot_power': 'shotPower',
+            'long_shots': 'longShots',
+            'defensive_awareness': 'interceptions', // Map to closest equivalent
+            'dribbling': 'ballControl', // Map to ball control as closest equivalent
+            'heading_accuracy': 'headingAccuracy'
+        };
+
+        return mapping[jsonSkillName] || null;
+    }
+
+    /**
+     * Search for a player in the FIFA database with enhanced JSON integration
      * @param {string} playerName - Name of the player to search for
      * @param {Object} options - Search options
      * @param {boolean} options.useLiveData - Whether to attempt SoFIFA fetch
@@ -2306,6 +2503,14 @@ export class FIFADataService {
     static async getPlayerData(playerName, options = { useLiveData: true }) {
         console.log(`🔍 Searching for player: ${playerName}`);
         
+        // Load database if not already loaded or if it's mostly empty
+        if (Object.keys(this.fifaDatabase).length < 50) {
+            console.log('📚 Database empty or small, loading JSON data...');
+            const loadSuccess = await this.loadDatabase();
+            console.log(`📚 Database load result: ${loadSuccess ? 'SUCCESS' : 'FALLBACK'}`);
+            console.log(`📊 Database now contains ${Object.keys(this.fifaDatabase).length} players`);
+        }
+        
         // Validate input
         if (!playerName || typeof playerName !== 'string' || playerName.trim().length === 0) {
             console.warn('⚠️ Invalid player name provided');
@@ -2313,72 +2518,91 @@ export class FIFADataService {
         }
 
         const cleanPlayerName = playerName.trim();
+        console.log(`🔍 Searching for exact match: "${cleanPlayerName}"`);
+        console.log(`📊 Available players sample:`, Object.keys(this.fifaDatabase).slice(0, 10));
         
-        // Try exact match first in mock database
-        let mockData = null;
+        // Try exact match first in database
+        let playerData = null;
         if (this.fifaDatabase[cleanPlayerName]) {
-            mockData = {
+            playerData = {
                 ...this.fifaDatabase[cleanPlayerName],
                 searchName: cleanPlayerName,
-                found: true,
-                source: 'mock_database'
+                found: true
             };
             console.log(`✅ Found exact match in database: ${cleanPlayerName}`);
+        } else {
+            console.log(`❌ No exact match found for: "${cleanPlayerName}"`);
+            console.log(`🔍 Available names containing "${cleanPlayerName.toLowerCase()}":`, 
+                Object.keys(this.fifaDatabase).filter(name => 
+                    name.toLowerCase().includes(cleanPlayerName.toLowerCase())
+                ).slice(0, 5)
+            );
         }
 
         // Try fuzzy matching if no exact match
-        if (!mockData) {
+        if (!playerData) {
+            console.log(`🔄 Attempting fuzzy match for: "${cleanPlayerName}"`);
             const fuzzyMatch = this.performFuzzyMatch(cleanPlayerName);
             if (fuzzyMatch) {
-                mockData = {
+                playerData = {
                     ...fuzzyMatch.data,
                     searchName: cleanPlayerName,
                     suggestedName: fuzzyMatch.name,
                     found: true,
-                    source: 'mock_database_fuzzy'
+                    source: 'database_fuzzy'
                 };
-                console.log(`✅ Found fuzzy match: ${cleanPlayerName} -> ${fuzzyMatch.name}`);
+                console.log(`✅ Found fuzzy match: "${cleanPlayerName}" -> "${fuzzyMatch.name}"`);
+            } else {
+                console.log(`❌ No fuzzy match found for: "${cleanPlayerName}"`);
             }
         }
 
-        // If we have mock data and should attempt live fetch
-        if (mockData && options.useLiveData && mockData.sofifaUrl) {
+        // If we have player data and should attempt live fetch
+        if (playerData && options.useLiveData && playerData.sofifaUrl) {
             try {
                 console.log('🌐 Attempting to fetch live data from SoFIFA...');
-                const liveData = await SofifaIntegration.fetchPlayerData(mockData.sofifaUrl, mockData.sofifaId);
+                const liveData = await SofifaIntegration.fetchPlayerData(playerData.sofifaUrl, playerData.sofifaId, cleanPlayerName);
                 
                 if (liveData) {
-                    // Merge live data with mock data (live data takes precedence)
+                    // Merge live data with existing data (live data takes precedence)
                     const enhancedData = {
-                        ...mockData,
+                        ...playerData,
                         ...liveData,
                         searchName: cleanPlayerName,
                         found: true,
                         source: 'sofifa_enhanced',
                         lastUpdated: new Date().toISOString(),
-                        mockDataAvailable: true
+                        fallbackDataAvailable: true
                     };
                     
                     console.log(`✅ Enhanced with live SoFIFA data for: ${cleanPlayerName}`);
                     return enhancedData;
                 } else {
-                    console.log('⚠️ Live data fetch failed, using mock data');
-                    mockData.source = 'mock_fallback';
-                    mockData.sofifaAttempted = true;
-                    mockData.sofifaFetchTime = new Date().toISOString();
+                    console.log('⚠️ Live data fetch failed, using database data');
+                    if (playerData.source) {
+                        playerData.source = playerData.source + '_fallback';
+                    } else {
+                        playerData.source = 'database_fallback';
+                    }
+                    playerData.sofifaAttempted = true;
+                    playerData.sofifaFetchTime = new Date().toISOString();
                 }
             } catch (error) {
                 console.error('❌ Error fetching live data:', error.message);
-                if (mockData) {
-                    mockData.source = 'mock_error_fallback';
-                    mockData.fetchError = error.message;
+                if (playerData) {
+                    playerData.source = (playerData.source || 'database') + '_error_fallback';
+                    playerData.fetchError = error.message;
                 }
             }
         }
 
-        // Return mock data if available
-        if (mockData) {
-            return mockData;
+        // Return player data if available
+        if (playerData) {
+            // Ensure source is set
+            if (!playerData.source) {
+                playerData.source = 'database';
+            }
+            return playerData;
         }
 
         // No data found

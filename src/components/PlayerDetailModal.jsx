@@ -43,13 +43,6 @@ const PlayerDetailModal = ({ player, isOpen, onClose }) => {
     }
   };
 
-  const getAttributeColor = (value) => {
-    if (value >= 85) return '#10b981'; // Green
-    if (value >= 75) return '#f59e0b'; // Yellow
-    if (value >= 65) return '#f97316'; // Orange
-    return '#ef4444'; // Red
-  };
-
   const formatSkillName = (skillName) => {
     return skillName
       .replace(/([A-Z])/g, ' $1')
