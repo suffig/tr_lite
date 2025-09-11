@@ -7,7 +7,7 @@ export default function Header() {
         <div className="header-brand">
           <div className="header-logo">
             <img 
-              src="/assets/logo.png" 
+              src="./assets/logo.png" 
               alt="FIFA Tracker Logo" 
               className="w-6 h-6 object-contain filter brightness-0 invert"
               loading="eager"
