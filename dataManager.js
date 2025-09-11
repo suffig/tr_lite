@@ -220,8 +220,10 @@ class DataManager {
         return message.includes('auth') || 
                message.includes('permission') || 
                message.includes('constraint') ||
+               message.includes('does not exist') ||
                error.code === 'PGRST301' || 
-               error.code === 'PGRST116';
+               error.code === 'PGRST116' ||
+               error.code === '42P01'; // PostgreSQL table does not exist
     }
 
     async batchedSelect(requests) {
@@ -389,7 +391,18 @@ class DataManager {
     }
 
     async getManagers() {
-        return this.select('managers', '*', { order: { column: 'id', ascending: true } });
+        try {
+            return this.select('managers', '*', { order: { column: 'id', ascending: true } });
+        } catch (error) {
+            console.warn('Managers table not available, using default values:', error);
+            // Return default manager data if table doesn't exist
+            return {
+                data: [
+                    { id: 1, name: 'Alexander', gewicht: 110 },
+                    { id: 2, name: 'Philip', gewicht: 105 }
+                ]
+            };
+        }
     }
 
     // Batch operations for better performance
@@ -412,7 +425,15 @@ class DataManager {
                 data[result.key] = result.data.data || [];
             } else {
                 console.error(`Failed to load ${result.key}:`, result.error);
-                data[result.key] = [];
+                // Provide fallback for managers table
+                if (result.key === 'managers') {
+                    data[result.key] = [
+                        { id: 1, name: 'Alexander', gewicht: 110 },
+                        { id: 2, name: 'Philip', gewicht: 105 }
+                    ];
+                } else {
+                    data[result.key] = [];
+                }
             }
         }
 

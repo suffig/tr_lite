@@ -412,6 +412,12 @@ button:focus {
   .header-logo {
     width: 36px;
     height: 36px;
+    background: linear-gradient(135deg, #1f2937, #374151);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
   
   .header-logo img {
