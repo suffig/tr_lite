@@ -395,12 +395,10 @@ async function renderPlayerList(containerId, arr, team) {
         const d = document.createElement("div");
         d.className = "modern-card fifa-enhanced";
         
-        // Determine what to display as main value - FIFA overall or market value
+        // Always display market value as primary, FIFA data as additional info
         const hasValidFIFAData = fifaData && fifaData.found && fifaData.overall;
-        const displayValue = hasValidFIFAData 
-            ? `<span class="fifa-overall">${fifaData.overall}</span> <span class="fifa-label">OVR</span>`
-            : `${marktwert}M €`;
-        const valueColor = hasValidFIFAData ? 'text-blue-600' : 'text-green-600';
+        const displayValue = `${marktwert}M €`;
+        const valueColor = 'text-green-600';
         
         d.innerHTML = `
             <div class="card-header">
@@ -414,11 +412,10 @@ async function renderPlayerList(containerId, arr, team) {
             </div>
             <div class="card-content">
                 <p class="text-sm text-gray-500">Team: ${team === 'AEK' ? 'AEK Athen' : team === 'Real' ? 'Real Madrid' : 'Ehemalige'}</p>
+                <p class="text-sm text-gray-500">Marktwert: ${marktwert}M €</p>
                 ${hasValidFIFAData 
-                    ? `<p class="text-sm text-blue-600"><strong>FIFA Overall:</strong> ${fifaData.overall} | <strong>Potential:</strong> ${fifaData.potential || 'N/A'}</p>
-                       <p class="text-sm text-gray-500">Marktwert: ${marktwert}M €</p>`
-                    : `<p class="text-sm text-gray-500">Marktwert: ${marktwert}M €</p>
-                       <p class="text-xs text-orange-500">⚠️ Keine FIFA-Daten gefunden</p>`
+                    ? `<p class="text-sm text-blue-600"><strong>FIFA Overall:</strong> ${fifaData.overall} | <strong>Potential:</strong> ${fifaData.potential || 'N/A'}</p>`
+                    : `<p class="text-xs text-orange-500">⚠️ Keine FIFA-Daten gefunden</p>`
                 }
                 <p class="text-xs text-blue-400 fifa-hint">
                     <i class="fas fa-info-circle"></i>
@@ -490,12 +487,10 @@ async function renderEhemaligeList(containerId = "ehemalige-players") {
         const d = document.createElement("div");
         d.className = "modern-card fifa-enhanced";
         
-        // Determine what to display as main value - FIFA overall or market value
+        // Always display market value as primary, FIFA data as additional info
         const hasValidFIFAData = fifaData && fifaData.found && fifaData.overall;
-        const displayValue = hasValidFIFAData 
-            ? `<span class="fifa-overall">${fifaData.overall}</span> <span class="fifa-label">OVR</span>`
-            : (marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'N/A');
-        const valueColor = hasValidFIFAData ? 'text-blue-600' : 'text-gray-600';
+        const displayValue = marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'N/A';
+        const valueColor = 'text-gray-600';
         
         d.innerHTML = `
             <div class="card-header">
@@ -509,11 +504,10 @@ async function renderEhemaligeList(containerId = "ehemalige-players") {
             </div>
             <div class="card-content">
                 <p class="text-sm text-gray-500">Status: Ehemaliger Spieler</p>
+                <p class="text-sm text-gray-500">Marktwert: ${marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'Nicht bewertet'}</p>
                 ${hasValidFIFAData 
-                    ? `<p class="text-sm text-blue-600"><strong>FIFA Overall:</strong> ${fifaData.overall} | <strong>Potential:</strong> ${fifaData.potential || 'N/A'}</p>
-                       <p class="text-sm text-gray-500">Marktwert: ${marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'Nicht bewertet'}</p>`
-                    : `<p class="text-sm text-gray-500">Marktwert: ${marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'Nicht bewertet'}</p>
-                       <p class="text-xs text-orange-500">⚠️ Keine FIFA-Daten gefunden</p>`
+                    ? `<p class="text-sm text-blue-600"><strong>FIFA Overall:</strong> ${fifaData.overall} | <strong>Potential:</strong> ${fifaData.potential || 'N/A'}</p>`
+                    : `<p class="text-xs text-orange-500">⚠️ Keine FIFA-Daten gefunden</p>`
                 }
                 <p class="text-xs text-blue-400 fifa-hint">
                     <i class="fas fa-info-circle"></i>
