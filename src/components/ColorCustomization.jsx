@@ -10,7 +10,7 @@ export default function ColorCustomization() {
     accentBlue: '#3B82F6'
   });
 
-  const [presets, setPresets] = useState([
+  const [presets] = useState([
     {
       name: 'Standard',
       colors: {

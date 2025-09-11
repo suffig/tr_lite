@@ -29,12 +29,12 @@ export default function BottomNavigation({ activeTab, onTabChange }) {
 
   return (
     <nav 
-      className="enhanced-bottom-nav fixed bottom-0 left-0 right-0 bg-bg-secondary border-t border-border-light shadow-lg z-50 safe-area-bottom"
+      className="enhanced-bottom-nav fixed bottom-0 left-0 right-0 bg-bg-secondary border-t border-border-light shadow-lg z-50 safe-area-bottom ios-touch"
       role="navigation"
       aria-label="Hauptnavigation"
     >
       <div className="nav-background-glow"></div>
-      <div className="flex items-center px-1 py-2 overflow-x-auto scrollbar-hide bottom-nav-container relative">
+      <div className="flex items-center px-1 py-2 overflow-x-auto scrollbar-hide bottom-nav-container relative ios-scroll-smooth">
         <div className="nav-active-indicator" style={{
           transform: `translateX(${tabs.findIndex(tab => tab.id === activeTab) * 100}%)`,
           width: `${100 / tabs.length}%`
@@ -43,7 +43,7 @@ export default function BottomNavigation({ activeTab, onTabChange }) {
           <button
             key={tab.id}
             onClick={() => onTabChange(tab.id)}
-            className={`nav-item-enhanced flex flex-col items-center justify-center rounded-lg transition-all duration-300 hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-opacity-50 active:scale-95 touch-target flex-shrink-0 relative overflow-hidden ${
+            className={`nav-item-enhanced flex flex-col items-center justify-center rounded-lg transition-all duration-300 hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-primary-green focus:ring-opacity-50 ios-touch-button touch-target flex-shrink-0 relative overflow-hidden ${
               activeTab === tab.id ? 'active text-primary-green' : 'text-text-muted'
             }`}
             aria-label={tab.ariaLabel}

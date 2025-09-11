@@ -172,7 +172,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="flex flex-col min-h-screen bg-bg-primary transition-colors duration-300">
+      <div className="flex flex-col min-h-screen bg-bg-primary transition-colors duration-300 safe-area-all ios-scroll-smooth">
         {/* Header */}
         <Header />
         
@@ -190,7 +190,7 @@ function App() {
         )}
         
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto scroll-smooth" role="main">
+        <main className="flex-1 overflow-y-auto scroll-smooth ios-scroll-smooth" role="main">
           <Suspense fallback={<LoadingSpinner message="Lade Tab..." />}>
             {tabLoading ? (
               <div className="flex items-center justify-center min-h-[50vh]">

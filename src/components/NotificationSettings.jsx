@@ -309,7 +309,7 @@ export default function NotificationSettings() {
                   iOS-Hinweis
                 </div>
                 <div className="text-xs text-blue-700 dark:text-blue-300 space-y-1">
-                  <p>• Installieren Sie die App über "Zum Home-Bildschirm hinzufügen" für beste Benachrichtigungen</p>
+                  <p>• Installieren Sie die App über &quot;Zum Home-Bildschirm hinzufügen&quot; für beste Benachrichtigungen</p>
                   <p>• Benachrichtigungen funktionieren nur bei aktiver App oder im Hintergrund</p>
                   <p>• Überprüfen Sie die iOS-Einstellungen für App-Benachrichtigungen</p>
                 </div>
