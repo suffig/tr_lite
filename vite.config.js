@@ -42,7 +42,7 @@ export default defineConfig({
     host: true
   },
   build: {
-    outDir: 'dist',
+    outDir: 'docs',
     assetsDir: 'assets',
     rollupOptions: {
       input: {
