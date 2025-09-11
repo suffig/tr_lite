@@ -348,7 +348,7 @@ function accordionPanelHtml(team, key, gradientClass, teamKey) {
     `;
 }
 
-function renderPlayerLists() {
+async function renderPlayerLists() {
     // Always update market values in accordion headers, regardless of panel state
     const aekMwSpan = document.getElementById('aek-marktwert');
     if (aekMwSpan) aekMwSpan.innerText = getKaderMarktwert(aekAthen).toLocaleString('de-DE') + "M €";
@@ -358,17 +358,17 @@ function renderPlayerLists() {
 
     // Only render player lists if panels are open
     if (openPanel === 'aek' && document.getElementById('team-aek-players')) {
-        renderPlayerList('team-aek-players', aekAthen, "AEK");
+        await renderPlayerList('team-aek-players', aekAthen, "AEK");
     }
     if (openPanel === 'real' && document.getElementById('team-real-players')) {
-        renderPlayerList('team-real-players', realMadrid, "Real");
+        await renderPlayerList('team-real-players', realMadrid, "Real");
     }
     if (openPanel === 'ehemalige' && document.getElementById('team-ehemalige-players')) {
-        renderEhemaligeList('team-ehemalige-players');
+        await renderEhemaligeList('team-ehemalige-players');
     }
 }
 
-function renderPlayerList(containerId, arr, team) {
+async function renderPlayerList(containerId, arr, team) {
     const c = document.getElementById(containerId);
     if (!c) return;
     arr = arr.slice().sort((a, b) => {
@@ -377,25 +377,49 @@ function renderPlayerList(containerId, arr, team) {
         return posA - posB;
     });
     c.innerHTML = "";
-    arr.forEach(player => {
+    
+    // Render players with FIFA data
+    for (const player of arr) {
         const marktwert = typeof player.value === 'number'
             ? player.value
             : (player.value ? parseFloat(player.value) : 0);
 
+        // Fetch FIFA data for this player
+        let fifaData = null;
+        try {
+            fifaData = await FIFADataService.getPlayerData(player.name);
+        } catch (error) {
+            console.warn(`Failed to load FIFA data for ${player.name}:`, error);
+        }
+
         const d = document.createElement("div");
         d.className = "modern-card fifa-enhanced";
+        
+        // Determine what to display as main value - FIFA overall or market value
+        const hasValidFIFAData = fifaData && fifaData.found && fifaData.overall;
+        const displayValue = hasValidFIFAData 
+            ? `<span class="fifa-overall">${fifaData.overall}</span> <span class="fifa-label">OVR</span>`
+            : `${marktwert}M €`;
+        const valueColor = hasValidFIFAData ? 'text-blue-600' : 'text-green-600';
+        
         d.innerHTML = `
             <div class="card-header">
                 <div class="flex items-center gap-3">
                     <span class="${getPositionBadgeClass(player.position)}">${player.position || 'N/A'}</span>
                     <h3 class="card-title">${player.name}</h3>
                     <span class="fifa-indicator" title="Click for FIFA stats">🎮</span>
+                    ${hasValidFIFAData ? '<span class="fifa-verified" title="FIFA-Daten verfügbar">✅</span>' : ''}
                 </div>
-                <div class="text-xl font-bold text-green-600">${marktwert}M €</div>
+                <div class="text-xl font-bold ${valueColor}">${displayValue}</div>
             </div>
             <div class="card-content">
                 <p class="text-sm text-gray-500">Team: ${team === 'AEK' ? 'AEK Athen' : team === 'Real' ? 'Real Madrid' : 'Ehemalige'}</p>
-                <p class="text-sm text-gray-500">Marktwert: ${marktwert}M €</p>
+                ${hasValidFIFAData 
+                    ? `<p class="text-sm text-blue-600"><strong>FIFA Overall:</strong> ${fifaData.overall} | <strong>Potential:</strong> ${fifaData.potential || 'N/A'}</p>
+                       <p class="text-sm text-gray-500">Marktwert: ${marktwert}M €</p>`
+                    : `<p class="text-sm text-gray-500">Marktwert: ${marktwert}M €</p>
+                       <p class="text-xs text-orange-500">⚠️ Keine FIFA-Daten gefunden</p>`
+                }
                 <p class="text-xs text-blue-400 fifa-hint">
                     <i class="fas fa-info-circle"></i>
                     Click to view FIFA statistics
@@ -435,11 +459,11 @@ function renderPlayerList(containerId, arr, team) {
             movePlayerWithTransaction(player.id, "Ehemalige");
         };
         c.appendChild(d);
-    });
+    }
 }
 
 
-function renderEhemaligeList(containerId = "ehemalige-players") {
+async function renderEhemaligeList(containerId = "ehemalige-players") {
     const c = document.getElementById(containerId);
     if (!c) return;
     const sorted = ehemalige.slice().sort((a, b) => {
@@ -448,25 +472,49 @@ function renderEhemaligeList(containerId = "ehemalige-players") {
         return posA - posB;
     });
     c.innerHTML = "";
-    sorted.forEach((player) => {
+    
+    // Render former players with FIFA data
+    for (const player of sorted) {
         const marktwert = typeof player.value === 'number'
             ? player.value
             : (player.value ? parseFloat(player.value) : 0);
 
+        // Fetch FIFA data for this player
+        let fifaData = null;
+        try {
+            fifaData = await FIFADataService.getPlayerData(player.name);
+        } catch (error) {
+            console.warn(`Failed to load FIFA data for ${player.name}:`, error);
+        }
+
         const d = document.createElement("div");
         d.className = "modern-card fifa-enhanced";
+        
+        // Determine what to display as main value - FIFA overall or market value
+        const hasValidFIFAData = fifaData && fifaData.found && fifaData.overall;
+        const displayValue = hasValidFIFAData 
+            ? `<span class="fifa-overall">${fifaData.overall}</span> <span class="fifa-label">OVR</span>`
+            : (marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'N/A');
+        const valueColor = hasValidFIFAData ? 'text-blue-600' : 'text-gray-600';
+        
         d.innerHTML = `
             <div class="card-header">
                 <div class="flex items-center gap-3">
                     <span class="${getPositionBadgeClass(player.position)}">${player.position || 'N/A'}</span>
                     <h3 class="card-title">${player.name}</h3>
                     <span class="fifa-indicator" title="Click for FIFA stats">🎮</span>
+                    ${hasValidFIFAData ? '<span class="fifa-verified" title="FIFA-Daten verfügbar">✅</span>' : ''}
                 </div>
-                <div class="text-xl font-bold text-gray-600">${marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'N/A'}</div>
+                <div class="text-xl font-bold ${valueColor}">${displayValue}</div>
             </div>
             <div class="card-content">
                 <p class="text-sm text-gray-500">Status: Ehemaliger Spieler</p>
-                <p class="text-sm text-gray-500">Marktwert: ${marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'Nicht bewertet'}</p>
+                ${hasValidFIFAData 
+                    ? `<p class="text-sm text-blue-600"><strong>FIFA Overall:</strong> ${fifaData.overall} | <strong>Potential:</strong> ${fifaData.potential || 'N/A'}</p>
+                       <p class="text-sm text-gray-500">Marktwert: ${marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'Nicht bewertet'}</p>`
+                    : `<p class="text-sm text-gray-500">Marktwert: ${marktwert !== null && marktwert !== undefined ? marktwert + 'M €' : 'Nicht bewertet'}</p>
+                       <p class="text-xs text-orange-500">⚠️ Keine FIFA-Daten gefunden</p>`
+                }
                 <p class="text-xs text-blue-400 fifa-hint">
                     <i class="fas fa-info-circle"></i>
                     Click to view FIFA statistics

@@ -1229,3 +1229,66 @@ body {
   }
 }
 
+/* --- FIFA-SPECIFIC STYLES --- */
+.fifa-overall {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent-blue);
+}
+
+.fifa-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-left: 0.25rem;
+}
+
+.fifa-verified {
+  color: var(--primary-green);
+  font-size: 0.875rem;
+  margin-left: 0.5rem;
+}
+
+.fifa-enhanced .card-header {
+  min-height: 60px;
+  align-items: center;
+}
+
+.fifa-enhanced .fifa-indicator {
+  transition: transform var(--transition-fast);
+}
+
+.fifa-enhanced:hover .fifa-indicator {
+  transform: scale(1.1);
+}
+
+/* FIFA Overall Rating Color Coding */
+.text-blue-600 {
+  color: #2563EB;
+}
+
+.text-orange-500 {
+  color: #F97316;
+}
+
+.text-green-600 {
+  color: #16A34A;
+}
+
+.text-gray-600 {
+  color: #4B5563;
+}
+
+/* FIFA Rating Badge */
+.fifa-rating-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, var(--accent-blue), #60A5FA);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
