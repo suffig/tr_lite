@@ -8,56 +8,111 @@ export default {
   theme: {
     extend: {
       colors: {
+        // iOS System Colors
+        system: {
+          blue: 'var(--system-blue)',
+          green: 'var(--system-green)',
+          indigo: 'var(--system-indigo)',
+          orange: 'var(--system-orange)',
+          pink: 'var(--system-pink)',
+          purple: 'var(--system-purple)',
+          red: 'var(--system-red)',
+          teal: 'var(--system-teal)',
+          yellow: 'var(--system-yellow)',
+        },
+        // FIFA Brand Colors
+        fifa: {
+          blue: 'var(--fifa-blue)',
+          red: 'var(--fifa-red)',
+          green: 'var(--fifa-green)',
+        },
+        // Legacy support (gradually migrate away from these)
         primary: {
-          green: '#10B981',
-          'green-dark': '#059669',
-          'green-light': '#34D399',
+          green: 'var(--fifa-green)',
+          'green-dark': 'var(--system-green)',
+          'green-light': 'var(--system-teal)',
         },
         accent: {
-          orange: '#F59E0B',
-          red: '#EF4444',
-          blue: '#3B82F6',
+          orange: 'var(--system-orange)',
+          red: 'var(--system-red)',
+          blue: 'var(--system-blue)',
         },
+        // Semantic colors using CSS variables
         bg: {
           primary: 'var(--bg-primary)',
           secondary: 'var(--bg-secondary)',
           tertiary: 'var(--bg-tertiary)',
+          elevated: 'var(--bg-elevated)',
+          grouped: 'var(--bg-grouped)',
         },
         text: {
           primary: 'var(--text-primary)',
           secondary: 'var(--text-secondary)',
+          tertiary: 'var(--text-tertiary)',
+          quaternary: 'var(--text-quaternary)',
           muted: 'var(--text-muted)',
         },
         border: {
           light: 'var(--border-light)',
           medium: 'var(--border-medium)',
-          dark: 'var(--border-dark)',
-        }
+          strong: 'var(--border-strong)',
+        },
+        separator: 'var(--separator)',
       },
       fontFamily: {
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'SF Pro Text', 'system-ui', 'sans-serif'],
       },
-      boxShadow: {
-        'sm': '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-        'md': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'lg': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-        'dark-sm': '0 1px 2px 0 rgba(0, 0, 0, 0.2)',
-        'dark-md': '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
-        'dark-lg': '0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3)',
+      fontSize: {
+        'headline': ['34px', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'title1': ['28px', { lineHeight: '1.2', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'title2': ['22px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
+        'title3': ['20px', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '600' }],
+        'body': ['17px', { lineHeight: '1.4', fontWeight: '400' }],
+        'callout': ['16px', { lineHeight: '1.4', fontWeight: '400' }],
+        'subhead': ['15px', { lineHeight: '1.4', fontWeight: '400' }],
+        'footnote': ['13px', { lineHeight: '1.4', fontWeight: '400' }],
+        'caption1': ['12px', { lineHeight: '1.3', fontWeight: '400' }],
+        'caption2': ['11px', { lineHeight: '1.3', fontWeight: '400' }],
+      },
+      spacing: {
+        '18': '4.5rem',
+        '88': '22rem',
       },
       borderRadius: {
-        'lg': '12px',
-        'xl': '16px',
-        '2xl': '20px',
+        'ios': '12px',
+        'ios-lg': '16px',
+        'ios-xl': '20px',
+        'ios-2xl': '24px',
+      },
+      boxShadow: {
+        'ios-sm': 'var(--shadow-sm)',
+        'ios-md': 'var(--shadow-md)',
+        'ios-lg': 'var(--shadow-lg)',
+        'ios-xl': 'var(--shadow-xl)',
+      },
+      backdropBlur: {
+        'ios-sm': 'var(--blur-sm)',
+        'ios-md': 'var(--blur-md)',
+        'ios-lg': 'var(--blur-lg)',
       },
       transitionTimingFunction: {
-        'fast': 'cubic-bezier(0.4, 0, 0.2, 1)',
-        'normal': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'ios': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'ios-spring': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
       },
       transitionDuration: {
-        'fast': '150ms',
-        'normal': '250ms',
-      }
+        'ios': '200ms',
+        'ios-slow': '300ms',
+      },
+      animation: {
+        'bounce-gentle': 'bounceGentle 1.5s ease-in-out infinite',
+        'fade-in-up': 'fadeInUp 0.6s ease-out',
+        'slide-in-left': 'slideInLeft 0.5s ease-out',
+        'slide-in-right': 'slideInRight 0.5s ease-out',
+        'scale-in': 'scaleIn 0.4s ease-out',
+        'pulse-gentle': 'pulseGentle 2s ease-in-out infinite',
+        'success-flash': 'successFlash 0.6s ease-out',
+        'error-shake': 'errorShake 0.5s ease-out',
+      },
     },
   },
   plugins: [],
