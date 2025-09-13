@@ -373,9 +373,6 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
             </div>
           </div>
         </div>
-            </div>
-          </div>
-        </div>
 
         {/* New Enhanced Statistics Row - Team-specific highest wins */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
