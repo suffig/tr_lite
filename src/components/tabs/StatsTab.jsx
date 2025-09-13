@@ -321,43 +321,58 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
       <div className="space-y-6">
         {/* Consolidated Quick Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
-            <div className="text-2xl font-bold text-primary-green group-hover:scale-110 transition-transform">{totalMatches}</div>
-            <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">Spiele gespielt</div>
+          <div className="card-ios text-center touch-target">
+            <div className="w-12 h-12 bg-system-green/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">⚽</span>
+            </div>
+            <div className="text-title2 font-bold text-text-primary mb-1">{totalMatches}</div>
+            <div className="text-caption1 text-text-secondary">Spiele gespielt</div>
           </div>
-          <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
-            <div className="text-2xl font-bold text-primary-green group-hover:scale-110 transition-transform">{advancedStats.totalGoals}</div>
-            <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">Tore insgesamt</div>
-            <div className="text-xs text-text-muted mt-1 group-hover:text-text-primary transition-colors">
+          <div className="card-ios text-center touch-target">
+            <div className="w-12 h-12 bg-system-orange/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">🎯</span>
+            </div>
+            <div className="text-title2 font-bold text-text-primary mb-1">{advancedStats.totalGoals}</div>
+            <div className="text-caption1 text-text-secondary">Tore insgesamt</div>
+            <div className="text-caption2 text-text-tertiary mt-1">
               ⌀ {totalMatches > 0 ? (advancedStats.totalGoals / totalMatches).toFixed(1) : '0.0'}/Spiel
             </div>
           </div>
-          <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
-            <div className="text-lg font-bold text-primary-green group-hover:text-blue-600 transition-colors">
+          <div className="card-ios text-center touch-target">
+            <div className="w-12 h-12 bg-system-blue/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">🥇</span>
+            </div>
+            <div className="text-subhead font-semibold text-text-primary mb-1">
               {topScorer ? topScorer.name : 'Keine Daten'}
             </div>
-            <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">
-              🥇 Topscorer ({topScorer ? topScorer.goals : 0} Tore)
+            <div className="text-caption1 text-text-secondary">
+              Topscorer ({topScorer ? topScorer.goals : 0} Tore)
             </div>
-            <div className="text-xs text-text-muted mt-1 group-hover:text-text-primary transition-colors">
+            <div className="text-caption2 text-text-tertiary mt-1">
               {topScorer && topScorer.matchesPlayed > 0 ? 
                 `⌀ ${(topScorer.goals / topScorer.matchesPlayed).toFixed(2)}/Spiel` : 
                 '⌀ 0.00/Spiel'
               }
             </div>
           </div>
-          <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
-            <div className="text-lg font-bold text-primary-green group-hover:text-yellow-600 transition-colors">
+          <div className="card-ios text-center touch-target">
+            <div className="w-12 h-12 bg-system-yellow/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">⭐</span>
+            </div>
+            <div className="text-subhead font-semibold text-text-primary mb-1">
               {topSdSPlayer ? topSdSPlayer.name : 'Keine Daten'}
             </div>
-            <div className="text-sm text-text-muted group-hover:text-text-primary transition-colors">
-              ⭐ Top SdS ({topSdSPlayer ? topSdSPlayer.sdsCount : 0}x)
+            <div className="text-caption1 text-text-secondary">
+              Top SdS ({topSdSPlayer ? topSdSPlayer.sdsCount : 0}x)
             </div>
-            <div className="text-xs text-text-muted mt-1 group-hover:text-text-primary transition-colors">
+            <div className="text-caption2 text-text-tertiary mt-1">
               {topSdSPlayer && topSdSPlayer.matchesPlayed > 0 ? 
                 `${((topSdSPlayer.sdsCount / topSdSPlayer.matchesPlayed) * 100).toFixed(1)}% Quote` : 
                 '0.0% Quote'
               }
+            </div>
+          </div>
+        </div>
             </div>
           </div>
         </div>
@@ -604,45 +619,55 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
 
       {/* Team Performance */}
       <div className="grid md:grid-cols-2 gap-6">
-        <div className="modern-card border-l-4 border-blue-400">
-          <h3 className="font-bold text-lg mb-4 text-blue-600">AEK Athen</h3>
+        <div className="card-ios">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-fifa-blue/10 rounded-full flex items-center justify-center">
+              <span className="text-lg">🔵</span>
+            </div>
+            <h3 className="text-title3 font-bold text-fifa-blue">AEK Athen</h3>
+          </div>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span>Siege:</span>
-              <span className="font-semibold text-green-600">{aekWins}</span>
+              <span className="text-body text-text-secondary">Siege:</span>
+              <span className="text-body font-semibold text-system-green">{aekWins}</span>
             </div>
             <div className="flex justify-between">
-              <span>Niederlagen:</span>
-              <span className="font-semibold text-red-600">{teamRecords.aek.losses}</span>
+              <span className="text-body text-text-secondary">Niederlagen:</span>
+              <span className="text-body font-semibold text-system-red">{teamRecords.aek.losses}</span>
             </div>
             <div className="flex justify-between">
-              <span>Zu Null:</span>
-              <span className="font-semibold">{advancedStats.cleanSheets.aek}</span>
+              <span className="text-body text-text-secondary">Zu Null:</span>
+              <span className="text-body font-semibold text-text-primary">{advancedStats.cleanSheets.aek}</span>
             </div>
-            <div className="mt-3">
-              <div className="text-sm text-text-muted mb-1">Form (letzte 5):</div>
+            <div className="mt-4">
+              <div className="text-caption1 text-text-secondary mb-2">Form (letzte 5):</div>
               <div className="flex">{formatForm(recentForm.aek)}</div>
             </div>
           </div>
         </div>
 
-        <div className="modern-card border-l-4 border-red-400">
-          <h3 className="font-bold text-lg mb-4 text-red-600">Real Madrid</h3>
+        <div className="card-ios">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 bg-fifa-red/10 rounded-full flex items-center justify-center">
+              <span className="text-lg">🔴</span>
+            </div>
+            <h3 className="text-title3 font-bold text-fifa-red">Real Madrid</h3>
+          </div>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span>Siege:</span>
-              <span className="font-semibold text-green-600">{realWins}</span>
+              <span className="text-body text-text-secondary">Siege:</span>
+              <span className="text-body font-semibold text-system-green">{realWins}</span>
             </div>
             <div className="flex justify-between">
-              <span>Niederlagen:</span>
-              <span className="font-semibold text-red-600">{teamRecords.real.losses}</span>
+              <span className="text-body text-text-secondary">Niederlagen:</span>
+              <span className="text-body font-semibold text-system-red">{teamRecords.real.losses}</span>
             </div>
             <div className="flex justify-between">
-              <span>Zu Null:</span>
-              <span className="font-semibold">{advancedStats.cleanSheets.real}</span>
+              <span className="text-body text-text-secondary">Zu Null:</span>
+              <span className="text-body font-semibold text-text-primary">{advancedStats.cleanSheets.real}</span>
             </div>
-            <div className="mt-3">
-              <div className="text-sm text-text-muted mb-1">Form (letzte 5):</div>
+            <div className="mt-4">
+              <div className="text-caption1 text-text-secondary mb-2">Form (letzte 5):</div>
               <div className="flex">{formatForm(recentForm.real)}</div>
             </div>
           </div>
@@ -650,28 +675,35 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
       </div>
 
       {/* Top Performers */}
-      <div className="modern-card">
-        <h3 className="font-bold text-lg mb-4">🏆 Top-Torschützen</h3>
-        <div className="space-y-2">
+      <div className="card-ios">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 bg-system-yellow/10 rounded-full flex items-center justify-center">
+            <span className="text-lg">🏆</span>
+          </div>
+          <h3 className="text-title3 font-bold text-text-primary">Top-Torschützen</h3>
+        </div>
+        <div className="space-y-3">
           {playerStats.slice(0, 5).map((player, index) => (
-            <div key={player.id} className="flex items-center justify-between py-2 border-b border-border-light last:border-b-0">
-              <div className="flex items-center space-x-3">
-                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                  index === 0 ? 'bg-yellow-500 text-white' :
-                  index === 1 ? 'bg-gray-400 text-white' :
-                  index === 2 ? 'bg-orange-600 text-white' :
-                  'bg-gray-200 text-gray-600'
-                }`}>
-                  {index + 1}
-                </span>
-                <div>
-                  <div className="font-medium">{player.name}</div>
-                  <div className="text-sm text-text-muted">{player.team}</div>
+            <div key={player.id} className="list-item-ios">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-caption2 font-bold ${
+                    index === 0 ? 'bg-system-yellow text-white' :
+                    index === 1 ? 'bg-text-quaternary text-white' :
+                    index === 2 ? 'bg-system-orange text-white' :
+                    'bg-bg-tertiary text-text-secondary'
+                  }`}>
+                    {index + 1}
+                  </div>
+                  <div>
+                    <div className="text-callout font-medium text-text-primary">{player.name}</div>
+                    <div className="text-caption1 text-text-secondary">{player.team}</div>
+                  </div>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="font-bold">{player.goals} Tore</div>
-                <div className="text-sm text-text-muted">{player.goalsPerGame} ⌀</div>
+                <div className="text-right">
+                  <div className="text-callout font-bold text-text-primary">{player.goals} Tore</div>
+                  <div className="text-caption1 text-text-secondary">{player.goalsPerGame} ⌀</div>
+                </div>
               </div>
             </div>
           ))}
@@ -1061,33 +1093,30 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
     <div className="p-4 pb-24 mobile-safe-bottom">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-text-primary mb-2">📊 Statistiken</h2>
-        <p className="text-text-muted">Umfassende Analyse von Spielen, Spielern und Teams</p>
+        <h2 className="text-title1 font-bold text-text-primary mb-2">📊 Statistiken</h2>
+        <p className="text-callout text-text-secondary">Umfassende Analyse von Spielen, Spielern und Teams</p>
       </div>
 
       {/* View Navigation with Scroll Indicators */}
       <div className="relative mb-6">
-        <div className="icon-only-nav flex overflow-x-auto space-x-2 pb-2 scroll-indicator-container">
+        <div className="flex overflow-x-auto space-x-3 pb-2 scrollbar-hide">
           {views.map((view) => (
             <button
               key={view.id}
               onClick={() => setSelectedView(view.id)}
-              className={`stats-nav-button flex items-center space-x-2 px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+              className={`flex items-center space-x-2 px-4 py-3 rounded-ios-lg whitespace-nowrap transition-all duration-ios touch-target ${
                 selectedView === view.id
-                  ? 'bg-primary-green text-white'
-                  : 'bg-bg-secondary text-text-muted hover:bg-bg-tertiary'
+                  ? 'bg-system-blue text-white shadow-ios-md'
+                  : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary'
               }`}
               title={view.label}
               aria-label={view.label}
             >
-              <span>{view.icon}</span>
-              <span className="font-medium hidden sm:inline">{view.label}</span>
+              <span className="text-lg">{view.icon}</span>
+              <span className="text-callout font-medium hidden sm:inline">{view.label}</span>
             </button>
           ))}
         </div>
-        {/* Scroll Indicators */}
-        <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-4 h-8 bg-gradient-to-r from-bg-primary to-transparent pointer-events-none opacity-50 md:hidden"></div>
-        <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-4 h-8 bg-gradient-to-l from-bg-primary to-transparent pointer-events-none opacity-50 md:hidden"></div>
       </div>
 
       {/* Content */}
