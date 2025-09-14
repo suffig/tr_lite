@@ -47,22 +47,29 @@ export default function Login() {
     setLoading(true);
     setErrors({});
 
+    // Get fresh values from form elements to avoid state issues
+    const formData = new FormData(e.target);
+    const formEmail = formData.get('email') || email;
+    const formPassword = formData.get('password') || password;
+
+    console.log('🔑 Attempting login with:', formEmail);
+
     try {
       // Client-side validation
       const newErrors = {};
-      if (!email.trim()) {
+      if (!formEmail.trim()) {
         newErrors.email = 'E-Mail ist erforderlich';
       } else {
         try {
-          FormValidator.validateEmail(email);
+          FormValidator.validateEmail(formEmail);
         } catch (err) {
           newErrors.email = 'Ungültige E-Mail-Adresse';
         }
       }
       
-      if (!password.trim()) {
+      if (!formPassword.trim()) {
         newErrors.password = 'Passwort ist erforderlich';
-      } else if (!isLogin && password.length < 6) {
+      } else if (!isLogin && formPassword.length < 6) {
         newErrors.password = 'Passwort muss mindestens 6 Zeichen haben';
       }
 
@@ -83,12 +90,12 @@ export default function Login() {
         
         result = isLogin
           ? await supabase.auth.signInWithPassword({
-              email: FormValidator.sanitizeInput(email),
-              password
+              email: FormValidator.sanitizeInput(formEmail),
+              password: formPassword
             })
           : await supabase.auth.signUp({
-              email: FormValidator.sanitizeInput(email),
-              password
+              email: FormValidator.sanitizeInput(formEmail),
+              password: formPassword
             });
       } catch (authError) {
         console.error('Auth operation failed:', authError);
@@ -104,12 +111,12 @@ export default function Login() {
           // Retry with fallback
           result = isLogin
             ? await supabase.auth.signInWithPassword({
-                email: FormValidator.sanitizeInput(email),
-                password
+                email: FormValidator.sanitizeInput(formEmail),
+                password: formPassword
               })
             : await supabase.auth.signUp({
-                email: FormValidator.sanitizeInput(email),
-                password
+                email: FormValidator.sanitizeInput(formEmail),
+                password: formPassword
               });
         } else {
           throw authError;
@@ -133,6 +140,8 @@ export default function Login() {
         if (!isLogin) {
           setErrors({ form: 'Registrierung erfolgreich! Sie können sich jetzt anmelden.' });
           setIsLogin(true);
+        } else {
+          console.log('✅ Login successful, should redirect to main app');
         }
       }
     } catch (error) {
@@ -197,6 +206,7 @@ export default function Login() {
               <div className="input-container">
                 <input
                   id="email"
+                  name="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -222,6 +232,7 @@ export default function Login() {
               <div className="input-container">
                 <input
                   id="password"
+                  name="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
