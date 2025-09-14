@@ -7,9 +7,9 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-system-green to-system-blue rounded-ios flex items-center justify-center shadow-ios-sm">
             <img 
-              src="/assets/logo.png" 
+              src="/assets/logo-new.svg" 
               alt="FIFA Tracker Logo" 
-              className="w-4 h-4 object-contain brightness-0 invert"
+              className="w-6 h-6 object-contain"
               loading="eager"
             />
           </div>

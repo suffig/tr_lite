@@ -172,9 +172,9 @@ export default function Login() {
             <div className="mb-6 flex justify-center">
               <div className="w-20 h-20 bg-gradient-to-br from-system-green to-system-blue rounded-ios-2xl flex items-center justify-center shadow-ios-lg">
                 <img 
-                  src="/tr_lite/assets/logo.png" 
+                  src="/tr_lite/assets/logo-new.svg" 
                   alt="FIFA Tracker Logo" 
-                  className="w-10 h-10 object-contain brightness-0 invert"
+                  className="w-12 h-12 object-contain"
                   loading="eager"
                 />
               </div>

@@ -1,0 +1,25 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Gaming Controller/Gamepad Logo - Primary Logo -->
+  <rect width="64" height="64" rx="16" fill="url(#gradient)"/>
+  
+  <!-- Controller Body -->
+  <path d="M20 28c-4 0-8 4-8 8v6c0 2 2 4 4 4h4c2 0 4-2 4-4v-2h16v2c0 2 2 4 4 4h4c2 0 4-2 4-4v-6c0-4-4-8-8-8H20z" fill="white" opacity="0.9"/>
+  
+  <!-- D-Pad -->
+  <rect x="18" y="32" width="8" height="2" rx="1" fill="#2D3E50"/>
+  <rect x="21" y="29" width="2" height="8" rx="1" fill="#2D3E50"/>
+  
+  <!-- Action Buttons -->
+  <circle cx="42" cy="32" r="2" fill="#E74C3C"/>
+  <circle cx="46" cy="36" r="2" fill="#F39C12"/>
+  <circle cx="38" cy="36" r="2" fill="#2ECC71"/>
+  <circle cx="42" cy="40" r="2" fill="#3498DB"/>
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1E3A5F;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2D5A87;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>
