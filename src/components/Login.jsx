@@ -3,7 +3,7 @@ import { supabase, switchToFallbackMode } from '../utils/supabase';
 import { ErrorHandler, FormValidator } from '../utils/errorHandling';
 
 export default function Login() {
-  const [isLogin, setIsLogin] = useState(true);
+  const [isLogin] = useState(true); // Always login mode, no registration
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -69,8 +69,6 @@ export default function Login() {
       
       if (!formPassword.trim()) {
         newErrors.password = 'Passwort ist erforderlich';
-      } else if (!isLogin && formPassword.length < 6) {
-        newErrors.password = 'Passwort muss mindestens 6 Zeichen haben';
       }
 
       if (Object.keys(newErrors).length > 0) {
@@ -88,15 +86,10 @@ export default function Login() {
           setIsDemoMode(true);
         }
         
-        result = isLogin
-          ? await supabase.auth.signInWithPassword({
-              email: FormValidator.sanitizeInput(formEmail),
-              password: formPassword
-            })
-          : await supabase.auth.signUp({
-              email: FormValidator.sanitizeInput(formEmail),
-              password: formPassword
-            });
+        result = await supabase.auth.signInWithPassword({
+          email: FormValidator.sanitizeInput(formEmail),
+          password: formPassword
+        });
       } catch (authError) {
         console.error('Auth operation failed:', authError);
         
@@ -109,15 +102,10 @@ export default function Login() {
           setIsDemoMode(true);
           
           // Retry with fallback
-          result = isLogin
-            ? await supabase.auth.signInWithPassword({
-                email: FormValidator.sanitizeInput(formEmail),
-                password: formPassword
-              })
-            : await supabase.auth.signUp({
-                email: FormValidator.sanitizeInput(formEmail),
-                password: formPassword
-              });
+          result = await supabase.auth.signInWithPassword({
+            email: FormValidator.sanitizeInput(formEmail),
+            password: formPassword
+          });
         } else {
           throw authError;
         }
@@ -131,18 +119,13 @@ export default function Login() {
         } else if (result.error.message?.includes('Email not confirmed')) {
           setErrors({ form: 'Bitte bestätigen Sie Ihre E-Mail-Adresse.' });
         } else if (result.error.message?.includes('User already registered')) {
-          setErrors({ form: 'Diese E-Mail ist bereits registriert. Versuchen Sie sich anzumelden.' });
+          setErrors({ form: 'Diese E-Mail ist bereits registriert. Bitte melden Sie sich an.' });
         } else {
           setErrors({ form: result.error.message });
         }
       } else {
         // Success - component will unmount when user state changes
-        if (!isLogin) {
-          setErrors({ form: 'Registrierung erfolgreich! Sie können sich jetzt anmelden.' });
-          setIsLogin(true);
-        } else {
-          console.log('✅ Login successful, should redirect to main app');
-        }
+        console.log('✅ Login successful, should redirect to main app');
       }
     } catch (error) {
       console.error('Auth error:', error);
@@ -172,15 +155,15 @@ export default function Login() {
             <div className="mb-6 flex justify-center">
               <div className="w-20 h-20 bg-gradient-to-br from-system-green to-system-blue rounded-ios-2xl flex items-center justify-center shadow-ios-lg">
                 <img 
-                  src="/tr_lite/assets/logo.png" 
-                  alt="FIFA Tracker Logo" 
-                  className="w-10 h-10 object-contain brightness-0 invert"
+                  src="/assets/logo-fusta.png" 
+                  alt="FUSTA Logo" 
+                  className="w-12 h-12 object-contain"
                   loading="eager"
                 />
               </div>
             </div>
-            <h1 className="text-title1 font-bold text-text-primary mb-2">FIFA Tracker</h1>
-            <p className="text-callout text-text-secondary">Verfolge FIFA-Spiele, Spieler und Statistiken</p>
+            <h1 className="text-title1 font-bold text-text-primary mb-2">FUSTA</h1>
+            <p className="text-callout text-text-secondary">FIFA Statistik-Tracker für deine Matches</p>
             
             {/* Demo Mode Indicator */}
             {isDemoMode && (
@@ -240,7 +223,7 @@ export default function Login() {
                     errors.password ? 'border-system-red focus:border-system-red focus:ring-system-red/20' : ''
                   }`}
                   placeholder="Dein Passwort"
-                  autoComplete={isLogin ? 'current-password' : 'new-password'}
+                  autoComplete="current-password"
                   required
                 />
               </div>
@@ -272,20 +255,8 @@ export default function Login() {
                 {loading && (
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 )}
-                <span>{isLogin ? 'Anmelden' : 'Registrieren'}</span>
+                <span>Anmelden</span>
               </div>
-            </button>
-
-            {/* Toggle Button */}
-            <button
-              type="button"
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setErrors({});
-              }}
-              className="w-full text-callout text-system-blue font-medium py-2 slide-up-delay-4 transition-all duration-ios hover:opacity-70 active:scale-95"
-            >
-              {isLogin ? 'Noch kein Konto? Registrieren' : 'Bereits ein Konto? Anmelden'}
             </button>
           </form>
         </div>

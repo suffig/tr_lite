@@ -211,7 +211,7 @@ export default function PerformanceMonitor() {
       
       <div className="mt-2 pt-2 border-t border-gray-700 text-gray-400">
         <div className="text-center">
-          FIFA Tracker v2.0
+          FUSTA v2.0
         </div>
       </div>
     </div>
