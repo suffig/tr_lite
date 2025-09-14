@@ -8,12 +8,12 @@ export default function Header() {
           <div className="w-8 h-8 bg-gradient-to-br from-system-green to-system-blue rounded-ios flex items-center justify-center shadow-ios-sm">
             <img 
               src="/assets/logo-new.svg" 
-              alt="FIFA Tracker Logo" 
+              alt="FUSTA Logo" 
               className="w-6 h-6 object-contain"
               loading="eager"
             />
           </div>
-          <h1 className="text-title3 font-bold text-text-primary">FIFA Tracker</h1>
+          <h1 className="text-title3 font-bold text-text-primary">FUSTA</h1>
         </div>
         
         {/* Status indicator */}
