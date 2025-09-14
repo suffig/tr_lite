@@ -113,8 +113,39 @@
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
   }
+}
+
+/* Header styling for all screen sizes */
+@layer components {
+  .modern-header {
+    @apply bg-bg-secondary border-b border-border-light backdrop-blur-sm;
+    background: rgba(var(--bg-secondary-rgb, 255, 255, 255), 0.95);
+  }
   
-  /* iOS Touch Improvements */
+  .header-content {
+    @apply flex items-center justify-between max-w-7xl mx-auto px-4 py-3;
+  }
+  
+  .header-brand {
+    @apply flex items-center gap-3;
+  }
+  
+  .header-logo {
+    @apply w-10 h-10 flex items-center justify-center rounded-lg shadow-md;
+    background: linear-gradient(135deg, #1f2937, #374151);
+  }
+  
+  .header-logo img {
+    @apply w-6 h-6 object-contain;
+  }
+  
+  .header-title {
+    @apply text-xl font-semibold text-text-primary;
+  }
+}
+
+/* iOS Touch Improvements */
+@layer utilities {
   .ios-touch {
     -webkit-touch-callout: none;
     -webkit-user-select: none;

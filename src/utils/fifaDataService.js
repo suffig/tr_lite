@@ -713,12 +713,12 @@ export class FIFADataService {
             height: 181,
             weight: 66,
             foot: "Right",
-            pace: 94,
-            shooting: 99,
-            passing: 87,
-            dribbling: 81,
-            defending: 86,
-            physical: 92,
+            pace: 94,      // Good for a fast winger
+            shooting: 87,  // Corrected from 99 - based on finishing (96) and related stats
+            passing: 75,   // Corrected from 87 - based on shortPassing (79) and vision (70)
+            dribbling: 81, // This was already realistic
+            defending: 35, // Corrected from 86 - wingers don't defend much, based on interceptions (72)
+            physical: 78,  // Corrected from 92 - based on strength (79) and stamina (74)
             skills: {
                 crossing: 79,
                 finishing: 96,
@@ -766,12 +766,12 @@ export class FIFADataService {
             height: 194,
             weight: 66,
             foot: "Left",
-            pace: 91,
-            shooting: 99,
-            passing: 92,
-            dribbling: 92,
-            defending: 83,
-            physical: 80,
+            pace: 71,      // Corrected from 91 - older player, based on acceleration (69) and sprint (68)
+            shooting: 84,  // Corrected from 99 - based on finishing (84) and positioning (81)
+            passing: 72,   // Corrected from 92 - based on shortPassing (67) and vision (69)
+            dribbling: 76, // Corrected from 92 - based on ballControl (76) and agility (76)
+            defending: 35, // Corrected from 83 - strikers don't defend much
+            physical: 75,  // Corrected from 80 - based on strength (77) and stamina (75)
             skills: {
                 crossing: 74,
                 finishing: 84,

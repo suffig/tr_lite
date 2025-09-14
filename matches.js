@@ -632,6 +632,7 @@ function matchHtml(match, nr) {
           </div>
           <!-- Score Display -->
           <div class="bg-gray-100 rounded-xl p-4 mb-3 border border-gray-200">
+            <div class="text-xs text-gray-600 mb-2 text-center font-medium">Endergebnis</div>
             <div class="flex items-center justify-center">
               <div class="text-center">
                 <span class="text-blue-600 font-bold text-xl block mb-1">${match.teama}</span>
@@ -663,15 +664,15 @@ function matchHtml(match, nr) {
         <div class="space-y-3 mb-4">
           <div class="bg-blue-50 border border-blue-200 rounded-xl p-3">
             <div class="text-sm font-bold text-blue-800 mb-2 flex items-center gap-2">
-              <i class="fas fa-futbol"></i>
-              ${match.teama} Torschützen:
+              <i class="fas fa-list"></i>
+              ${match.teama} Torschützen-Aufschlüsselung:
             </div>
             <div class="flex flex-wrap gap-2">${goalsHtml(match.goalslista || [])}</div>
           </div>
           <div class="bg-red-50 border border-red-200 rounded-xl p-3">
             <div class="text-sm font-bold text-red-800 mb-2 flex items-center gap-2">
-              <i class="fas fa-futbol"></i>
-              ${match.teamb} Torschützen:
+              <i class="fas fa-list"></i>
+              ${match.teamb} Torschützen-Aufschlüsselung:
             </div>
             <div class="flex flex-wrap gap-2">${goalsHtml(match.goalslistb || [])}</div>
           </div>

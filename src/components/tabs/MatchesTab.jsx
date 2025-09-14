@@ -435,13 +435,11 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                 
                                 {/* Score */}
                                 <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg">
+                                  <div className="text-xs text-gray-500 text-center mb-1 font-medium">Endergebnis</div>
                                   <div className="text-2xl font-black text-gray-800">
                                     <span className={winner === 'aek' ? 'text-blue-600' : 'text-gray-600'}>{aekGoals}</span>
                                     <span className="mx-2 text-gray-400">:</span>
                                     <span className={winner === 'real' ? 'text-red-600' : 'text-gray-600'}>{realGoals}</span>
-                                  </div>
-                                  <div className="text-xs text-gray-500 text-center mt-1">
-                                    {aekGoals + realGoals} Tore insgesamt
                                   </div>
                                 </div>
                                 
@@ -470,10 +468,10 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                           
                           {/* Quick stats preview */}
                           <div className="flex items-center gap-4">
-                            {/* Goals stats */}
+                            {/* Match result stats */}
                             <div className="text-right">
-                              <div className="text-xs text-gray-500">Tore</div>
-                              <div className="text-sm font-semibold">{aekGoals + realGoals}</div>
+                              <div className="text-xs text-gray-500">Ergebnis</div>
+                              <div className="text-sm font-semibold">{aekGoals}:{realGoals}</div>
                             </div>
                             
                             {/* Cards stats */}
@@ -524,10 +522,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                 {/* Enhanced Goal Scorers Section */}
                                 <div className="space-y-3 bg-white/80 rounded-lg p-4 border border-gray-100 hover:shadow-md transition-shadow">
                                   <h4 className="font-bold text-gray-800 flex items-center gap-2 text-lg">
-                                    ⚽ Torschützen
-                                    <span className="text-xs bg-gray-200 px-2 py-1 rounded-full">
-                                      {(match.goalsa || 0) + (match.goalsb || 0)} Tore
-                                    </span>
+                                    📝 Torschützen-Aufschlüsselung
                                   </h4>
                                   <div className="space-y-3">
                                     {(() => {
