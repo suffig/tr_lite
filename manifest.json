@@ -31,13 +31,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "./assets/logo-new.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    },
-    {
-      "src": "./assets/logo.png",
+      "src": "./assets/logo-fusta.png",
       "sizes": "1024x1024",
       "type": "image/png",
       "purpose": "any"
