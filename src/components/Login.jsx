@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase, switchToFallbackMode } from '../utils/supabase';
 import { ErrorHandler, FormValidator } from '../utils/errorHandling';
 
@@ -8,6 +8,39 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isDemoMode, setIsDemoMode] = useState(false);
+
+  // Listen for fallback mode activation
+  useEffect(() => {
+    const handleFallbackActivation = (event) => {
+      console.log('🔄 Fallback mode activated:', event.detail);
+      setIsDemoMode(true);
+      // Show helpful message
+      setErrors({ 
+        form: '🌐 Demo-Modus aktiviert - Verwenden Sie beliebige Anmeldedaten für die Vorschau!' 
+      });
+    };
+
+    window.addEventListener('fifa-fallback-activated', handleFallbackActivation);
+    
+    // Check if already in fallback mode
+    const checkFallbackStatus = () => {
+      try {
+        if (window.location.hostname === 'localhost' || 
+            document.querySelector('script[src*="supabase"]') === null) {
+          setIsDemoMode(true);
+        }
+      } catch (error) {
+        console.warn('Error checking fallback status:', error);
+      }
+    };
+    
+    checkFallbackStatus();
+    
+    return () => {
+      window.removeEventListener('fifa-fallback-activated', handleFallbackActivation);
+    };
+  }, []);
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -41,6 +74,13 @@ export default function Login() {
       // Use current supabase client for auth
       let result;
       try {
+        // Automatically switch to fallback mode if CDN is blocked
+        if (!isDemoMode && !window.supabase && document.querySelector('script[src*="supabase"]') === null) {
+          console.warn('🔄 Supabase CDN blocked, switching to demo mode');
+          await switchToFallbackMode();
+          setIsDemoMode(true);
+        }
+        
         result = isLogin
           ? await supabase.auth.signInWithPassword({
               email: FormValidator.sanitizeInput(email),
@@ -55,9 +95,11 @@ export default function Login() {
         
         // If auth fails, try switching to fallback mode
         if (authError.message?.includes('Failed to fetch') || 
-            authError.name === 'AuthRetryableFetchError') {
+            authError.name === 'AuthRetryableFetchError' ||
+            authError.message?.includes('NetworkError')) {
           console.warn('🔄 Auth failed, switching to fallback mode');
           await switchToFallbackMode();
+          setIsDemoMode(true);
           
           // Retry with fallback
           result = isLogin
@@ -121,7 +163,7 @@ export default function Login() {
             <div className="mb-6 flex justify-center">
               <div className="w-20 h-20 bg-gradient-to-br from-system-green to-system-blue rounded-ios-2xl flex items-center justify-center shadow-ios-lg">
                 <img 
-                  src="/assets/logo.png" 
+                  src="/tr_lite/assets/logo.png" 
                   alt="FIFA Tracker Logo" 
                   className="w-10 h-10 object-contain brightness-0 invert"
                   loading="eager"
@@ -130,6 +172,19 @@ export default function Login() {
             </div>
             <h1 className="text-title1 font-bold text-text-primary mb-2">FIFA Tracker</h1>
             <p className="text-callout text-text-secondary">Verfolge FIFA-Spiele, Spieler und Statistiken</p>
+            
+            {/* Demo Mode Indicator */}
+            {isDemoMode && (
+              <div className="mt-4 p-3 bg-system-blue/10 border border-system-blue/30 rounded-ios-lg">
+                <div className="flex items-center justify-center gap-2 text-system-blue">
+                  <span className="text-lg">🌐</span>
+                  <span className="text-footnote font-medium">Demo-Modus aktiv</span>
+                </div>
+                <p className="text-caption1 text-text-secondary mt-1">
+                  Verwenden Sie beliebige Anmeldedaten um fortzufahren
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Form */}

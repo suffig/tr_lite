@@ -1,7 +1,7 @@
 import { useState, Suspense, lazy, useEffect } from 'react';
 import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
-import { useAuth } from './hooks/useAuth';
+import { useAuth } from './hooks/useAuth.js';
 import { OfflineIndicator } from './hooks/useOfflineManager.jsx';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Login from './components/Login';

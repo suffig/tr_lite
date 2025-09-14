@@ -323,9 +323,14 @@ try {
 // Function to switch to fallback mode (can be called when CDN is detected as blocked)
 const switchToFallbackMode = () => {
   if (!usingFallback) {
-    console.warn('🔄 Switching to fallback mode globally');
+    console.warn('🔄 Switching to enhanced fallback mode globally');
     supabase = createFallbackClient();
     usingFallback = true;
+    
+    // Emit custom event to notify components
+    window.dispatchEvent(new CustomEvent('fifa-fallback-activated', {
+      detail: { reason: 'CDN blocked or connection failed' }
+    }));
   }
   return supabase;
 };
