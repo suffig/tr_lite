@@ -8,17 +8,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        // iOS System Colors
+        // Enhanced iOS System Colors with variants
         system: {
           blue: 'var(--system-blue)',
+          'blue-light': 'var(--system-blue-light)',
+          'blue-dark': 'var(--system-blue-dark)',
           green: 'var(--system-green)',
+          'green-light': 'var(--system-green-light)',
+          'green-dark': 'var(--system-green-dark)',
           indigo: 'var(--system-indigo)',
+          'indigo-light': 'var(--system-indigo-light)',
+          'indigo-dark': 'var(--system-indigo-dark)',
           orange: 'var(--system-orange)',
+          'orange-light': 'var(--system-orange-light)',
+          'orange-dark': 'var(--system-orange-dark)',
           pink: 'var(--system-pink)',
+          'pink-light': 'var(--system-pink-light)',
+          'pink-dark': 'var(--system-pink-dark)',
           purple: 'var(--system-purple)',
+          'purple-light': 'var(--system-purple-light)',
+          'purple-dark': 'var(--system-purple-dark)',
           red: 'var(--system-red)',
+          'red-light': 'var(--system-red-light)',
+          'red-dark': 'var(--system-red-dark)',
           teal: 'var(--system-teal)',
+          'teal-light': 'var(--system-teal-light)',
+          'teal-dark': 'var(--system-teal-dark)',
           yellow: 'var(--system-yellow)',
+          'yellow-light': 'var(--system-yellow-light)',
+          'yellow-dark': 'var(--system-yellow-dark)',
         },
         // FIFA Brand Colors
         fifa: {
@@ -37,13 +55,16 @@ export default {
           red: 'var(--system-red)',
           blue: 'var(--system-blue)',
         },
-        // Semantic colors using CSS variables
+        // Enhanced semantic colors using CSS variables
         bg: {
           primary: 'var(--bg-primary)',
           secondary: 'var(--bg-secondary)',
           tertiary: 'var(--bg-tertiary)',
           elevated: 'var(--bg-elevated)',
           grouped: 'var(--bg-grouped)',
+          overlay: 'var(--bg-overlay)',
+          card: 'var(--bg-card)',
+          glass: 'var(--bg-glass)',
         },
         text: {
           primary: 'var(--text-primary)',
@@ -89,19 +110,36 @@ export default {
         'ios-md': 'var(--shadow-md)',
         'ios-lg': 'var(--shadow-lg)',
         'ios-xl': 'var(--shadow-xl)',
+        'ios-card': 'var(--shadow-card)',
+        'ios-elevated': 'var(--shadow-elevated)',
+        'ios-floating': 'var(--shadow-floating)',
       },
       backdropBlur: {
         'ios-sm': 'var(--blur-sm)',
         'ios-md': 'var(--blur-md)',
         'ios-lg': 'var(--blur-lg)',
+        'ios-xl': 'var(--blur-xl)',
+        'ios-heavy': 'var(--blur-heavy)',
+      },
+      backgroundImage: {
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-card': 'var(--gradient-card)',
+        'gradient-glass': 'var(--gradient-glass)',
+        'gradient-overlay': 'var(--gradient-overlay)',
+        'gradient-success': 'var(--gradient-success)',
+        'gradient-warning': 'var(--gradient-warning)',
+        'gradient-danger': 'var(--gradient-danger)',
+        'gradient-info': 'var(--gradient-info)',
       },
       transitionTimingFunction: {
         'ios': 'cubic-bezier(0.4, 0, 0.2, 1)',
-        'ios-spring': 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        'ios-spring': 'var(--spring-bounce)',
+        'ios-smooth': 'var(--spring-smooth)',
       },
       transitionDuration: {
-        'ios': '200ms',
-        'ios-slow': '300ms',
+        'ios': 'var(--transition-fast)',
+        'ios-medium': 'var(--transition-medium)',
+        'ios-slow': 'var(--transition-slow)',
       },
       animation: {
         'bounce-gentle': 'bounceGentle 1.5s ease-in-out infinite',
@@ -112,6 +150,61 @@ export default {
         'pulse-gentle': 'pulseGentle 2s ease-in-out infinite',
         'success-flash': 'successFlash 0.6s ease-out',
         'error-shake': 'errorShake 0.5s ease-out',
+        'shimmer': 'shimmer 2s infinite',
+        'mobile-slide-in': 'mobileSlideIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards',
+        'spin': 'spin 1s linear infinite',
+        'ripple': 'ripple 0.3s ease-out',
+      },
+      keyframes: {
+        bounceGentle: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-3px)' },
+        },
+        fadeInUp: {
+          '0%': { opacity: '0', transform: 'translateY(30px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideInLeft: {
+          '0%': { opacity: '0', transform: 'translateX(-30px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        slideInRight: {
+          '0%': { opacity: '0', transform: 'translateX(30px)' },
+          '100%': { opacity: '1', transform: 'translateX(0)' },
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(0.8)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        pulseGentle: {
+          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
+          '50%': { opacity: '0.8', transform: 'scale(1.02)' },
+        },
+        successFlash: {
+          '0%': { backgroundColor: 'transparent' },
+          '50%': { backgroundColor: 'rgba(16, 185, 129, 0.2)' },
+          '100%': { backgroundColor: 'transparent' },
+        },
+        errorShake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-5px)' },
+          '20%, 40%, 60%, 80%': { transform: 'translateX(5px)' },
+        },
+        shimmer: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
+        mobileSlideIn: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        spin: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
+        ripple: {
+          'to': { transform: 'translate(-50%, -50%) scale(1)', opacity: '0' },
+        },
       },
     },
   },

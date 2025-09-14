@@ -318,54 +318,54 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
     }, { player: null, count: 0, match: null });
 
     return (
-      <div className="space-y-6">
-        {/* Consolidated Quick Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="card-ios text-center touch-target">
-            <div className="w-12 h-12 bg-system-green/10 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">⚽</span>
+      <div className="space-y-6 mobile-card-list">
+        {/* Enhanced Quick Stats Grid with iOS 26 Design */}
+        <div className="mobile-grid mobile-grid-2 md:grid-cols-4">
+          <div className="mobile-metric-card animate-mobile-slide-in">
+            <div className="mobile-metric-icon bg-gradient-success">
+              <span className="text-white">⚽</span>
             </div>
-            <div className="text-title2 font-bold text-text-primary mb-1">{totalMatches}</div>
-            <div className="text-caption1 text-text-secondary">Spiele gespielt</div>
+            <div className="mobile-metric-value">{totalMatches}</div>
+            <div className="mobile-metric-label">Spiele gespielt</div>
           </div>
-          <div className="card-ios text-center touch-target">
-            <div className="w-12 h-12 bg-system-orange/10 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">🎯</span>
+          <div className="mobile-metric-card animate-mobile-slide-in">
+            <div className="mobile-metric-icon bg-gradient-warning">
+              <span className="text-white">🎯</span>
             </div>
-            <div className="text-title2 font-bold text-text-primary mb-1">{advancedStats.totalGoals}</div>
-            <div className="text-caption1 text-text-secondary">Tore insgesamt</div>
-            <div className="text-caption2 text-text-tertiary mt-1">
+            <div className="mobile-metric-value">{advancedStats.totalGoals}</div>
+            <div className="mobile-metric-label">Tore insgesamt</div>
+            <div className="mobile-metric-sublabel">
               ⌀ {totalMatches > 0 ? (advancedStats.totalGoals / totalMatches).toFixed(1) : '0.0'}/Spiel
             </div>
           </div>
-          <div className="card-ios text-center touch-target">
-            <div className="w-12 h-12 bg-system-blue/10 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">🥇</span>
+          <div className="mobile-metric-card animate-mobile-slide-in">
+            <div className="mobile-metric-icon bg-gradient-info">
+              <span className="text-white">🥇</span>
             </div>
-            <div className="text-subhead font-semibold text-text-primary mb-1">
-              {topScorer ? topScorer.name : 'Keine Daten'}
+            <div className="mobile-metric-value text-subhead font-semibold">
+              {topScorer ? topScorer.name.split(' ').slice(-1)[0] : '–'}
             </div>
-            <div className="text-caption1 text-text-secondary">
+            <div className="mobile-metric-label">
               Topscorer ({topScorer ? topScorer.goals : 0} Tore)
             </div>
-            <div className="text-caption2 text-text-tertiary mt-1">
+            <div className="mobile-metric-sublabel">
               {topScorer && topScorer.matchesPlayed > 0 ? 
                 `⌀ ${(topScorer.goals / topScorer.matchesPlayed).toFixed(2)}/Spiel` : 
                 '⌀ 0.00/Spiel'
               }
             </div>
           </div>
-          <div className="card-ios text-center touch-target">
-            <div className="w-12 h-12 bg-system-yellow/10 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">⭐</span>
+          <div className="mobile-metric-card animate-mobile-slide-in">
+            <div className="mobile-metric-icon bg-gradient-warning">
+              <span className="text-white">⭐</span>
             </div>
-            <div className="text-subhead font-semibold text-text-primary mb-1">
-              {topSdSPlayer ? topSdSPlayer.name : 'Keine Daten'}
+            <div className="mobile-metric-value text-subhead font-semibold">
+              {topSdSPlayer ? topSdSPlayer.name.split(' ').slice(-1)[0] : '–'}
             </div>
-            <div className="text-caption1 text-text-secondary">
+            <div className="mobile-metric-label">
               Top SdS ({topSdSPlayer ? topSdSPlayer.sdsCount : 0}x)
             </div>
-            <div className="text-caption2 text-text-tertiary mt-1">
+            <div className="mobile-metric-sublabel">
               {topSdSPlayer && topSdSPlayer.matchesPlayed > 0 ? 
                 `${((topSdSPlayer.sdsCount / topSdSPlayer.matchesPlayed) * 100).toFixed(1)}% Quote` : 
                 '0.0% Quote'
@@ -374,86 +374,92 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
           </div>
         </div>
 
-        {/* New Enhanced Statistics Row - Team-specific highest wins */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="modern-card text-center hover:bg-blue-50 transition-colors cursor-pointer group">
-            <div className="text-xl font-bold text-blue-600 group-hover:scale-110 transition-transform">
+        {/* Enhanced Team Victory Cards with iOS 26 Design */}
+        <div className="mobile-grid mobile-grid-1 md:grid-cols-3 gap-4">
+          <div className="mobile-overview-card team-aek animate-mobile-slide-in hover:scale-105 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-caption1 font-semibold text-system-blue uppercase tracking-wide">🔵 AEK Athen</div>
+              <div className="w-8 h-8 bg-system-blue/10 rounded-full flex items-center justify-center">
+                <span className="text-system-blue text-sm font-bold">A</span>
+              </div>
+            </div>
+            <div className="text-title1 font-bold text-text-primary mb-2">
               {headToHead.biggestAekWin.diff > 0 ? headToHead.biggestAekWin.score : '–'}
             </div>
-            <div className="text-sm text-text-muted group-hover:text-blue-700 transition-colors">🔵 Größter AEK Sieg</div>
+            <div className="text-callout text-text-secondary mb-3">Größter Sieg</div>
             {headToHead.biggestAekWin.diff > 0 && (
-              <div className="text-xs text-text-muted mt-1 group-hover:text-blue-600 transition-colors">
-                vs {headToHead.biggestAekWin.opponent}<br/>
-                {new Date(headToHead.biggestAekWin.date).toLocaleDateString('de-DE')}
+              <div className="text-footnote text-text-tertiary space-y-1">
+                <div>vs {headToHead.biggestAekWin.opponent}</div>
+                <div className="text-caption1">
+                  {new Date(headToHead.biggestAekWin.date).toLocaleDateString('de-DE')}
+                </div>
               </div>
             )}
           </div>
-          <div className="modern-card text-center hover:bg-red-50 transition-colors cursor-pointer group">
-            <div className="text-xl font-bold text-red-600 group-hover:scale-110 transition-transform">{headToHead.biggestRealWin.diff > 0 ? headToHead.biggestRealWin.score : '–'}</div>
-            <div className="text-sm text-text-muted group-hover:text-red-700 transition-colors">🔴 Größter Real Sieg</div>
-            {headToHead.biggestRealWin.diff > 0 && (
-              <div className="text-xs text-text-muted mt-1 group-hover:text-red-600 transition-colors">
-                vs {headToHead.biggestRealWin.opponent}<br/>
-                {new Date(headToHead.biggestRealWin.date).toLocaleDateString('de-DE')}
+          
+          <div className="mobile-overview-card team-real animate-mobile-slide-in hover:scale-105 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-caption1 font-semibold text-system-red uppercase tracking-wide">🔴 Real Madrid</div>
+              <div className="w-8 h-8 bg-system-red/10 rounded-full flex items-center justify-center">
+                <span className="text-system-red text-sm font-bold">R</span>
               </div>
-            )}
-          </div>
-          <div className="modern-card text-center hover:bg-blue-50 transition-colors cursor-pointer group">
-            <div className="text-xl font-bold text-accent-blue group-hover:scale-110 transition-transform">
-              {mostGoalsInMatch?.player || 'Keine Daten'}
             </div>
-            <div className="text-sm text-text-muted group-hover:text-blue-700 transition-colors">
-              ⚽ Meiste Tore ({mostGoalsInMatch?.count || 0} in einem Spiel)
+            <div className="text-title1 font-bold text-text-primary mb-2">
+              {headToHead.biggestRealWin.diff > 0 ? headToHead.biggestRealWin.score : '–'}
+            </div>
+            <div className="text-callout text-text-secondary mb-3">Größter Sieg</div>
+            {headToHead.biggestRealWin.diff > 0 && (
+              <div className="text-footnote text-text-tertiary space-y-1">
+                <div>vs {headToHead.biggestRealWin.opponent}</div>
+                <div className="text-caption1">
+                  {new Date(headToHead.biggestRealWin.date).toLocaleDateString('de-DE')}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="mobile-overview-card animate-mobile-slide-in hover:scale-105 transition-all duration-300">
+            <div className="flex items-center justify-between mb-4">
+              <div className="text-caption1 font-semibold text-system-purple uppercase tracking-wide">⚽ Top Performance</div>
+              <div className="w-8 h-8 bg-system-purple/10 rounded-full flex items-center justify-center">
+                <span className="text-system-purple text-sm font-bold">🏆</span>
+              </div>
+            </div>
+            <div className="text-title1 font-bold text-text-primary mb-2">
+              {mostGoalsInMatch?.player ? mostGoalsInMatch.player.split(' ').slice(-1)[0] : '–'}
+            </div>
+            <div className="text-callout text-text-secondary mb-3">
+              Meiste Tore ({mostGoalsInMatch?.count || 0} in einem Spiel)
             </div>
             {mostGoalsInMatch?.match && (
-              <div className="text-xs text-text-muted mt-1 group-hover:text-blue-600 transition-colors">
-                {new Date(mostGoalsInMatch.match.date).toLocaleDateString('de-DE')}
+              <div className="text-footnote text-text-tertiary">
+                <div className="text-caption1">
+                  {new Date(mostGoalsInMatch.match.date).toLocaleDateString('de-DE')}
+                </div>
               </div>
             )}
-          </div>
-          <div className="modern-card text-center">
-            <div className="text-xl font-bold text-accent-red">
-              {(() => {
-                // Calculate most suspended player
-                const suspensionCounts = {};
-                bans?.forEach(ban => {
-                  const playerInfo = players?.find(p => p.id === ban.player_id);
-                  const playerName = playerInfo?.name || 'Unbekannt';
-                  suspensionCounts[playerName] = (suspensionCounts[playerName] || 0) + 1;
-                });
-                
-                const mostSuspended = Object.entries(suspensionCounts)
-                  .sort((a, b) => b[1] - a[1])[0];
-                
-                return mostSuspended ? mostSuspended[0] : 'Keine Daten';
-              })()}
-            </div>
-            <div className="text-sm text-text-muted">
-              🟥 Meiste Sperren ({(() => {
-                const suspensionCounts = {};
-                bans?.forEach(ban => {
-                  const playerInfo = players?.find(p => p.id === ban.player_id);
-                  const playerName = playerInfo?.name || 'Unbekannt';
-                  suspensionCounts[playerName] = (suspensionCounts[playerName] || 0) + 1;
-                });
-                
-                const mostSuspended = Object.entries(suspensionCounts)
-                  .sort((a, b) => b[1] - a[1])[0];
-                
-                return mostSuspended ? mostSuspended[1] : 0;
-              })()}x)
-            </div>
           </div>
         </div>
 
-        {/* Additional Statistics */}
-        <div className="modern-card">
-          <h3 className="font-bold text-lg mb-4">📊 Erweiterte Statistiken</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="text-center p-3 bg-bg-secondary rounded-lg">
-              <div className="text-xl font-bold text-primary-green">
+        {/* Enhanced Additional Statistics Section */}
+        <div className="mobile-overview-card animate-mobile-slide-in">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-gradient-info rounded-full flex items-center justify-center">
+              <span className="text-white text-lg">📊</span>
+            </div>
+            <div>
+              <h3 className="text-title3 font-bold text-text-primary">Erweiterte Statistiken</h3>
+              <p className="text-caption1 text-text-secondary">Detaillierte Analyse der Liga</p>
+            </div>
+          </div>
+          
+          <div className="mobile-grid mobile-grid-auto gap-4">
+            <div className="mobile-metric-card">
+              <div className="mobile-metric-icon bg-gradient-warning">
+                <span className="text-white">⏱️</span>
+              </div>
+              <div className="mobile-metric-value text-title2">
                 {(() => {
-                  // Calculate average suspension length
                   const totalDays = bans?.reduce((sum, ban) => {
                     const start = new Date(ban.start_date);
                     const end = new Date(ban.end_date);
@@ -462,23 +468,33 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
                   }, 0) || 0;
                   
                   const avgDays = bans?.length > 0 ? (totalDays / bans.length).toFixed(1) : '0.0';
-                  return `${avgDays} Tage`;
+                  return `${avgDays}`;
                 })()}
               </div>
-              <div className="text-sm text-text-muted">⌀ Sperrenlänge</div>
+              <div className="mobile-metric-label">⌀ Sperrenlänge</div>
+              <div className="mobile-metric-sublabel">Tage</div>
             </div>
 
-            <div className="text-center p-3 bg-bg-secondary rounded-lg">
-              <div className="text-xl font-bold text-accent-blue">
+            <div className="mobile-metric-card">
+              <div className="mobile-metric-icon bg-gradient-success">
+                <span className="text-white">🎯</span>
+              </div>
+              <div className="mobile-metric-value text-title2">
                 {playerStats.filter(p => p.goals > 0).length}
               </div>
-              <div className="text-sm text-text-muted">Aktive Torschützen</div>
+              <div className="mobile-metric-label">Aktive Torschützen</div>
+              <div className="mobile-metric-sublabel">von {playerStats.length}</div>
             </div>
-            <div className="text-center p-3 bg-bg-secondary rounded-lg">
-              <div className="text-xl font-bold text-accent-red">
+            
+            <div className="mobile-metric-card">
+              <div className="mobile-metric-icon bg-gradient-danger">
+                <span className="text-white">🟥</span>
+              </div>
+              <div className="mobile-metric-value text-title2">
                 {bans?.length || 0}
               </div>
-              <div className="text-sm text-text-muted">Gesamt Sperren</div>
+              <div className="mobile-metric-label">Gesamt Sperren</div>
+              <div className="mobile-metric-sublabel">aller Zeiten</div>
             </div>
           </div>
         </div>
@@ -1088,36 +1104,54 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
 
   return (
     <div className="p-4 pb-24 mobile-safe-bottom">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-title1 font-bold text-text-primary mb-2">📊 Statistiken</h2>
-        <p className="text-callout text-text-secondary">Umfassende Analyse von Spielen, Spielern und Teams</p>
+      {/* Enhanced Header with iOS 26 Design */}
+      <div className="mb-6 animate-mobile-slide-in">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 bg-gradient-info rounded-ios-lg flex items-center justify-center">
+            <span className="text-white text-xl">📊</span>
+          </div>
+          <div>
+            <h2 className="text-title1 font-bold text-text-primary">Statistiken</h2>
+            <p className="text-footnote text-text-secondary">Umfassende Liga-Analyse</p>
+          </div>
+        </div>
+        <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-info w-3/4 rounded-full animate-pulse-gentle"></div>
+        </div>
       </div>
 
-      {/* View Navigation with Scroll Indicators */}
-      <div className="relative mb-6">
-        <div className="flex overflow-x-auto space-x-3 pb-2 scrollbar-hide">
+      {/* Enhanced View Navigation with iOS 26 Design */}
+      <div className="relative mb-6 animate-mobile-slide-in">
+        <div className="icon-only-nav scrollbar-hide">
           {views.map((view) => (
             <button
               key={view.id}
               onClick={() => setSelectedView(view.id)}
-              className={`flex items-center space-x-2 px-4 py-3 rounded-ios-lg whitespace-nowrap transition-all duration-ios touch-target ${
+              className={`stats-nav-button transition-all duration-300 ${
                 selectedView === view.id
-                  ? 'bg-system-blue text-white shadow-ios-md'
-                  : 'bg-bg-secondary text-text-secondary hover:bg-bg-tertiary'
+                  ? 'bg-system-blue text-white shadow-ios-elevated scale-105'
+                  : 'bg-bg-card text-text-secondary hover:bg-bg-elevated hover:scale-102'
               }`}
               title={view.label}
               aria-label={view.label}
             >
-              <span className="text-lg">{view.icon}</span>
-              <span className="text-callout font-medium hidden sm:inline">{view.label}</span>
+              <div className="flex flex-col items-center gap-1">
+                <span className="text-lg">{view.icon}</span>
+                <span className="text-caption2 font-semibold hidden sm:inline">{view.label}</span>
+              </div>
+              {selectedView === view.id && (
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-white rounded-full"></div>
+              )}
             </button>
           ))}
         </div>
+        {/* Scroll indicators */}
+        <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-bg-primary to-transparent pointer-events-none opacity-50"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-bg-primary to-transparent pointer-events-none opacity-50"></div>
       </div>
 
-      {/* Content */}
-      <div className="form-container">
+      {/* Enhanced Content with Animation */}
+      <div className="form-container animate-mobile-slide-in">
         {renderCurrentView()}
       </div>
     </div>
