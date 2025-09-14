@@ -341,7 +341,7 @@ class NotificationService {
   async testNotification() {
     await this.showNotification({
       title: '🧪 Test Notification',
-      body: 'FIFA Tracker notifications are working!',
+      body: 'FUSTA notifications are working!',
       icon: '/assets/icon-180.png',
       tag: 'test-notification'
     });

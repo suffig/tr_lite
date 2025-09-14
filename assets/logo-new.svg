@@ -1,25 +1,30 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Gaming Controller/Gamepad Logo - Primary Logo -->
-  <rect width="64" height="64" rx="16" fill="url(#gradient)"/>
+  <!-- FUSTA Beer Logo - Based on provided design -->
+  <!-- Background Shield -->
+  <path d="M32 2L58 10v20c0 18-26 30-26 30S6 48 6 30V10L32 2z" fill="#2E7D32" stroke="#1B5E20" stroke-width="1.5"/>
   
-  <!-- Controller Body -->
-  <path d="M20 28c-4 0-8 4-8 8v6c0 2 2 4 4 4h4c2 0 4-2 4-4v-2h16v2c0 2 2 4 4 4h4c2 0 4-2 4-4v-6c0-4-4-8-8-8H20z" fill="white" opacity="0.9"/>
+  <!-- Beer Mug -->
+  <rect x="20" y="14" width="16" height="20" rx="3" fill="#FF9800" stroke="#E65100" stroke-width="1.2"/>
+  <!-- Beer Handle -->
+  <path d="M36 18h3c2 0 4 2 4 4v6c0 2-2 4-4 4h-3" stroke="#E65100" stroke-width="2" fill="none"/>
   
-  <!-- D-Pad -->
-  <rect x="18" y="32" width="8" height="2" rx="1" fill="#2D3E50"/>
-  <rect x="21" y="29" width="2" height="8" rx="1" fill="#2D3E50"/>
+  <!-- Beer Foam -->
+  <ellipse cx="28" cy="14" rx="8" ry="4" fill="#FFF8E1"/>
+  <circle cx="24" cy="12" r="2" fill="#FFF8E1"/>
+  <circle cx="32" cy="11" r="1.5" fill="#FFF8E1"/>
+  <circle cx="28" cy="10" r="1.8" fill="#FFF8E1"/>
+  <circle cx="30" cy="13" r="1.2" fill="#FFF8E1"/>
   
-  <!-- Action Buttons -->
-  <circle cx="42" cy="32" r="2" fill="#E74C3C"/>
-  <circle cx="46" cy="36" r="2" fill="#F39C12"/>
-  <circle cx="38" cy="36" r="2" fill="#2ECC71"/>
-  <circle cx="42" cy="40" r="2" fill="#3498DB"/>
+  <!-- FUSTA Text Badge -->
+  <rect x="12" y="36" width="40" height="10" rx="5" fill="#1B5E20"/>
+  <text x="32" y="43" text-anchor="middle" fill="#FFF8E1" font-family="Arial, sans-serif" font-size="8" font-weight="bold">FUSTA</text>
   
-  <!-- Gradient Definition -->
-  <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1E3A5F;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#2D5A87;stop-opacity:1" />
-    </linearGradient>
-  </defs>
+  <!-- Bar Chart with Arrow -->
+  <rect x="18" y="50" width="4" height="10" fill="#1E88E5"/>
+  <rect x="24" y="47" width="4" height="13" fill="#1E88E5"/>
+  <rect x="30" y="44" width="4" height="16" fill="#1E88E5"/>
+  <rect x="36" y="48" width="4" height="12" fill="#1E88E5"/>
+  
+  <!-- Upward Arrow -->
+  <path d="M42 54L46 50L50 54M46 50v10" stroke="#4CAF50" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
