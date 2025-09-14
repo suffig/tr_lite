@@ -107,7 +107,7 @@ export default function EnhancedModal({
 
   const modalContent = (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4"
       onClick={handleBackdropClick}
     >
       {/* Backdrop */}
@@ -125,8 +125,12 @@ export default function EnhancedModal({
           relative w-full mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden
           ${fullScreen ? 'h-full max-w-full' : sizeClasses[size]}
           ${isOpen ? animationClasses[animation].enter : animationClasses[animation].exit}
+          mobile-safe-content
         `}
-        style={{ maxHeight: fullScreen ? '100%' : '90vh' }}
+        style={{ 
+          maxHeight: fullScreen ? '100%' : 'calc(100vh - 2rem)',
+          marginBottom: 'env(safe-area-inset-bottom, 0px)'
+        }}
       >
         {/* Header */}
         {(title || showCloseButton) && (

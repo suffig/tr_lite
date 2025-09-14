@@ -120,16 +120,20 @@ button:active::after {
     transition: transform 0.1s ease;
   }
   
-  /* Better spacing for icon-only navigation with smooth scrolling */
+  /* Better spacing for icon-only navigation with improved horizontal layout */
   .icon-only-nav {
+    display: flex;
+    flex-direction: row;
     gap: 8px;
     padding: 12px 16px;
     overflow-x: auto;
+    overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
     -ms-overflow-style: none;
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
+    white-space: nowrap;
   }
   
   .icon-only-nav::-webkit-scrollbar {
@@ -538,7 +542,7 @@ button:active {
     width: 95vw;
     max-width: 95vw;
     margin: 10px auto;
-    max-height: 90vh;
+    max-height: calc(100vh - 6rem); /* Account for bottom navigation */
     overflow-y: auto;
   }
   
@@ -552,14 +556,20 @@ button:active {
   
   .modal-body {
     padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
   }
   
   .modal-footer {
     padding: 1rem;
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
     position: sticky;
     bottom: 0;
     background: white;
     border-top: 1px solid #e5e7eb;
+  }
+  
+  .mobile-safe-content {
+    margin-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
   }
 }
 

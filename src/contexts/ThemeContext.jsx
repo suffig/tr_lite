@@ -17,8 +17,8 @@ export const ThemeProvider = ({ children }) => {
     if (savedTheme) {
       return savedTheme;
     }
-    // Check system preference
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    // Default to light theme instead of system preference
+    return 'light';
   });
 
   const [autoMode, setAutoMode] = useState(() => {
