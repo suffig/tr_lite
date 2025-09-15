@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import HorizontalNavigation from '../HorizontalNavigation';
+import TeamLogo from '../TeamLogo';
 import '../../styles/match-animations.css';
 
 export default function MatchesTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars

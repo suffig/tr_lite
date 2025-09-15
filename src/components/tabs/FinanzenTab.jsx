@@ -3,6 +3,7 @@ import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import ExportImportManager from '../ExportImportManager';
 import HorizontalNavigation from '../HorizontalNavigation';
+import TeamLogo from '../TeamLogo';
 import toast from 'react-hot-toast';
 import '../../styles/match-animations.css';
 
@@ -271,7 +272,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="modern-card text-center border-l-4 border-blue-400 financial-card">
               <div className="flex items-center justify-center mb-2">
-                <span className="text-2xl mr-2">🔵</span>
+                <TeamLogo team="aek" size="lg" className="mr-2" />
                 <h3 className="font-semibold text-blue-600">AEK Athen</h3>
               </div>
               <div className="space-y-1 text-sm">
@@ -296,7 +297,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
           {/* AEK Team-specific Details */}
           <div className="modern-card mb-6">
             <h3 className="font-bold text-lg mb-4 flex items-center">
-              <span className="text-2xl mr-2">🔵</span>
+              <TeamLogo team="aek" size="lg" className="mr-2" />
               AEK Athen - Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -323,7 +324,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div className="modern-card text-center border-l-4 border-red-400 financial-card">
               <div className="flex items-center justify-center mb-2">
-                <span className="text-2xl mr-2">🔴</span>
+                <TeamLogo team="real" size="lg" className="mr-2" />
                 <h3 className="font-semibold text-red-600">Real Madrid</h3>
               </div>
               <div className="space-y-1 text-sm">
@@ -348,7 +349,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
           {/* Real Team-specific Details */}
           <div className="modern-card mb-6">
             <h3 className="font-bold text-lg mb-4 flex items-center">
-              <span className="text-2xl mr-2">🔴</span>
+              <TeamLogo team="real" size="lg" className="mr-2" />
               Real Madrid - Details
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -375,7 +376,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="modern-card text-center border-l-4 border-blue-400 financial-card">
           <div className="flex items-center justify-center mb-2">
-            <span className="text-2xl mr-2">🔵</span>
+            <TeamLogo team="aek" size="lg" className="mr-2" />
             <h3 className="font-semibold text-blue-600">AEK Athen</h3>
           </div>
           <div className="space-y-1 text-sm">
@@ -387,7 +388,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
 
         <div className="modern-card text-center border-l-4 border-red-400 financial-card">
           <div className="flex items-center justify-center mb-2">
-            <span className="text-2xl mr-2">🔴</span>
+            <TeamLogo team="real" size="lg" className="mr-2" />
             <h3 className="font-semibold text-red-600">Real Madrid</h3>
           </div>
           <div className="space-y-1 text-sm">
