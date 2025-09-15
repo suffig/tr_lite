@@ -261,7 +261,11 @@ function App() {
         {activeTab === 'admin' && <PerformanceMonitor />}
 
         {/* Global Notification System */}
-        <NotificationSystem />
+        <NotificationSystem onNavigate={(tab, options) => {
+          setActiveTab(tab);
+          // Could add additional navigation logic here if needed
+          // e.g., storing options in state for tab components to use
+        }} />
       </div>
     </ThemeProvider>
   );

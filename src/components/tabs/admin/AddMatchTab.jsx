@@ -148,8 +148,9 @@ export default function AddMatchTab() {
       // Show success message with comprehensive feedback
       toast.success(result.message);
       
-      // Trigger push notification for new match
+      // Trigger push notification for new match with match ID for navigation
       triggerNotification('match-created', {
+        matchId: result.match?.id || result.id || 'latest',
         date: formData.date,
         teama: formData.teama,
         teamb: formData.teamb,
