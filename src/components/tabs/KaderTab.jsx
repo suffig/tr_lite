@@ -3,6 +3,7 @@ import { useSupabaseQuery, useSupabaseMutation } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import ExportImportManager from '../ExportImportManager';
 import PlayerDetailModal from '../PlayerDetailModal';
+import TeamLogo from '../TeamLogo';
 import { POSITIONS } from '../../utils/errorHandling';
 import toast from 'react-hot-toast';
 
@@ -132,7 +133,7 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
       displayName: 'AEK Athen', 
       players: aekPlayers,
       squadValue: getTeamSquadValue('AEK'),
-      icon: '🔵'
+      logoComponent: <TeamLogo team="aek" size="md" />
     },
     { 
       id: 'real', 
@@ -140,7 +141,7 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
       displayName: 'Real Madrid', 
       players: realPlayers,
       squadValue: getTeamSquadValue('Real'),
-      icon: '🔴'
+      logoComponent: <TeamLogo team="real" size="md" />
     },
     { 
       id: 'ehemalige', 
@@ -232,7 +233,7 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
-                      <span className="text-2xl">{team.icon}</span>
+                      {team.logoComponent || <span className="text-2xl">{team.icon}</span>}
                       <div>
                         <h3 className={`font-semibold text-lg ${getTeamColor(team.name)}`}>
                           {team.displayName}
@@ -326,7 +327,9 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
                       </div>
                     ) : (
                       <div className="text-center py-8">
-                        <div className="text-4xl mb-2">{team.icon}</div>
+                        <div className="text-4xl mb-2 flex justify-center">
+                          {team.logoComponent || <span>{team.icon}</span>}
+                        </div>
                         <p className="text-text-muted">
                           Keine Spieler in {team.displayName}
                         </p>
