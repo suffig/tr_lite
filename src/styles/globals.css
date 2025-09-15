@@ -1583,3 +1583,153 @@
     box-shadow: 0 2px 8px rgba(255, 69, 58, 0.3);
   }
 }
+
+/* Enhanced Login Animations */
+.login-title-bounce {
+  animation: logoTitleBounce 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) 0.3s both;
+}
+
+.login-logo-bounce {
+  animation: logoBounceEnhanced 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) both;
+}
+
+.push-notification {
+  animation: pushNotificationSlide 0.4s cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.push-notification-exit {
+  animation: pushNotificationExit 0.3s cubic-bezier(0.55, 0.085, 0.68, 0.53) both;
+}
+
+.form-input-enhanced {
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.form-input-enhanced:focus {
+  animation: inputFocusGlow 0.3s ease-out;
+}
+
+.btn-spring-press {
+  transition: transform 0.1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.btn-spring-press:active {
+  transform: scale(0.96);
+}
+
+/* Enhanced Card Animations */
+.card-hover-lift {
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-floating);
+}
+
+.slide-in-stagger-1 {
+  animation: slideInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.1s both;
+}
+
+.slide-in-stagger-2 {
+  animation: slideInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.2s both;
+}
+
+.slide-in-stagger-3 {
+  animation: slideInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.3s both;
+}
+
+.slide-in-stagger-4 {
+  animation: slideInUp 0.6s cubic-bezier(0.23, 1, 0.32, 1) 0.4s both;
+}
+
+.icon-bounce-hover {
+  transition: transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.icon-bounce-hover:hover {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.notification-badge-pulse {
+  animation: notificationPulse 1.5s ease-in-out infinite;
+}
+
+/* New Keyframe Animations */
+@keyframes logoTitleBounce {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) scale(0.8);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(-5px) scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes logoBounceEnhanced {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) rotate(-10deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1) rotate(5deg);
+  }
+  70% {
+    transform: scale(0.95) rotate(-2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes pushNotificationSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(-100%) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pushNotificationExit {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+@keyframes inputFocusGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 122, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(0, 122, 255, 0.1);
+  }
+  100% {
+    box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2);
+  }
+}
+
+@keyframes notificationPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.8;
+  }
+}

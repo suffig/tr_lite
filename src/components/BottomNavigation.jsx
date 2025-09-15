@@ -39,7 +39,7 @@ export default function BottomNavigation({ activeTab, onTabChange }) {
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
-              className={`flex flex-col items-center justify-center p-2 rounded-ios-lg transition-all duration-ios touch-target active:scale-95 ${
+              className={`flex flex-col items-center justify-center p-2 rounded-ios-lg transition-all duration-ios touch-target btn-spring-press ${
                 activeTab === tab.id 
                   ? 'text-system-blue bg-system-blue/10' 
                   : 'text-text-tertiary hover:text-text-secondary hover:bg-bg-tertiary/50'
@@ -47,7 +47,7 @@ export default function BottomNavigation({ activeTab, onTabChange }) {
               aria-label={tab.ariaLabel}
               aria-current={activeTab === tab.id ? 'page' : undefined}
             >
-              <div className={`text-lg mb-1 transition-transform duration-ios ${
+              <div className={`text-lg mb-1 transition-transform duration-ios icon-bounce-hover ${
                 activeTab === tab.id ? 'scale-110' : ''
               }`}>
                 {tab.icon}

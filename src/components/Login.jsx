@@ -154,7 +154,7 @@ export default function Login() {
           {/* Header */}
           <div className="text-center mb-8 login-header">
             <div className="mb-6 flex justify-center">
-              <div className="w-20 h-20 bg-gradient-to-br from-system-green to-system-blue rounded-ios-2xl flex items-center justify-center shadow-ios-lg">
+              <div className="w-20 h-20 bg-gradient-to-br from-system-green to-system-blue rounded-ios-2xl flex items-center justify-center shadow-ios-lg login-logo-bounce">
                 <img 
                   src={logoFusta} 
                   alt="FUSTA Logo" 
@@ -163,8 +163,7 @@ export default function Login() {
                 />
               </div>
             </div>
-            <h1 className="text-title1 font-bold text-text-primary mb-2">FUSTA</h1>
-            <p className="text-callout text-text-secondary">FIFA Statistik-Tracker für deine Matches</p>
+            <h1 className="text-title1 font-bold text-text-primary mb-2 login-title-bounce">FUSTA</h1>
             
             {/* Demo Mode Indicator */}
             {isDemoMode && (
@@ -194,7 +193,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className={`w-full px-4 py-4 bg-bg-tertiary border border-border-light rounded-ios-lg text-body text-text-primary placeholder-text-tertiary transition-all duration-ios focus:outline-none focus:border-system-blue focus:ring-4 focus:ring-system-blue/20 ${
+                  className={`w-full px-4 py-4 bg-bg-tertiary border border-border-light rounded-ios-lg text-body text-text-primary placeholder-text-tertiary form-input-enhanced ${
                     errors.email ? 'border-system-red focus:border-system-red focus:ring-system-red/20' : ''
                   }`}
                   placeholder="deine@email.de"
@@ -220,7 +219,7 @@ export default function Login() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className={`w-full px-4 py-4 bg-bg-tertiary border border-border-light rounded-ios-lg text-body text-text-primary placeholder-text-tertiary transition-all duration-ios focus:outline-none focus:border-system-blue focus:ring-4 focus:ring-system-blue/20 ${
+                  className={`w-full px-4 py-4 bg-bg-tertiary border border-border-light rounded-ios-lg text-body text-text-primary placeholder-text-tertiary form-input-enhanced ${
                     errors.password ? 'border-system-red focus:border-system-red focus:ring-system-red/20' : ''
                   }`}
                   placeholder="Dein Passwort"
@@ -250,7 +249,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary-ios text-body font-semibold py-4 slide-up-delay-3 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full btn-primary-ios text-body font-semibold py-4 slide-up-delay-3 btn-spring-press disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <div className="flex items-center justify-center gap-3">
                 {loading && (
