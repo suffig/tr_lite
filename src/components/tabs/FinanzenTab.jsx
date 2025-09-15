@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import ExportImportManager from '../ExportImportManager';
+import HorizontalNavigation from '../HorizontalNavigation';
 import toast from 'react-hot-toast';
 
 export default function FinanzenTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
@@ -166,6 +167,15 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
     return { matchGroups, nonMatchTransactions };
   };
 
+  // Define views for horizontal navigation
+  const views = [
+    { id: 'overview', label: 'Übersicht', icon: '💰' },
+    { id: 'aek', label: 'AEK', icon: '🔵' },
+    { id: 'real', label: 'Real', icon: '🔴' },
+    { id: 'transactions', label: 'Transaktionen', icon: '💸' },
+    { id: 'analysis', label: 'Analyse', icon: '📊' },
+  ];
+
   if (loading) {
     return <LoadingSpinner message="Lade Finanzen..." />;
   }
@@ -196,31 +206,12 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
         </div>
       </div>
 
-      {/* View Navigation */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        <button
-          onClick={() => setCurrentView('overview')}
-          className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-            currentView === 'overview'
-              ? 'bg-primary-blue text-white'
-              : 'bg-bg-secondary text-text-primary hover:bg-bg-tertiary'
-          }`}
-        >
-          <span>💰</span>
-          <span className="hidden sm:inline">Übersicht</span>
-        </button>
-        <button
-          onClick={() => setCurrentView('transactions')}
-          className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-            currentView === 'transactions'
-              ? 'bg-primary-red text-white'
-              : 'bg-bg-secondary text-text-primary hover:bg-bg-tertiary'
-          }`}
-        >
-          <span>📋</span>
-          <span className="hidden sm:inline">Transaktionen</span>
-        </button>
-      </div>
+      {/* Horizontal Navigation */}
+      <HorizontalNavigation
+        views={views}
+        selectedView={currentView}
+        onViewChange={setCurrentView}
+      />
 
       {/* Conditional Content */}
       {currentView === 'transactions' ? (

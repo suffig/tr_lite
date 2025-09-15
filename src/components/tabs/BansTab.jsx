@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import { BAN_TYPES, getBanTypeColor, getBanIcon } from '../../constants/banTypes';
+import HorizontalNavigation from '../HorizontalNavigation';
 
 export default function BansTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   const [selectedType, setSelectedType] = useState('active'); // Changed from 'all' to 'active'
@@ -38,6 +39,19 @@ export default function BansTab({ onNavigate, showHints = false }) { // eslint-d
   const activeBans = bans?.filter(ban => (ban.totalgames - ban.matchesserved) > 0) || [];
   const completedBans = bans?.filter(ban => (ban.totalgames - ban.matchesserved) === 0) || [];
 
+  // Define views for horizontal navigation
+  const views = [
+    { id: 'all', label: 'Alle', icon: '📋', count: bans?.length || 0 },
+    { id: 'active', label: 'Aktiv', icon: '🔴', count: activeBans.length },
+    { id: 'completed', label: 'Beendet', icon: '✅', count: completedBans.length },
+    ...BAN_TYPES.map(type => ({
+      id: type.value,
+      label: type.label,
+      icon: getBanIcon(type.value) || '⚠️',
+      count: bans?.filter(ban => ban.type === type.value).length || 0
+    }))
+  ];
+
   if (loading) {
     return <LoadingSpinner message="Lade Sperren..." />;
   }
@@ -60,31 +74,15 @@ export default function BansTab({ onNavigate, showHints = false }) { // eslint-d
         </div>
       </div>
 
-      {/* Filter Buttons */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {[
-          { key: 'all', label: 'Alle', count: bans?.length || 0 },
-          { key: 'active', label: 'Aktiv', count: activeBans.length },
-          { key: 'completed', label: 'Beendet', count: completedBans.length },
-          ...BAN_TYPES.map(type => ({
-            key: type.value,
-            label: type.label,
-            count: bans?.filter(ban => ban.type === type.value).length || 0
-          }))
-        ].map((filter) => (
-          <button
-            key={filter.key}
-            onClick={() => setSelectedType(filter.key)}
-            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-              selectedType === filter.key
-                ? 'bg-primary-green text-white'
-                : 'bg-bg-secondary text-text-muted hover:bg-bg-tertiary border border-border-light'
-            }`}
-          >
-            {filter.label} ({filter.count})
-          </button>
-        ))}
-      </div>
+      {/* Horizontal Navigation */}
+      <HorizontalNavigation
+        views={views.map(view => ({
+          ...view,
+          label: `${view.label} (${view.count})`
+        }))}
+        selectedView={selectedType}
+        onViewChange={setSelectedType}
+      />
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -117,7 +115,7 @@ export default function BansTab({ onNavigate, showHints = false }) { // eslint-d
       {/* Bans Display */}
       {selectedType === 'active' || selectedType === 'all' ? (
         <>
-          {/* Active Bans Section */}
+          {/* Active Bans Section - moved below filters and statistics cards */}
           {activeBans.length > 0 && (
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">

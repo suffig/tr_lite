@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 
-// Real-time notification system for FIFA Tracker
+// Enhanced push-up notification system for FIFA Tracker
 export default function NotificationSystem() {
   const [notifications, setNotifications] = useState([]);
   const [isEnabled, setIsEnabled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const notificationId = useRef(0);
 
-  // Show notification function
+  // Enhanced notification function with better animations
   const showNotification = useCallback((type, data) => {
     const id = ++notificationId.current;
     const notification = {
@@ -17,7 +18,8 @@ export default function NotificationSystem() {
       message: getNotificationMessage(type, data),
       timestamp: new Date(),
       read: false,
-      data
+      data,
+      exitAnimation: false
     };
 
     setNotifications(prev => [notification, ...prev.slice(0, 9)]); // Keep max 10 notifications
@@ -35,10 +37,17 @@ export default function NotificationSystem() {
       });
     }
 
-    // Auto-remove notification after 5 seconds
+    // Enhanced auto-remove with exit animation
     setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-    }, 5000);
+      setNotifications(prev => 
+        prev.map(n => n.id === id ? { ...n, exitAnimation: true } : n)
+      );
+      
+      // Remove after exit animation completes
+      setTimeout(() => {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+      }, 300);
+    }, 4000);
   }, [isEnabled]);
 
   // Initialize notification system
@@ -102,10 +111,18 @@ export default function NotificationSystem() {
     }
   };
 
-  const markAsRead = (id) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
-    );
+  const dismissNotification = (id, immediate = false) => {
+    if (immediate) {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    } else {
+      setNotifications(prev => 
+        prev.map(n => n.id === id ? { ...n, exitAnimation: true } : n)
+      );
+      
+      setTimeout(() => {
+        setNotifications(prev => prev.filter(n => n.id !== id));
+      }, 300);
+    }
   };
 
   const clearAll = () => {
@@ -115,57 +132,74 @@ export default function NotificationSystem() {
   if (notifications.length === 0) return null;
 
   return createPortal(
-    <div className="fixed top-4 right-4 z-50 space-y-2 pointer-events-none">
-      {notifications.map((notification) => (
+    <div className="fixed top-4 right-4 z-50 space-y-3 pointer-events-none max-w-sm">
+      {notifications.map((notification, index) => (
         <div
           key={notification.id}
           className={`
-            pointer-events-auto max-w-sm w-full bg-white rounded-lg shadow-lg border
+            pointer-events-auto w-full bg-bg-elevated backdrop-blur-lg rounded-ios-lg border border-border-light
             transform transition-all duration-300 ease-out
+            ${notification.exitAnimation ? 'push-notification-exit' : 'push-notification'}
             ${notification.read ? 'opacity-70' : 'opacity-100'}
-            hover:scale-105 hover:shadow-xl
+            hover:scale-105 hover:shadow-floating
+            shadow-ios-lg
           `}
-          onClick={() => markAsRead(notification.id)}
+          onClick={() => setNotifications(prev => 
+            prev.map(n => n.id === notification.id ? { ...n, read: true } : n)
+          )}
+          style={{
+            animationDelay: `${index * 0.1}s`
+          }}
         >
           <div className="p-4">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 relative">
                 <div className={`
-                  w-3 h-3 rounded-full mt-1
-                  ${notification.read ? 'bg-gray-400' : getNotificationColor(notification.type)}
+                  w-4 h-4 rounded-full mt-0.5 shadow-sm
+                  ${notification.read ? 'bg-text-tertiary' : getNotificationColor(notification.type)}
+                  ${!notification.read ? 'notification-badge-pulse' : ''}
                 `} />
               </div>
-              <div className="ml-3 w-0 flex-1">
-                <p className="text-sm font-medium text-gray-900">
+              <div className="flex-1 min-w-0">
+                <p className="text-footnote font-semibold text-text-primary leading-tight">
                   {notification.title}
                 </p>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-caption1 text-text-secondary leading-tight">
                   {notification.message}
                 </p>
-                <p className="mt-1 text-xs text-gray-400">
-                  {notification.timestamp.toLocaleTimeString('de-DE')}
+                <p className="mt-2 text-caption2 text-text-tertiary">
+                  {notification.timestamp.toLocaleTimeString('de-DE', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
                 </p>
               </div>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setNotifications(prev => prev.filter(n => n.id !== notification.id));
+                  dismissNotification(notification.id);
                 }}
-                className="ml-4 flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+                className="ml-2 flex-shrink-0 text-text-tertiary hover:text-text-secondary transition-colors duration-200 p-1 rounded-full hover:bg-bg-tertiary icon-bounce-hover"
+                aria-label="Benachrichtigung schließen"
               >
                 <i className="fas fa-times text-xs" />
               </button>
             </div>
           </div>
+          
+          {/* Subtle bottom border for visual separation */}
+          <div className={`h-0.5 bg-gradient-to-r ${getNotificationGradient(notification.type)} opacity-60`} />
         </div>
       ))}
       
+      {/* Enhanced clear all button */}
       {notifications.length > 1 && (
-        <div className="pointer-events-auto flex justify-end">
+        <div className="pointer-events-auto flex justify-end pt-2">
           <button
             onClick={clearAll}
-            className="text-xs text-gray-500 hover:text-gray-700 bg-white px-2 py-1 rounded shadow"
+            className="text-caption1 text-text-secondary hover:text-text-primary bg-bg-elevated backdrop-blur-sm px-3 py-1.5 rounded-ios shadow-sm border border-border-light hover:shadow-md transition-all duration-200 btn-spring-press"
           >
+            <i className="fas fa-trash-alt mr-1 text-xs" />
             Alle löschen
           </button>
         </div>
@@ -179,17 +213,35 @@ const getNotificationColor = (type) => {
   switch (type) {
     case 'match-created':
     case 'match-result':
-      return 'bg-green-500';
+      return 'bg-system-green';
     case 'player-ban':
-      return 'bg-red-500';
+      return 'bg-system-red';
     case 'financial-milestone':
-      return 'bg-yellow-500';
+      return 'bg-system-yellow';
     case 'achievement-unlocked':
-      return 'bg-purple-500';
+      return 'bg-system-purple';
     case 'system-update':
-      return 'bg-blue-500';
+      return 'bg-system-blue';
     default:
-      return 'bg-gray-500';
+      return 'bg-system-blue';
+  }
+};
+
+const getNotificationGradient = (type) => {
+  switch (type) {
+    case 'match-created':
+    case 'match-result':
+      return 'from-system-green to-system-green-light';
+    case 'player-ban':
+      return 'from-system-red to-system-red-light';
+    case 'financial-milestone':
+      return 'from-system-yellow to-system-orange';
+    case 'achievement-unlocked':
+      return 'from-system-purple to-system-purple-light';
+    case 'system-update':
+      return 'from-system-blue to-system-blue-light';
+    default:
+      return 'from-system-blue to-system-blue-light';
   }
 };
 
