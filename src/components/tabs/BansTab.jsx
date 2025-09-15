@@ -59,32 +59,31 @@ export default function BansTab({ onNavigate, showHints = false }) { // eslint-d
           <div className="h-full bg-gradient-info w-3/4 rounded-full animate-pulse-gentle"></div>
         </div>
       </div>
-        
-        {/* Filter Buttons */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {[
-            { key: 'all', label: 'Alle', count: bans?.length || 0 },
-            { key: 'active', label: 'Aktiv', count: activeBans.length },
-            { key: 'completed', label: 'Beendet', count: completedBans.length },
-            ...BAN_TYPES.map(type => ({
-              key: type.value,
-              label: type.label,
-              count: bans?.filter(ban => ban.type === type.value).length || 0
-            }))
-          ].map((filter) => (
-            <button
-              key={filter.key}
-              onClick={() => setSelectedType(filter.key)}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                selectedType === filter.key
-                  ? 'bg-primary-green text-white'
-                  : 'bg-bg-secondary text-text-muted hover:bg-bg-tertiary border border-border-light'
-              }`}
-            >
-              {filter.label} ({filter.count})
-            </button>
-          ))}
-        </div>
+
+      {/* Filter Buttons */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {[
+          { key: 'all', label: 'Alle', count: bans?.length || 0 },
+          { key: 'active', label: 'Aktiv', count: activeBans.length },
+          { key: 'completed', label: 'Beendet', count: completedBans.length },
+          ...BAN_TYPES.map(type => ({
+            key: type.value,
+            label: type.label,
+            count: bans?.filter(ban => ban.type === type.value).length || 0
+          }))
+        ].map((filter) => (
+          <button
+            key={filter.key}
+            onClick={() => setSelectedType(filter.key)}
+            className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              selectedType === filter.key
+                ? 'bg-primary-green text-white'
+                : 'bg-bg-secondary text-text-muted hover:bg-bg-tertiary border border-border-light'
+            }`}
+          >
+            {filter.label} ({filter.count})
+          </button>
+        ))}
       </div>
 
       {/* Statistics Cards */}
