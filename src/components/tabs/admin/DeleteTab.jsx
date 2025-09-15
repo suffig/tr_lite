@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSupabaseQuery, useSupabaseMutation } from '../../../hooks/useSupabase';
 import { TEAMS } from '../../../constants/teams';
+import { deleteMatch } from '../../../services/matchService';
 import LoadingSpinner from '../../LoadingSpinner';
 import toast from 'react-hot-toast';
 
@@ -89,8 +90,6 @@ export default function DeleteTab() {
     let failedCount = 0;
 
     try {
-      const { deleteMatch } = await import('../../../../matches.js');
-      
       // Delete matches one by one to handle individual errors
       for (const matchId of selectedMatches) {
         try {
@@ -206,8 +205,7 @@ export default function DeleteTab() {
     
     setLoading(true);
     try {
-      // Use the comprehensive deleteMatch function from matches.js
-      const { deleteMatch } = await import('../../../../matches.js');
+      // Use the modern deleteMatch service
       console.log(`Attempting to delete match ${match.id}`);
       await deleteMatch(match.id);
       console.log(`Successfully deleted match ${match.id}`);
