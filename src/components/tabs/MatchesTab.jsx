@@ -367,8 +367,8 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                 className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
               >
                 <option value="all">Alle Ergebnisse</option>
-                <option value="aek-wins">🔵 AEK Siege</option>
-                <option value="real-wins">🔴 Real Siege</option>
+                <option value="aek-wins">AEK Siege</option>
+                <option value="real-wins">Real Siege</option>
               </select>
             </div>
             
@@ -609,7 +609,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                       return goalsList && goalsList.length > 0 ? (
                                         <div className="space-y-2">
                                           <div className="flex items-center gap-2 text-sm font-medium text-blue-700">
-                                            🔵 AEK ({match.goalsa || 0} Tore)
+                                            <TeamLogo team="aek" size="xs" /> AEK ({match.goalsa || 0} Tore)
                                           </div>
                                           {goalsList.map((goal, idx) => {
                                             const isObject = typeof goal === 'object' && goal !== null;
@@ -641,7 +641,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                         </div>
                                       ) : (
                                         <div className="p-3 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                                          <p className="text-sm text-gray-500 text-center">🔵 AEK: Keine Tore erzielt</p>
+                                          <p className="text-sm text-gray-500 text-center"><TeamLogo team="aek" size="xs" /> AEK: Keine Tore erzielt</p>
                                         </div>
                                       );
                                     })()}
@@ -663,7 +663,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                       return goalsList && goalsList.length > 0 ? (
                                         <div className="space-y-2">
                                           <div className="flex items-center gap-2 text-sm font-medium text-red-700">
-                                            🔴 Real ({match.goalsb || 0} Tore)
+                                            <TeamLogo team="real" size="xs" /> Real ({match.goalsb || 0} Tore)
                                           </div>
                                           {goalsList.map((goal, idx) => {
                                             const isObject = typeof goal === 'object' && goal !== null;
@@ -695,7 +695,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                         </div>
                                       ) : (
                                         <div className="p-3 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                                          <p className="text-sm text-gray-500 text-center">🔴 Real: Keine Tore erzielt</p>
+                                          <p className="text-sm text-gray-500 text-center"><TeamLogo team="real" size="xs" /> Real: Keine Tore erzielt</p>
                                         </div>
                                       );
                                     })()}
@@ -754,7 +754,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                     <div className="grid grid-cols-2 gap-3">
                                       {/* AEK Cards */}
                                       <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                                        <div className="text-sm font-medium text-blue-700 mb-2">🔵 AEK</div>
+                                        <div className="text-sm font-medium text-blue-700 mb-2 flex items-center gap-2">
+                                          <TeamLogo team="aek" size="xs" /> AEK
+                                        </div>
                                         <div className="space-y-1">
                                           <div className="flex items-center justify-between">
                                             <span className="text-sm text-gray-600">🟨 Gelbe Karten</span>
@@ -769,7 +771,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                       
                                       {/* Real Cards */}
                                       <div className="p-3 bg-red-50 rounded-lg border border-red-200">
-                                        <div className="text-sm font-medium text-red-700 mb-2">🔴 Real</div>
+                                        <div className="text-sm font-medium text-red-700 mb-2 flex items-center gap-2">
+                                          <TeamLogo team="real" size="xs" /> Real
+                                        </div>
                                         <div className="space-y-1">
                                           <div className="flex items-center justify-between">
                                             <span className="text-sm text-gray-600">🟨 Gelbe Karten</span>
@@ -802,7 +806,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                       {/* AEK Prize */}
                                       <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                                         <div className="flex items-center justify-between">
-                                          <span className="text-sm font-medium text-blue-700">🔵 AEK</span>
+                                          <span className="text-sm font-medium text-blue-700 flex items-center gap-2">
+                                            <TeamLogo team="aek" size="xs" /> AEK
+                                          </span>
                                           <span className={`font-bold text-lg ${(match.prizeaek || 0) > 0 ? 'text-green-600' : 'text-gray-500'}`}>
                                             €{match.prizeaek || 0}
                                           </span>
@@ -812,7 +818,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                       {/* Real Prize */}
                                       <div className="p-3 bg-red-50 rounded-lg border border-red-200">
                                         <div className="flex items-center justify-between">
-                                          <span className="text-sm font-medium text-red-700">🔴 Real</span>
+                                          <span className="text-sm font-medium text-red-700 flex items-center gap-2">
+                                            <TeamLogo team="real" size="xs" /> Real
+                                          </span>
                                           <span className={`font-bold text-lg ${(match.prizereal || 0) > 0 ? 'text-green-600' : 'text-gray-500'}`}>
                                             €{match.prizereal || 0}
                                           </span>
