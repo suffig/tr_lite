@@ -98,15 +98,23 @@ export default function TeamSettingsTab() {
     try {
       setLoading(true);
       
+      // Debug: Log what we're trying to save
+      console.log('💾 [TeamSettings] Saving manager settings:', managers);
+      
       // Update both managers in the database
       const aekData = { name: managers.aek.name, gewicht: managers.aek.weight };
       const realData = { name: managers.real.name, gewicht: managers.real.weight };
       
+      console.log('💾 [TeamSettings] AEK Data:', aekData);
+      console.log('💾 [TeamSettings] Real Data:', realData);
+      
       // Update AEK manager (id=1)
-      await dataManager.update('managers', aekData, 1);
+      const aekResult = await dataManager.update('managers', aekData, 1);
+      console.log('💾 [TeamSettings] AEK Update Result:', aekResult);
       
       // Update Real manager (id=2)
-      await dataManager.update('managers', realData, 2);
+      const realResult = await dataManager.update('managers', realData, 2);
+      console.log('💾 [TeamSettings] Real Update Result:', realResult);
       
       setHasChanges(false);
       
