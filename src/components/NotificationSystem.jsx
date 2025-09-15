@@ -140,10 +140,11 @@ export default function NotificationSystem({ onNavigate }) {
 
   const getNotificationMessage = (type, data) => {
     switch (type) {
-      case 'match-created':
+      case 'match-created': {
         const matchResult = `AEK ${data.goalsa || 0} - ${data.goalsb || 0} Real`;
         const motmText = data.manofthematch ? ` • SdS: ${data.manofthematch}` : '';
         return `${matchResult} vom ${new Date(data.date).toLocaleDateString('de-DE')}${motmText}`;
+      }
       case 'match-result':
         return data.manofthematch ? `Spieler des Spiels: ${data.manofthematch}` : 'Spiel beendet';
       case 'player-ban':
