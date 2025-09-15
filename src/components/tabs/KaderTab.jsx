@@ -154,13 +154,22 @@ export default function KaderTab({ onNavigate, showHints = false }) { // eslint-
 
   return (
     <div className="p-4 pb-24 mobile-safe-bottom">
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-text-primary mb-2">
-          Kader-Übersicht
-        </h2>
-        <p className="text-text-muted">
-          {players?.length || 0} Spieler insgesamt
-        </p>
+      {/* Enhanced Header with iOS 26 Design - matching StatsTab */}
+      <div className="mb-6 animate-mobile-slide-in">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 bg-gradient-info rounded-ios-lg flex items-center justify-center">
+            <span className="text-white text-xl">👥</span>
+          </div>
+          <div>
+            <h2 className="text-title1 font-bold text-text-primary">Kader</h2>
+            <p className="text-footnote text-text-secondary">
+              {players?.length || 0} Spieler insgesamt
+            </p>
+          </div>
+        </div>
+        <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-info w-3/4 rounded-full animate-pulse-gentle"></div>
+        </div>
       </div>
 
       {/* Enhanced Quick Actions Panel */}

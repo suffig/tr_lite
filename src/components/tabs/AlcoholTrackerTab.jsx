@@ -27,22 +27,39 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
   // Load manager data from database
   const loadManagersFromDatabase = useCallback(async () => {
     try {
+      console.log('🔄 Loading managers from database...');
       const result = await dataManager.getManagers();
+      console.log('📊 Manager data result:', result);
       
-      if (result.data && result.data.length >= 2) {
+      if (result && result.data && Array.isArray(result.data) && result.data.length >= 2) {
+        console.log('✅ Manager data loaded successfully:', result.data);
         // Convert database format to component format
         // Assuming id=1 is AEK manager, id=2 is Real manager
         const aekManager = result.data.find(m => m.id === 1) || { name: 'Alexander', gewicht: 110 };
         const realManager = result.data.find(m => m.id === 2) || { name: 'Philip', gewicht: 105 };
         
+        console.log('👤 AEK Manager:', aekManager);
+        console.log('👤 Real Manager:', realManager);
+        
         setManagers({
           aek: { name: aekManager.name, age: 30, weight: aekManager.gewicht },
           real: { name: realManager.name, age: 30, weight: realManager.gewicht }
         });
+      } else {
+        console.warn('⚠️ No manager data found, using defaults. Result:', result);
+        // Use defaults if no data
+        setManagers({
+          aek: { name: 'Alexander', age: 30, weight: 110 },
+          real: { name: 'Philip', age: 30, weight: 105 }
+        });
       }
     } catch (error) {
-      console.error('Error loading manager settings from database:', error);
+      console.error('❌ Error loading manager settings from database:', error);
       // Fallback to defaults if database fails
+      setManagers({
+        aek: { name: 'Alexander', age: 30, weight: 110 },
+        real: { name: 'Philip', age: 30, weight: 105 }
+      });
     }
   }, []);
 
@@ -502,14 +519,20 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
 
   return (
     <div className="p-4 pb-24 mobile-safe-bottom">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-text-primary mb-4">
-          🍺🃏 Alkohol & Blackjack Tracker
-        </h2>
-        <p className="text-text-muted">
-          Alexander vs Philip - Getränke und Kartenspiele verfolgen
-        </p>
+      {/* Enhanced Header with iOS 26 Design - matching StatsTab */}
+      <div className="mb-6 animate-mobile-slide-in">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 bg-gradient-info rounded-ios-lg flex items-center justify-center">
+            <span className="text-white text-xl">🍺</span>
+          </div>
+          <div>
+            <h2 className="text-title1 font-bold text-text-primary">Alkohol & Blackjack</h2>
+            <p className="text-footnote text-text-secondary">Alexander vs Philip - Getränke und Kartenspiele verfolgen</p>
+          </div>
+        </div>
+        <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-info w-3/4 rounded-full animate-pulse-gentle"></div>
+        </div>
       </div>
 
       {/* Sub-Navigation */}

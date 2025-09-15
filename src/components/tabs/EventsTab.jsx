@@ -165,15 +165,21 @@ export default function EventsTab() {
   );
 
   return (
-    <div className="p-4 space-y-6 pb-24">
-      {/* Header */}
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-text-primary mb-2">
-          🎉 Events & Turniere
-        </h1>
-        <p className="text-text-secondary text-sm">
-          Besondere Events, Turniere und Challenges
-        </p>
+    <div className="p-4 pb-24 mobile-safe-bottom">
+      {/* Enhanced Header with iOS 26 Design - matching StatsTab */}
+      <div className="mb-6 animate-mobile-slide-in">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 bg-gradient-info rounded-ios-lg flex items-center justify-center">
+            <span className="text-white text-xl">🎉</span>
+          </div>
+          <div>
+            <h2 className="text-title1 font-bold text-text-primary">Events</h2>
+            <p className="text-footnote text-text-secondary">Besondere Events, Turniere und Challenges</p>
+          </div>
+        </div>
+        <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-info w-3/4 rounded-full animate-pulse-gentle"></div>
+        </div>
       </div>
 
       {/* Active Events */}

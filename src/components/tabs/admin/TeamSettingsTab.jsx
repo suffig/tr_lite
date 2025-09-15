@@ -20,24 +20,66 @@ export default function TeamSettingsTab() {
   const loadManagersFromDatabase = async () => {
     try {
       setLoading(true);
+      console.log('🔄 [AdminTab] Loading managers from database...');
       const result = await dataManager.getManagers();
+      console.log('📊 [AdminTab] Manager data result:', result);
       
-      if (result.data && result.data.length >= 2) {
+      if (result && result.data && Array.isArray(result.data) && result.data.length >= 2) {
+        console.log('✅ [AdminTab] Manager data loaded successfully:', result.data);
         // Convert database format to component format
         // Assuming id=1 is AEK manager, id=2 is Real manager
         const aekManager = result.data.find(m => m.id === 1) || { name: 'Alexander', gewicht: 110 };
         const realManager = result.data.find(m => m.id === 2) || { name: 'Philip', gewicht: 105 };
         
+        console.log('👤 [AdminTab] AEK Manager:', aekManager);
+        console.log('👤 [AdminTab] Real Manager:', realManager);
+        
         setManagers({
           aek: { name: aekManager.name, age: 30, weight: aekManager.gewicht },
           real: { name: realManager.name, age: 30, weight: realManager.gewicht }
         });
+      } else {
+        console.warn('⚠️ [AdminTab] No manager data found, using defaults. Result:', result);
+        // Use defaults if no data - but let's try to create the managers first
+        await initializeManagers();
       }
     } catch (error) {
-      console.error('Error loading manager settings from database:', error);
-      // Fallback to defaults if database fails
+      console.error('❌ [AdminTab] Error loading manager settings from database:', error);
+      // Try to initialize managers if they don't exist
+      await initializeManagers();
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Initialize managers if they don't exist in database
+  const initializeManagers = async () => {
+    try {
+      console.log('🔧 [AdminTab] Initializing default managers...');
+      
+      // Create AEK manager (id=1)
+      const aekData = { name: 'Alexander', gewicht: 110 };
+      const aekResult = await dataManager.insert('managers', aekData);
+      console.log('✅ [AdminTab] AEK manager created:', aekResult);
+      
+      // Create Real manager (id=2)  
+      const realData = { name: 'Philip', gewicht: 105 };
+      const realResult = await dataManager.insert('managers', realData);
+      console.log('✅ [AdminTab] Real manager created:', realResult);
+      
+      // Set defaults in state
+      setManagers({
+        aek: { name: 'Alexander', age: 30, weight: 110 },
+        real: { name: 'Philip', age: 30, weight: 105 }
+      });
+      
+    } catch (error) {
+      console.error('❌ [AdminTab] Error initializing managers:', error);
+      // Final fallback - just use state defaults
+      setManagers({
+        aek: { name: 'Alexander', age: 30, weight: 110 },
+        real: { name: 'Philip', age: 30, weight: 105 }
+      });
     }
   };
 

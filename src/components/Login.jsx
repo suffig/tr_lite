@@ -4,7 +4,7 @@ import { ErrorHandler, FormValidator } from '../utils/errorHandling';
 import logoFusta from '/assets/logo-fusta.png';
 
 export default function Login() {
-  const [isLogin] = useState(true); // Always login mode, no registration
+  // Always login mode, no registration - removed unused isLogin state
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);

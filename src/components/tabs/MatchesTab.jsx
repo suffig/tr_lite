@@ -226,15 +226,22 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
 
   return (
     <div className="p-4 pb-24 mobile-safe-bottom">
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-xl font-semibold text-text-primary">
-            Spiele-Übersicht
-          </h2>
+      {/* Enhanced Header with iOS 26 Design - matching StatsTab */}
+      <div className="mb-6 animate-mobile-slide-in">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 bg-gradient-info rounded-ios-lg flex items-center justify-center">
+            <span className="text-white text-xl">⚽</span>
+          </div>
+          <div>
+            <h2 className="text-title1 font-bold text-text-primary">Spiele</h2>
+            <p className="text-footnote text-text-secondary">
+              {matches?.length || 0} Spiele gefunden, gruppiert nach Datum
+            </p>
+          </div>
         </div>
-        <p className="text-text-muted">
-          {matches?.length || 0} Spiele gefunden, gruppiert nach Datum
-        </p>
+        <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-info w-3/4 rounded-full animate-pulse-gentle"></div>
+        </div>
       </div>
 
       {/* Enhanced Filter Controls */}
@@ -465,33 +472,16 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                             </div>
                           </div>
                           
-                          {/* Quick stats preview */}
-                          <div className="flex items-center gap-4">
-                            {/* Goals stats */}
-                            <div className="text-right">
-                              <div className="text-xs text-gray-500">Tore</div>
-                              <div className="text-sm font-semibold">{aekGoals + realGoals}</div>
-                            </div>
-                            
-                            {/* Cards stats */}
-                            <div className="text-right">
-                              <div className="text-xs text-gray-500">Karten</div>
-                              <div className="text-sm font-semibold">
-                                🟨{(match.yellowa || 0) + (match.yellowb || 0)} 🟥{(match.reda || 0) + (match.redb || 0)}
-                              </div>
-                            </div>
-                            
-                            {/* Expand indicator */}
-                            <div className="flex items-center gap-2 ml-4">
-                              <span className="text-xs text-gray-500 group-hover:text-gray-700 transition-colors">
-                                {isExpanded ? 'Weniger' : 'Details'}
-                              </span>
-                              <div className={`
-                                p-2 rounded-full bg-white/60 group-hover:bg-white/80 transition-all duration-300
-                                ${isExpanded ? 'rotate-90 bg-blue-100' : 'hover:scale-110'}
-                              `}>
-                                <span className="text-lg block">▶</span>
-                              </div>
+                          {/* Clean result overview - only show expand indicator */}
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 group-hover:text-gray-700 transition-colors">
+                              {isExpanded ? 'Weniger' : 'Details'}
+                            </span>
+                            <div className={`
+                              p-2 rounded-full bg-white/60 group-hover:bg-white/80 transition-all duration-300
+                              ${isExpanded ? 'rotate-90 bg-blue-100' : 'hover:scale-110'}
+                            `}>
+                              <span className="text-lg block">▶</span>
                             </div>
                           </div>
                         </button>
