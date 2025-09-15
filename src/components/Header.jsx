@@ -1,4 +1,5 @@
 import React from 'react';
+import logoFusta from '/assets/logo-fusta.png';
 
 export default function Header() {
   return (
@@ -7,7 +8,7 @@ export default function Header() {
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-gradient-to-br from-system-green to-system-blue rounded-ios flex items-center justify-center shadow-ios-sm">
             <img 
-              src="/assets/logo-fusta.png" 
+              src={logoFusta} 
               alt="FUSTA Logo" 
               className="w-6 h-6 object-contain"
               loading="eager"
