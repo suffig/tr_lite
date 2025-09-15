@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 
 // Enhanced push-up notification system for FIFA Tracker
-export default function NotificationSystem() {
+export default function NotificationSystem({ onNavigate }) {
   const [notifications, setNotifications] = useState([]);
   const [isEnabled, setIsEnabled] = useState(false);
   // const [isVisible, setIsVisible] = useState(true); // Currently unused
@@ -24,17 +24,47 @@ export default function NotificationSystem() {
 
     setNotifications(prev => [notification, ...prev.slice(0, 9)]); // Keep max 10 notifications
 
-    // Show browser notification if enabled
+    // Show browser notification if enabled and document is hidden (iOS compatible)
     if (isEnabled && document.hidden) {
-      new Notification(notification.title, {
-        body: notification.message,
-        icon: '/assets/icon-180.png',
-        badge: '/assets/icon-180.png',
-        tag: `fifa-tracker-${type}`,
-        requireInteraction: type === 'match-result',
-        vibrate: [200, 100, 200],
-        timestamp: Date.now()
-      });
+      try {
+        // iOS Safari has different behavior, so we use a more compatible approach
+        const notificationOptions = {
+          body: notification.message,
+          icon: '/tr_lite/assets/icon-180.png', // Updated path for subdir
+          badge: '/tr_lite/assets/icon-180.png',
+          tag: `fifa-tracker-${type}-${id}`,
+          requireInteraction: type === 'match-result' || type === 'match-created', // Keep match notifications visible
+          silent: false,
+          timestamp: Date.now(),
+          data: {
+            type,
+            matchId: data?.matchId,
+            url: getNotificationUrl(type, data)
+          }
+        };
+
+        // Only add vibrate for non-iOS devices
+        if (!/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+          notificationOptions.vibrate = [200, 100, 200];
+        }
+
+        const browserNotification = new Notification(notification.title, notificationOptions);
+        
+        // Handle notification click for navigation
+        browserNotification.onclick = () => {
+          window.focus();
+          // Navigate to appropriate page
+          if (type === 'match-created' && data?.matchId) {
+            // This would need to be handled by the main app navigation
+            window.dispatchEvent(new CustomEvent('notification-navigate', {
+              detail: { type, data }
+            }));
+          }
+          browserNotification.close();
+        };
+      } catch (error) {
+        console.warn('Failed to show browser notification:', error);
+      }
     }
 
     // Enhanced auto-remove with exit animation
@@ -73,6 +103,22 @@ export default function NotificationSystem() {
     return () => window.removeEventListener('fifa-notification', handleNotificationEvent);
   }, [showNotification]);
 
+  const getNotificationUrl = (type, data) => {
+    switch (type) {
+      case 'match-created':
+      case 'match-result':
+        return `/tr_lite/#matches${data?.matchId ? `?match=${data.matchId}` : ''}`;
+      case 'player-ban':
+        return `/tr_lite/#bans${data?.banId ? `?ban=${data.banId}` : ''}`;
+      case 'financial-milestone':
+        return `/tr_lite/#finances${data?.team ? `?team=${data.team}` : ''}`;
+      case 'achievement-unlocked':
+        return `/tr_lite/#stats${data?.achievementId ? `?achievement=${data.achievementId}` : ''}`;
+      default:
+        return '/tr_lite/#matches';
+    }
+  };
+
   const getNotificationTitle = (type, data) => {
     switch (type) {
       case 'match-created':
@@ -95,7 +141,9 @@ export default function NotificationSystem() {
   const getNotificationMessage = (type, data) => {
     switch (type) {
       case 'match-created':
-        return `Spiel vom ${new Date(data.date).toLocaleDateString('de-DE')} wurde hinzugefügt`;
+        const matchResult = `AEK ${data.goalsa || 0} - ${data.goalsb || 0} Real`;
+        const motmText = data.manofthematch ? ` • SdS: ${data.manofthematch}` : '';
+        return `${matchResult} vom ${new Date(data.date).toLocaleDateString('de-DE')}${motmText}`;
       case 'match-result':
         return data.manofthematch ? `Spieler des Spiels: ${data.manofthematch}` : 'Spiel beendet';
       case 'player-ban':
@@ -125,6 +173,56 @@ export default function NotificationSystem() {
     }
   };
 
+  const handleNotificationClick = (notification) => {
+    if (!onNavigate) return;
+
+    switch (notification.type) {
+      case 'match-created':
+        // Navigate to matches tab and highlight the new match
+        onNavigate('matches', { 
+          scrollToTop: true,
+          highlightMatch: notification.data?.matchId || 'latest'
+        });
+        break;
+      case 'match-result':
+        // Navigate to matches tab and show the specific match details
+        onNavigate('matches', { 
+          expandMatch: notification.data?.matchId,
+          scrollToMatch: notification.data?.matchId
+        });
+        break;
+      case 'player-ban':
+        // Navigate to bans tab and highlight the ban
+        onNavigate('bans', { 
+          highlightBan: notification.data?.banId,
+          filterByPlayer: notification.data?.playerName
+        });
+        break;
+      case 'financial-milestone':
+        // Navigate to finances tab
+        onNavigate('finances', { 
+          team: notification.data?.team?.toLowerCase(),
+          showMilestone: true
+        });
+        break;
+      case 'achievement-unlocked':
+        // Navigate to stats tab
+        onNavigate('stats', { 
+          highlightAchievement: notification.data?.achievementId
+        });
+        break;
+      default:
+        // Default navigation to matches
+        onNavigate('matches');
+        break;
+    }
+
+    // Auto-dismiss notification after navigation
+    setTimeout(() => {
+      dismissNotification(notification.id);
+    }, 1000);
+  };
+
   const clearAll = () => {
     setNotifications([]);
   };
@@ -142,11 +240,14 @@ export default function NotificationSystem() {
             ${notification.exitAnimation ? 'push-notification-exit' : 'push-notification'}
             ${notification.read ? 'opacity-70' : 'opacity-100'}
             hover:scale-105 hover:shadow-floating
-            shadow-ios-lg
+            shadow-ios-lg cursor-pointer
           `}
-          onClick={() => setNotifications(prev => 
-            prev.map(n => n.id === notification.id ? { ...n, read: true } : n)
-          )}
+          onClick={() => {
+            setNotifications(prev => 
+              prev.map(n => n.id === notification.id ? { ...n, read: true } : n)
+            );
+            handleNotificationClick(notification);
+          }}
           style={{
             animationDelay: `${index * 0.1}s`
           }}

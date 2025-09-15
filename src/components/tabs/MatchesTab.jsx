@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import HorizontalNavigation from '../HorizontalNavigation';
+import TeamLogo from '../TeamLogo';
 import '../../styles/match-animations.css';
 
 export default function MatchesTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
@@ -48,10 +49,38 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
     
     let filtered = allMatches;
     
-    // Apply date filter if set (exact date)
-    if (dateFilter) {
+    // Apply horizontal navigation view filter first
+    switch (activeView) {
+      case 'aek-wins':
+        filtered = filtered.filter(match => {
+          const aekGoals = match.goalsa || 0;
+          const realGoals = match.goalsb || 0;
+          return aekGoals > realGoals;
+        });
+        break;
+      case 'real-wins':
+        filtered = filtered.filter(match => {
+          const aekGoals = match.goalsa || 0;
+          const realGoals = match.goalsb || 0;
+          return realGoals > aekGoals;
+        });
+        break;
+      case 'recent':
+        // Show only the last 2 weeks
+        const twoWeeksAgo = new Date();
+        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+        filtered = filtered.filter(match => new Date(match.date) >= twoWeeksAgo);
+        break;
+      case 'overview':
+      default:
+        // No additional filtering for overview
+        break;
+    }
+    
+    // Apply date filter if set (exact date) - only if not in horizontal nav filter mode
+    if (activeView === 'overview' && dateFilter) {
       filtered = filtered.filter(match => match.date === dateFilter);
-    } else if (timeFilter !== 'all') {
+    } else if (activeView === 'overview' && timeFilter !== 'all') {
       // Apply time period filter
       const filterDate = getTimeFilterDate();
       if (filterDate) {
@@ -59,8 +88,8 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
       }
     }
     
-    // Apply result filter
-    if (resultFilter !== 'all') {
+    // Apply result filter - only if not using horizontal nav for results
+    if (activeView === 'overview' && resultFilter !== 'all') {
       filtered = filtered.filter(match => {
         const aekGoals = match.goalsa || 0;
         const realGoals = match.goalsb || 0;
@@ -76,8 +105,8 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
       });
     }
     
-    // Apply goal filter
-    if (goalFilter !== 'all') {
+    // Apply goal filter - only if in overview mode
+    if (activeView === 'overview' && goalFilter !== 'all') {
       filtered = filtered.filter(match => {
         const totalGoals = (match.goalsa || 0) + (match.goalsb || 0);
         
@@ -107,6 +136,34 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
     { id: 'real-wins', label: 'Real Siege', icon: '🔴' },
     { id: 'stats', label: 'Statistiken', icon: '📊' },
   ];
+
+  // Sync horizontal navigation with dropdown filters
+  useEffect(() => {
+    switch (activeView) {
+      case 'aek-wins':
+        if (resultFilter !== 'aek-wins') {
+          setResultFilter('aek-wins');
+          setTimeFilter('all'); // Reset time filter when using specific view
+        }
+        break;
+      case 'real-wins':
+        if (resultFilter !== 'real-wins') {
+          setResultFilter('real-wins');
+          setTimeFilter('all'); // Reset time filter when using specific view
+        }
+        break;
+      case 'recent':
+        if (timeFilter !== '4weeks') {
+          setTimeFilter('4weeks');
+          setResultFilter('all'); // Reset result filter for recent view
+        }
+        break;
+      case 'overview':
+      default:
+        // Don't auto-change filters when in overview mode
+        break;
+    }
+  }, [activeView]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Helper function to get player name and value
   const getPlayerInfo = (playerId, playerName) => {
