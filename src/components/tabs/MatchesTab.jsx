@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
+import HorizontalNavigation from '../HorizontalNavigation';
 import '../../styles/match-animations.css';
 
 export default function MatchesTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
@@ -12,6 +13,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
   const [goalFilter, setGoalFilter] = useState('all'); // 'all', 'high-scoring', 'low-scoring'
   const [hoveredMatch, setHoveredMatch] = useState(null);
   const [animatingMatches, setAnimatingMatches] = useState(new Set());
+  const [activeView, setActiveView] = useState('overview');
   const animationTimeouts = useRef(new Map());
   
   const { data: allMatches, loading, error, refetch } = useSupabaseQuery(
@@ -96,6 +98,15 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
   const matches = getFilteredMatches();
   
   const isLoading = loading || playersLoading;
+
+  // Define views for horizontal navigation
+  const views = [
+    { id: 'overview', label: 'Übersicht', icon: '⚽' },
+    { id: 'recent', label: 'Letzte', icon: '📅' },
+    { id: 'aek-wins', label: 'AEK Siege', icon: '🔵' },
+    { id: 'real-wins', label: 'Real Siege', icon: '🔴' },
+    { id: 'stats', label: 'Statistiken', icon: '📊' },
+  ];
 
   // Helper function to get player name and value
   const getPlayerInfo = (playerId, playerName) => {
@@ -243,6 +254,13 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
           <div className="h-full bg-gradient-info w-3/4 rounded-full animate-pulse-gentle"></div>
         </div>
       </div>
+
+      {/* Horizontal Navigation */}
+      <HorizontalNavigation
+        views={views}
+        selectedView={activeView}
+        onViewChange={setActiveView}
+      />
 
       {/* Enhanced Filter Controls */}
       <div className="mb-6 modern-card">
@@ -443,9 +461,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                 {/* Score */}
                                 <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg">
                                   <div className="text-2xl font-black text-gray-800">
-                                    <span className={winner === 'aek' ? 'text-blue-600' : 'text-gray-600'}>{aekGoals}</span>
+                                    <span className="text-blue-600">{aekGoals}</span>
                                     <span className="mx-2 text-gray-400">:</span>
-                                    <span className={winner === 'real' ? 'text-red-600' : 'text-gray-600'}>{realGoals}</span>
+                                    <span className="text-red-600">{realGoals}</span>
                                   </div>
                                 </div>
                                 
