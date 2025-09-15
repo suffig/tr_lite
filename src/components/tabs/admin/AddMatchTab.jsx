@@ -157,10 +157,64 @@ export default function AddMatchTab() {
     // No draws allowed - one team must win
     if (formData.goalsa === formData.goalsb) return false;
     
+    // At least one goal must be scored (no 0:0 matches)
+    if (formData.goalsa === 0 && formData.goalsb === 0) return false;
+    
     // SdS (Spieler des Spiels) must be selected
     if (!formData.manofthematch || formData.manofthematch.trim() === '') return false;
     
+    // If goals are scored, there must be goal scorers (except for own goals only)
+    if (formData.goalsa > 0) {
+      const playerGoalsA = formData.goalslista.reduce((sum, scorer) => sum + scorer.count, 0);
+      const ownGoalsFromB = formData.ownGoalsB || 0;
+      if (playerGoalsA + ownGoalsFromB < formData.goalsa) return false;
+    }
+    
+    if (formData.goalsb > 0) {
+      const playerGoalsB = formData.goalslistb.reduce((sum, scorer) => sum + scorer.count, 0);
+      const ownGoalsFromA = formData.ownGoalsA || 0;
+      if (playerGoalsB + ownGoalsFromA < formData.goalsb) return false;
+    }
+    
     return true;
+  };
+
+  // Get validation status for UI feedback
+  const getValidationStatus = () => {
+    const issues = [];
+    
+    if (!formData.date) issues.push('Datum fehlt');
+    if (formData.goalsa === 0 && formData.goalsb === 0) issues.push('Mindestens ein Tor erforderlich');
+    if (formData.goalsa === formData.goalsb && (formData.goalsa > 0 || formData.goalsb > 0)) issues.push('Unentschieden nicht erlaubt');
+    if (!formData.manofthematch || formData.manofthematch.trim() === '') issues.push('Spieler des Spiels fehlt');
+    
+    // Check goal scorer validation
+    if (formData.goalsa > 0) {
+      const playerGoalsA = formData.goalslista.reduce((sum, scorer) => sum + scorer.count, 0);
+      const ownGoalsFromB = formData.ownGoalsB || 0;
+      if (playerGoalsA + ownGoalsFromB < formData.goalsa) {
+        issues.push(`AEK Torschützen fehlen (${playerGoalsA + ownGoalsFromB}/${formData.goalsa})`);
+      }
+    }
+    
+    if (formData.goalsb > 0) {
+      const playerGoalsB = formData.goalslistb.reduce((sum, scorer) => sum + scorer.count, 0);
+      const ownGoalsFromA = formData.ownGoalsA || 0;
+      if (playerGoalsB + ownGoalsFromA < formData.goalsb) {
+        issues.push(`Real Torschützen fehlen (${playerGoalsB + ownGoalsFromA}/${formData.goalsb})`);
+      }
+    }
+    
+    return {
+      isValid: issues.length === 0,
+      issues: issues
+    };
+  };
+
+  // Helper functions for card management
+  const adjustCards = (cardType, delta) => {
+    const newValue = Math.max(0, (formData[cardType] || 0) + delta);
+    updateFormData({ [cardType]: newValue });
   };
 
   // Helper functions for live goal scoring
@@ -545,72 +599,116 @@ export default function AddMatchTab() {
                   <h4 className="text-sm font-medium text-text-primary mb-3">🟨🟥 Karten</h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-3">
-                      <p className="text-xs text-blue-600 font-medium">Heimteam</p>
+                      <p className="text-xs text-blue-600 font-medium">AEK Athen</p>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
                           <label className="block text-xs text-text-muted mb-1">
                             🟨 Gelbe Karten
                           </label>
-                          <input
-                            type="number"
-                            min="0"
-                            max="99"
-                            value={formData.yellowa}
-                            onChange={(e) => handleInputChange('yellowa', e.target.value)}
-                            onFocus={(e) => e.target.select()}
-                            className="form-input w-16 text-center"
-                            disabled={loading}
-                          />
+                          <div className="flex items-center justify-center bg-yellow-50 border border-yellow-300 rounded-lg p-2">
+                            <button
+                              type="button"
+                              onClick={() => adjustCards('yellowa', -1)}
+                              className="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                              disabled={loading || formData.yellowa <= 0}
+                            >
+                              −
+                            </button>
+                            <span className="mx-3 text-lg font-bold text-gray-700 min-w-[2rem] text-center">
+                              {formData.yellowa}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => adjustCards('yellowa', 1)}
+                              className="w-8 h-8 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                              disabled={loading}
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                         <div>
                           <label className="block text-xs text-text-muted mb-1">
                             🟥 Rote Karten
                           </label>
-                          <input
-                            type="number"
-                            min="0"
-                            max="99"
-                            value={formData.reda}
-                            onChange={(e) => handleInputChange('reda', e.target.value)}
-                            onFocus={(e) => e.target.select()}
-                            className="form-input w-16 text-center"
-                            disabled={loading}
-                          />
+                          <div className="flex items-center justify-center bg-red-50 border border-red-300 rounded-lg p-2">
+                            <button
+                              type="button"
+                              onClick={() => adjustCards('reda', -1)}
+                              className="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                              disabled={loading || formData.reda <= 0}
+                            >
+                              −
+                            </button>
+                            <span className="mx-3 text-lg font-bold text-gray-700 min-w-[2rem] text-center">
+                              {formData.reda}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => adjustCards('reda', 1)}
+                              className="w-8 h-8 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                              disabled={loading}
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <p className="text-xs text-red-600 font-medium">Gastteam</p>
+                      <p className="text-xs text-red-600 font-medium">Real Madrid</p>
                       <div className="grid grid-cols-2 gap-2">
                         <div>
                           <label className="block text-xs text-text-muted mb-1">
                             🟨 Gelbe Karten
                           </label>
-                          <input
-                            type="number"
-                            min="0"
-                            max="99"
-                            value={formData.yellowb}
-                            onChange={(e) => handleInputChange('yellowb', e.target.value)}
-                            onFocus={(e) => e.target.select()}
-                            className="form-input w-16 text-center"
-                            disabled={loading}
-                          />
+                          <div className="flex items-center justify-center bg-yellow-50 border border-yellow-300 rounded-lg p-2">
+                            <button
+                              type="button"
+                              onClick={() => adjustCards('yellowb', -1)}
+                              className="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                              disabled={loading || formData.yellowb <= 0}
+                            >
+                              −
+                            </button>
+                            <span className="mx-3 text-lg font-bold text-gray-700 min-w-[2rem] text-center">
+                              {formData.yellowb}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => adjustCards('yellowb', 1)}
+                              className="w-8 h-8 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                              disabled={loading}
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                         <div>
                           <label className="block text-xs text-text-muted mb-1">
                             🟥 Rote Karten
                           </label>
-                          <input
-                            type="number"
-                            min="0"
-                            max="99"
-                            value={formData.redb}
-                            onChange={(e) => handleInputChange('redb', e.target.value)}
-                            onFocus={(e) => e.target.select()}
-                            className="form-input w-16 text-center"
-                            disabled={loading}
-                          />
+                          <div className="flex items-center justify-center bg-red-50 border border-red-300 rounded-lg p-2">
+                            <button
+                              type="button"
+                              onClick={() => adjustCards('redb', -1)}
+                              className="w-8 h-8 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                              disabled={loading || formData.redb <= 0}
+                            >
+                              −
+                            </button>
+                            <span className="mx-3 text-lg font-bold text-gray-700 min-w-[2rem] text-center">
+                              {formData.redb}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => adjustCards('redb', 1)}
+                              className="w-8 h-8 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold transition-colors"
+                              disabled={loading}
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -746,6 +844,26 @@ export default function AddMatchTab() {
                   </div>
                 )}
 
+                {/* Enhanced Validation Status */}
+                {!isFormValid() && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <div className="flex items-start">
+                      <div className="text-red-600 mr-2 mt-1">⚠️</div>
+                      <div className="flex-1">
+                        <h5 className="font-medium text-red-800 mb-1">Formular unvollständig</h5>
+                        <ul className="text-sm text-red-700 space-y-1">
+                          {getValidationStatus().issues.map((issue, index) => (
+                            <li key={index} className="flex items-start">
+                              <span className="mr-2">•</span>
+                              <span>{issue}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Buttons */}
                 <div className="flex gap-3 pt-4 pb-20 sm:pb-4">
                   <button
@@ -758,11 +876,11 @@ export default function AddMatchTab() {
                   </button>
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={loading || !isFormValid()}
                     className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
                       isFormValid() 
                         ? 'bg-green-600 hover:bg-green-700 text-white' 
-                        : 'bg-red-500 hover:bg-red-600 text-white cursor-not-allowed'
+                        : 'bg-red-500 text-white cursor-not-allowed opacity-75'
                     } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {loading ? (
@@ -771,7 +889,7 @@ export default function AddMatchTab() {
                         Speichern...
                       </div>
                     ) : (
-                      isFormValid() ? '✅ Speichern' : '❌ Eingaben unvollständig'
+                      isFormValid() ? '✅ Spiel speichern' : `❌ ${getValidationStatus().issues[0] || 'Eingaben unvollständig'}`
                     )}
                   </button>
                 </div>
