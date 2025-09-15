@@ -440,9 +440,6 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                     <span className="mx-2 text-gray-400">:</span>
                                     <span className={winner === 'real' ? 'text-red-600' : 'text-gray-600'}>{realGoals}</span>
                                   </div>
-                                  <div className="text-xs text-gray-500 text-center mt-1">
-                                    {aekGoals + realGoals} Tore insgesamt
-                                  </div>
                                 </div>
                                 
                                 {/* Team B */}
