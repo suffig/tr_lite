@@ -31,6 +31,22 @@ export default function AddMatchTab() {
     motmTeamFilter: 'all' // Add team filter for man of the match
   });
   const [loading, setLoading] = useState(false);
+  
+  // Section expansion state for mobile-friendly accordion
+  const [expandedSections, setExpandedSections] = useState({
+    goals: true,    // Start with goals expanded as it's most important
+    cards: false,
+    motm: false,
+    prizes: false
+  });
+  
+  // Toggle section expansion
+  const toggleSection = (sectionKey) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey]
+    }));
+  };
 
   // Calculate total goals from player scores and own goals
   // Own goals count for the opponent team!
