@@ -132,8 +132,8 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
   const views = [
     { id: 'overview', label: 'Übersicht', icon: '⚽' },
     { id: 'recent', label: 'Letzte', icon: '📅' },
-    { id: 'aek-wins', label: 'AEK Siege', icon: '🔵' },
-    { id: 'real-wins', label: 'Real Siege', icon: '🔴' },
+    { id: 'aek-wins', label: 'AEK Siege', logoComponent: <TeamLogo team="aek" size="sm" /> },
+    { id: 'real-wins', label: 'Real Siege', logoComponent: <TeamLogo team="real" size="sm" /> },
     { id: 'stats', label: 'Statistiken', icon: '📊' },
   ];
 

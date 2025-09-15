@@ -16,7 +16,7 @@ export default function HorizontalNavigation({ views, selectedView, onViewChange
             title={view.label}
             aria-label={view.label}
           >
-            <span className="text-lg">{view.icon}</span>
+            <span className="text-lg">{view.logoComponent || view.icon}</span>
             <span className="text-xs font-semibold">{view.label}</span>
             {selectedView === view.id && (
               <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-white rounded-full"></div>

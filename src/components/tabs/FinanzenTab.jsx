@@ -179,8 +179,8 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
   // Define views for horizontal navigation
   const views = [
     { id: 'overview', label: 'Übersicht', icon: '💰' },
-    { id: 'aek', label: 'AEK', icon: '🔵' },
-    { id: 'real', label: 'Real', icon: '🔴' },
+    { id: 'aek', label: 'AEK', logoComponent: <TeamLogo team="aek" size="sm" /> },
+    { id: 'real', label: 'Real', logoComponent: <TeamLogo team="real" size="sm" /> },
     { id: 'transactions', label: 'Transaktionen', icon: '💸' },
     { id: 'analysis', label: 'Analyse', icon: '📊' },
   ];
