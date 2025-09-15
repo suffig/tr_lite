@@ -84,7 +84,83 @@ export default function BansTab({ onNavigate, showHints = false }) { // eslint-d
         onViewChange={setSelectedType}
       />
 
-      {/* Statistics Cards */}
+      {/* Active Bans Section - moved directly below filters as requested */}
+      {(selectedType === 'active' || selectedType === 'all') && activeBans.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+            🔴 Aktive Sperren ({activeBans.length})
+          </h3>
+          <div className="space-y-4">
+            {activeBans.map((ban) => {
+              const remainingGames = (ban.totalgames || 0) - (ban.matchesserved || 0);
+              const progress = (ban.totalgames || 0) > 0 ? ((ban.matchesserved || 0) / (ban.totalgames || 0)) * 100 : 0;
+              
+              return (
+                <div key={ban.id} className="modern-card hover:bg-bg-secondary transition-colors cursor-pointer group">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start space-x-4 flex-1">
+                      <div className="text-2xl group-hover:scale-110 transition-transform">
+                        {getBanIcon(ban.type)}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h3 className="font-semibold text-text-primary group-hover:text-primary-green transition-colors">
+                            {getPlayerName(ban.player_id)}
+                          </h3>
+                          <span className="text-sm text-text-muted group-hover:text-text-primary transition-colors">
+                            ({getPlayerTeam(ban.player_id)})
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 mb-3">
+                          <span className={`inline-block px-2 py-1 rounded text-xs font-medium border transition-all group-hover:scale-105 ${getBanTypeColor(ban.type)}`}>
+                            {ban.type}
+                          </span>
+                          <span className="inline-block px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800 border border-red-200 transition-all group-hover:scale-105">
+                            🔴 Aktiv - {remainingGames} Spiel{remainingGames !== 1 ? 'e' : ''} verbleibend
+                          </span>
+                        </div>
+                        
+                        <div className="flex items-center space-x-2 mb-2">
+                          <div className="flex-1 bg-gray-200 rounded-full h-2">
+                            <div 
+                              className="bg-accent-red h-2 rounded-full transition-all duration-300"
+                              style={{ width: `${progress}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-xs text-text-muted font-medium group-hover:text-text-primary transition-colors">
+                            Fortschritt: {ban.matchesserved || 0} / {ban.totalgames || 0} Spiele
+                          </span>
+                          <span className="text-xs font-bold text-accent-red group-hover:scale-110 transition-transform">
+                            {Math.round(progress)}%
+                          </span>
+                        </div>
+                        
+                        {ban.reason && (
+                          <p className="text-sm text-text-muted group-hover:text-text-primary transition-colors">
+                            Grund: {ban.reason}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="text-center ml-4">
+                      <div className="text-lg font-bold text-accent-red group-hover:scale-110 transition-transform">
+                        {remainingGames}
+                      </div>
+                      <div className="text-xs text-text-muted group-hover:text-text-primary transition-colors">
+                        Verbleibend
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Statistics Cards - moved below active bans */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <div className="modern-card text-center hover:bg-bg-secondary transition-colors cursor-pointer group">
           <div className="text-2xl font-bold text-accent-red group-hover:scale-110 transition-transform">
