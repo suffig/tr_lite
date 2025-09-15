@@ -221,7 +221,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
         onViewChange={setCurrentView}
       />
 
-      {/* Conditional Content */}
+      {/* Conditional Content Based on currentView */}
       {currentView === 'transactions' ? (
         <div className="space-y-4">
           {/* Transactions List */}
@@ -265,6 +265,110 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
             </div>
           </div>
         </div>
+      ) : currentView === 'aek' ? (
+        <>
+          {/* AEK-only View */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="modern-card text-center border-l-4 border-blue-400 financial-card">
+              <div className="flex items-center justify-center mb-2">
+                <span className="text-2xl mr-2">🔵</span>
+                <h3 className="font-semibold text-blue-600">AEK Athen</h3>
+              </div>
+              <div className="space-y-1 text-sm">
+                <div>Kontostand: <span className={`font-bold ${getAmountColorClass(aekFinances.balance)} animate-numberCount`}>{formatCurrency(aekFinances.balance)}</span></div>
+                <div>Kaderwert: <span className="font-bold text-blue-600">{formatPlayerValue(getTeamSquadValue('AEK'))}</span></div>
+                <div>Schulden: <span className={`font-bold ${getAmountColorClass(-(aekFinances.debt || 0))} animate-numberCount`}>{formatCurrency(aekFinances.debt || 0)}</span></div>
+              </div>
+            </div>
+            
+            <div className="modern-card text-center border-l-4 border-primary-green">
+              <div className="flex items-center justify-center mb-2">
+                <span className="text-2xl mr-2">💰</span>
+                <h3 className="font-semibold text-primary-green">AEK Gesamt</h3>
+              </div>
+              <div className="text-2xl font-bold text-text-primary">
+                {formatCurrency(aekFinances.balance + (getTeamSquadValue('AEK') * 1000000))}
+              </div>
+              <div className="text-sm text-text-muted">Gesamtkapital (Bargeld + Kaderwert)</div>
+            </div>
+          </div>
+
+          {/* AEK Team-specific Details */}
+          <div className="modern-card mb-6">
+            <h3 className="font-bold text-lg mb-4 flex items-center">
+              <span className="text-2xl mr-2">🔵</span>
+              AEK Athen - Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-600">{formatCurrency(aekFinances.balance)}</div>
+                <div className="text-sm text-text-muted">Aktueller Kontostand</div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-xl font-bold text-green-600">{getTeamTransactions('AEK').filter(t => t.amount > 0).length}</div>
+                  <div className="text-sm text-text-muted">Einnahmen</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-red-600">{getTeamTransactions('AEK').filter(t => t.amount < 0).length}</div>
+                  <div className="text-sm text-text-muted">Ausgaben</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : currentView === 'real' ? (
+        <>
+          {/* Real-only View */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="modern-card text-center border-l-4 border-red-400 financial-card">
+              <div className="flex items-center justify-center mb-2">
+                <span className="text-2xl mr-2">🔴</span>
+                <h3 className="font-semibold text-red-600">Real Madrid</h3>
+              </div>
+              <div className="space-y-1 text-sm">
+                <div>Kontostand: <span className={`font-bold ${getAmountColorClass(realFinances.balance)} animate-numberCount`}>{formatCurrency(realFinances.balance)}</span></div>
+                <div>Kaderwert: <span className="font-bold text-red-600">{formatPlayerValue(getTeamSquadValue('Real'))}</span></div>
+                <div>Schulden: <span className={`font-bold ${getAmountColorClass(-(realFinances.debt || 0))} animate-numberCount`}>{formatCurrency(realFinances.debt || 0)}</span></div>
+              </div>
+            </div>
+            
+            <div className="modern-card text-center border-l-4 border-primary-green">
+              <div className="flex items-center justify-center mb-2">
+                <span className="text-2xl mr-2">💰</span>
+                <h3 className="font-semibold text-primary-green">Real Gesamt</h3>
+              </div>
+              <div className="text-2xl font-bold text-text-primary">
+                {formatCurrency(realFinances.balance + (getTeamSquadValue('Real') * 1000000))}
+              </div>
+              <div className="text-sm text-text-muted">Gesamtkapital (Bargeld + Kaderwert)</div>
+            </div>
+          </div>
+
+          {/* Real Team-specific Details */}
+          <div className="modern-card mb-6">
+            <h3 className="font-bold text-lg mb-4 flex items-center">
+              <span className="text-2xl mr-2">🔴</span>
+              Real Madrid - Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-red-600">{formatCurrency(realFinances.balance)}</div>
+                <div className="text-sm text-text-muted">Aktueller Kontostand</div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-xl font-bold text-green-600">{getTeamTransactions('Real').filter(t => t.amount > 0).length}</div>
+                  <div className="text-sm text-text-muted">Einnahmen</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-red-600">{getTeamTransactions('Real').filter(t => t.amount < 0).length}</div>
+                  <div className="text-sm text-text-muted">Ausgaben</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       ) : (
         <>
           {/* Original Overview Content */}
