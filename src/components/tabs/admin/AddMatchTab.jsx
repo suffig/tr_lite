@@ -570,10 +570,11 @@ export default function AddMatchTab() {
                           <input
                             type="number"
                             min="0"
+                            max="99"
                             value={formData.yellowa}
                             onChange={(e) => handleInputChange('yellowa', e.target.value)}
                             onFocus={(e) => e.target.select()}
-                            className="form-input"
+                            className="form-input w-16 text-center"
                             disabled={loading}
                           />
                         </div>
@@ -584,10 +585,11 @@ export default function AddMatchTab() {
                           <input
                             type="number"
                             min="0"
+                            max="99"
                             value={formData.reda}
                             onChange={(e) => handleInputChange('reda', e.target.value)}
                             onFocus={(e) => e.target.select()}
-                            className="form-input"
+                            className="form-input w-16 text-center"
                             disabled={loading}
                           />
                         </div>
@@ -603,10 +605,11 @@ export default function AddMatchTab() {
                           <input
                             type="number"
                             min="0"
+                            max="99"
                             value={formData.yellowb}
                             onChange={(e) => handleInputChange('yellowb', e.target.value)}
                             onFocus={(e) => e.target.select()}
-                            className="form-input"
+                            className="form-input w-16 text-center"
                             disabled={loading}
                           />
                         </div>
@@ -617,10 +620,11 @@ export default function AddMatchTab() {
                           <input
                             type="number"
                             min="0"
+                            max="99"
                             value={formData.redb}
                             onChange={(e) => handleInputChange('redb', e.target.value)}
                             onFocus={(e) => e.target.select()}
-                            className="form-input"
+                            className="form-input w-16 text-center"
                             disabled={loading}
                           />
                         </div>
@@ -770,8 +774,12 @@ export default function AddMatchTab() {
                   </button>
                   <button
                     type="submit"
-                    disabled={!isFormValid() || loading}
-                    className="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={loading}
+                    className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+                      isFormValid() 
+                        ? 'bg-green-600 hover:bg-green-700 text-white' 
+                        : 'bg-red-500 hover:bg-red-600 text-white cursor-not-allowed'
+                    } ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {loading ? (
                       <div className="flex items-center justify-center">
@@ -779,7 +787,7 @@ export default function AddMatchTab() {
                         Speichern...
                       </div>
                     ) : (
-                      'Speichern'
+                      isFormValid() ? '✅ Speichern' : '❌ Eingaben unvollständig'
                     )}
                   </button>
                 </div>

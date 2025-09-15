@@ -509,8 +509,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                               
                               <div className="flex items-center gap-4">
                                 {/* Team A */}
-                                <div className="text-right">
-                                  <div className="text-lg font-bold text-blue-700">
+                                <div className="text-right flex flex-col items-center">
+                                  <TeamLogo team={match.teama || 'AEK'} size="lg" />
+                                  <div className="text-sm font-medium text-blue-700 mt-1">
                                     {match.teama || 'AEK'}
                                   </div>
                                 </div>
@@ -525,8 +526,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                 </div>
                                 
                                 {/* Team B */}
-                                <div className="text-left">
-                                  <div className="text-lg font-bold text-red-700">
+                                <div className="text-left flex flex-col items-center">
+                                  <TeamLogo team={match.teamb || 'Real'} size="lg" />
+                                  <div className="text-sm font-medium text-red-700 mt-1">
                                     {match.teamb || 'Real'}
                                   </div>
                                 </div>
