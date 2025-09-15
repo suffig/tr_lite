@@ -3,6 +3,7 @@ import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import { BAN_TYPES, getBanTypeColor, getBanIcon } from '../../constants/banTypes';
 import HorizontalNavigation from '../HorizontalNavigation';
+import TeamLogo from '../TeamLogo';
 
 export default function BansTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   const [selectedType, setSelectedType] = useState('active'); // Changed from 'all' to 'active'
@@ -112,9 +113,7 @@ export default function BansTab({ onNavigate, showHints = false }) { // eslint-d
                               <h3 className="font-semibold text-text-primary group-hover:text-primary-green transition-colors">
                                 {getPlayerName(ban.player_id)}
                               </h3>
-                              <span className="text-sm text-text-muted group-hover:text-text-primary transition-colors">
-                                ({getPlayerTeam(ban.player_id)})
-                              </span>
+                              <TeamLogo team={getPlayerTeam(ban.player_id)} size="sm" className="group-hover:scale-110 transition-transform" />
                             </div>
                             
                             <div className="flex items-center space-x-2 mb-3">
@@ -204,9 +203,7 @@ export default function BansTab({ onNavigate, showHints = false }) { // eslint-d
                               <h3 className="font-semibold text-text-primary group-hover:text-primary-green transition-colors">
                                 {getPlayerName(ban.player_id)}
                               </h3>
-                              <span className="text-sm text-text-muted group-hover:text-text-primary transition-colors">
-                                ({getPlayerTeam(ban.player_id)})
-                              </span>
+                              <TeamLogo team={getPlayerTeam(ban.player_id)} size="sm" className="group-hover:scale-110 transition-transform" />
                             </div>
                             
                             <div className="flex items-center space-x-2 mb-3">
@@ -269,9 +266,7 @@ export default function BansTab({ onNavigate, showHints = false }) { // eslint-d
                             <h3 className="font-semibold text-text-primary group-hover:text-primary-green transition-colors">
                               {getPlayerName(ban.player_id)}
                             </h3>
-                            <span className="text-sm text-text-muted group-hover:text-text-primary transition-colors">
-                              ({getPlayerTeam(ban.player_id)})
-                            </span>
+                            <TeamLogo team={getPlayerTeam(ban.player_id)} size="sm" className="group-hover:scale-110 transition-transform" />
                           </div>
                           
                           <div className="flex items-center space-x-2 mb-3">

@@ -65,12 +65,13 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
           return realGoals > aekGoals;
         });
         break;
-      case 'recent':
+      case 'recent': {
         // Show only the last 2 weeks
         const twoWeeksAgo = new Date();
         twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
         filtered = filtered.filter(match => new Date(match.date) >= twoWeeksAgo);
         break;
+      }
       case 'overview':
       default:
         // No additional filtering for overview
@@ -509,8 +510,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                               
                               <div className="flex items-center gap-4">
                                 {/* Team A */}
-                                <div className="text-right">
-                                  <div className="text-lg font-bold text-blue-700">
+                                <div className="text-right flex flex-col items-center">
+                                  <TeamLogo team={match.teama || 'AEK'} size="lg" />
+                                  <div className="text-sm font-medium text-blue-700 mt-1">
                                     {match.teama || 'AEK'}
                                   </div>
                                 </div>
@@ -525,8 +527,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                 </div>
                                 
                                 {/* Team B */}
-                                <div className="text-left">
-                                  <div className="text-lg font-bold text-red-700">
+                                <div className="text-left flex flex-col items-center">
+                                  <TeamLogo team={match.teamb || 'Real'} size="lg" />
+                                  <div className="text-sm font-medium text-red-700 mt-1">
                                     {match.teamb || 'Real'}
                                   </div>
                                 </div>
