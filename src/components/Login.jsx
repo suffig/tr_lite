@@ -52,7 +52,7 @@ export default function Login() {
     const formEmail = formData.get('email') || email;
     const formPassword = formData.get('password') || password;
 
-    console.log('🔑 Attempting login with:', formEmail);
+    console.log('🔑 Attempting login with:', formEmail, 'isDemoMode:', isDemoMode);
 
     try {
       // Client-side validation
@@ -76,16 +76,16 @@ export default function Login() {
         return;
       }
 
+      // Force switch to fallback mode when in demo mode or CDN is blocked
+      if (isDemoMode || !window.supabase || document.querySelector('script[src*="supabase"]') === null) {
+        console.warn('🔄 Force switching to fallback mode for demo');
+        await switchToFallbackMode();
+        setIsDemoMode(true);
+      }
+
       // Use current supabase client for auth
       let result;
       try {
-        // Automatically switch to fallback mode if CDN is blocked
-        if (!isDemoMode && !window.supabase && document.querySelector('script[src*="supabase"]') === null) {
-          console.warn('🔄 Supabase CDN blocked, switching to demo mode');
-          await switchToFallbackMode();
-          setIsDemoMode(true);
-        }
-        
         result = await supabase.auth.signInWithPassword({
           email: FormValidator.sanitizeInput(formEmail),
           password: formPassword

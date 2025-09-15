@@ -1120,25 +1120,23 @@ export default function StatsTab({ onNavigate, showHints = false }) { // eslint-
         </div>
       </div>
 
-      {/* Enhanced View Navigation with iOS 26 Design */}
+      {/* Enhanced View Navigation with iOS 26 Design - Horizontal Layout */}
       <div className="relative mb-6 animate-mobile-slide-in">
-        <div className="icon-only-nav scrollbar-hide">
+        <div className="flex overflow-x-auto scrollbar-hide gap-2 py-2">
           {views.map((view) => (
             <button
               key={view.id}
               onClick={() => setSelectedView(view.id)}
-              className={`stats-nav-button transition-all duration-300 ${
+              className={`flex-shrink-0 flex flex-col items-center gap-1 px-4 py-3 rounded-xl transition-all duration-300 min-w-[80px] ${
                 selectedView === view.id
-                  ? 'bg-system-blue text-white shadow-ios-elevated scale-105'
-                  : 'bg-bg-card text-text-secondary hover:bg-bg-elevated hover:scale-102'
+                  ? 'bg-system-blue text-white shadow-ios-elevated'
+                  : 'bg-bg-card text-text-secondary hover:bg-bg-elevated'
               }`}
               title={view.label}
               aria-label={view.label}
             >
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-lg">{view.icon}</span>
-                <span className="text-caption2 font-semibold hidden sm:inline">{view.label}</span>
-              </div>
+              <span className="text-lg">{view.icon}</span>
+              <span className="text-xs font-semibold">{view.label}</span>
               {selectedView === view.id && (
                 <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-white rounded-full"></div>
               )}
