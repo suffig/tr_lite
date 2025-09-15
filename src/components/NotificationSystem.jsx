@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 export default function NotificationSystem() {
   const [notifications, setNotifications] = useState([]);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
+  // const [isVisible, setIsVisible] = useState(true); // Currently unused
   const notificationId = useRef(0);
 
   // Enhanced notification function with better animations
