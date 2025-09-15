@@ -278,14 +278,14 @@ export default function AddMatchTab() {
 
       {/* Match Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-2 sm:p-4">
-          <div className="bg-bg-secondary rounded-lg w-full max-w-lg modal-content match-modal-content modal-mobile-safe">
-            <div className="p-4 sm:p-6">
-              <div className="flex justify-between items-center mb-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-bg-secondary rounded-lg w-full max-w-lg modal-content match-modal-content modal-mobile-safe my-4" style={{ maxHeight: 'calc(100vh - 2rem)' }}>
+            <div className="p-4 sm:p-6 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 4rem)' }}>
+              <div className="flex justify-between items-center mb-6 sticky top-0 bg-bg-secondary z-10 pb-4">
                 <h3 className="text-xl font-semibold text-text-primary">Neues Spiel</h3>
                 <button
                   onClick={() => setShowModal(false)}
-                  className="text-text-muted hover:text-text-primary text-2xl"
+                  className="text-text-secondary hover:text-text-primary text-2xl font-bold bg-bg-tertiary hover:bg-bg-hover rounded-full w-8 h-8 flex items-center justify-center transition-colors"
                   disabled={loading}
                 >
                   ×

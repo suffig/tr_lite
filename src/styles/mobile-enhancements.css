@@ -542,7 +542,7 @@ button:active {
     width: 95vw;
     max-width: 95vw;
     margin: 10px auto;
-    max-height: calc(100vh - 6rem); /* Account for bottom navigation */
+    max-height: calc(100vh - 2rem); /* Reduced from 6rem to 2rem to prevent cut-off */
     overflow-y: auto;
   }
   
@@ -551,12 +551,14 @@ button:active {
     position: sticky;
     top: 0;
     background: white;
+    color: #1F2937; /* Improved text contrast */
     z-index: 10;
   }
   
   .modal-body {
     padding: 1rem;
     padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    color: #374151; /* Improved text readability */
   }
   
   .modal-footer {
@@ -570,6 +572,34 @@ button:active {
   
   .mobile-safe-content {
     margin-bottom: calc(5rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Match modal specific fixes for better readability and preventing cut-off */
+  .match-modal-content {
+    background: var(--bg-secondary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-light);
+  }
+
+  .modal-mobile-safe {
+    max-height: calc(100vh - 2rem) !important;
+    overflow-y: auto;
+  }
+
+  .modal-mobile-safe .form-input {
+    background: var(--bg-tertiary) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border-medium) !important;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .modal-mobile-safe label {
+    color: var(--text-primary) !important;
+    font-weight: 500;
+  }
+
+  .modal-mobile-safe .text-text-muted {
+    color: var(--text-secondary) !important;
   }
 }
 
@@ -1551,12 +1581,13 @@ button:focus {
 @media (max-width: 640px) {
   .enhanced-modal {
     margin: 1rem;
-    max-height: calc(100vh - 2rem);
+    max-height: calc(100vh - 2rem); /* Reduced from previous value to prevent cut-off */
     animation: mobileModalSlideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   }
   
   .modal-body {
-    max-height: calc(100vh - 12rem);
+    max-height: calc(100vh - 8rem); /* Reduced from 12rem to 8rem for better visibility */
+    overflow-y: auto; /* Ensure scrolling when content is too long */
   }
   
   @keyframes mobileModalSlideUp {

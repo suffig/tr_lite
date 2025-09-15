@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase, switchToFallbackMode } from '../utils/supabase';
 import { ErrorHandler, FormValidator } from '../utils/errorHandling';
+import logoFusta from '/assets/logo-fusta.png';
 
 export default function Login() {
   const [isLogin] = useState(true); // Always login mode, no registration
@@ -155,7 +156,7 @@ export default function Login() {
             <div className="mb-6 flex justify-center">
               <div className="w-20 h-20 bg-gradient-to-br from-system-green to-system-blue rounded-ios-2xl flex items-center justify-center shadow-ios-lg">
                 <img 
-                  src="/assets/logo-fusta.png" 
+                  src={logoFusta} 
                   alt="FUSTA Logo" 
                   className="w-12 h-12 object-contain"
                   loading="eager"
