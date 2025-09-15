@@ -65,12 +65,13 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
           return realGoals > aekGoals;
         });
         break;
-      case 'recent':
+      case 'recent': {
         // Show only the last 2 weeks
         const twoWeeksAgo = new Date();
         twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
         filtered = filtered.filter(match => new Date(match.date) >= twoWeeksAgo);
         break;
+      }
       case 'overview':
       default:
         // No additional filtering for overview
