@@ -85,7 +85,7 @@ export class MatchBusinessLogic {
         throw new Error(`Match insert failed: ${matchResult.error.message}`);
       }
 
-      const matchId = matchResult.data.id;
+      const matchId = matchResult.data?.id;
       const now = new Date().toISOString().slice(0, 10);
 
       // 4. Update player goals (excluding own goals which start with "Eigentore_")

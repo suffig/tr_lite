@@ -132,9 +132,9 @@ export default function AddMatchTab() {
       // Show success message with comprehensive feedback
       toast.success(result.message);
       
-      // Trigger push notification for new match with match ID for navigation
+      // Trigger push notification for new match with correct match ID
       triggerNotification('match-created', {
-        matchId: result.match?.id || result.id || 'latest',
+        matchId: result.matchId || 'latest',
         date: formData.date,
         teama: formData.teama,
         teamb: formData.teamb,
@@ -323,7 +323,7 @@ export default function AddMatchTab() {
           
           <button 
             onClick={() => setShowModal(true)}
-            className="btn-primary"
+            className="btn-primary inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             <i className="fas fa-plus mr-2"></i>
             Neues Spiel erfassen
@@ -383,14 +383,24 @@ export default function AddMatchTab() {
                 <div className="border-t pt-4">
                   <h4 className="text-sm font-medium text-text-primary mb-3">⚽ Live Torwertung</h4>
                   
-                  {/* Score Display */}
-                  <div className="bg-gray-50 rounded-lg p-4 mb-4 text-center">
-                    <div className="text-2xl font-bold text-gray-700">
-                      {formData.goalsa} : {formData.goalsb}
+                  {/* Enhanced Score Display */}
+                  <div className="bg-gradient-to-r from-blue-50 to-red-50 rounded-xl p-6 mb-4 text-center border border-gray-200 shadow-sm">
+                    <div className="text-4xl font-bold text-gray-800 mb-2">
+                      <span className="text-blue-600">{formData.goalsa}</span>
+                      <span className="mx-4 text-gray-400">:</span>
+                      <span className="text-red-600">{formData.goalsb}</span>
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">
-                      AEK Athen {formData.goalsa} - {formData.goalsb} Real Madrid
+                    <div className="text-sm text-gray-600 mb-1">
+                      <span className="font-medium text-blue-700">AEK Athen</span>
+                      <span className="mx-2">vs</span>
+                      <span className="font-medium text-red-700">Real Madrid</span>
                     </div>
+                    {(formData.goalsa > 0 || formData.goalsb > 0) && (
+                      <div className="text-xs text-gray-500 mt-2">
+                        {formData.goalsa > formData.goalsb ? '🏆 AEK führt' : 
+                         formData.goalsb > formData.goalsa ? '🏆 Real führt' : '⚖️ Unentschieden'}
+                      </div>
+                    )}
                   </div>
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
@@ -839,6 +849,38 @@ export default function AddMatchTab() {
                       <div>
                         <h5 className="font-medium text-yellow-800">Spieler des Spiels erforderlich</h5>
                         <p className="text-sm text-yellow-700">Bitte wählen Sie einen Spieler des Spiels aus, bevor Sie das Match speichern.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Match Summary Preview */}
+                {isFormValid() && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h5 className="font-medium text-green-800 mb-3 flex items-center">
+                      <i className="fas fa-check-circle mr-2"></i>
+                      Spiel-Zusammenfassung
+                    </h5>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-green-700">Datum:</span>
+                        <span className="font-medium text-green-800">{new Date(formData.date).toLocaleDateString('de-DE')}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-green-700">Ergebnis:</span>
+                        <span className="font-medium text-green-800">AEK {formData.goalsa} : {formData.goalsb} Real</span>
+                      </div>
+                      {formData.manofthematch && (
+                        <div className="flex justify-between">
+                          <span className="text-green-700">Spieler des Spiels:</span>
+                          <span className="font-medium text-green-800">{formData.manofthematch}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between">
+                        <span className="text-green-700">Preisgelder:</span>
+                        <span className="font-medium text-green-800">
+                          AEK {formData.prizeaek.toLocaleString()}€, Real {formData.prizereal.toLocaleString()}€
+                        </span>
                       </div>
                     </div>
                   </div>
