@@ -1,7 +1,7 @@
 import { useState, Suspense, lazy, useEffect } from 'react';
 import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
-import { useAuth } from './hooks/useAuth';
+import { useAuth } from './hooks/useAuth.js';
 import { OfflineIndicator } from './hooks/useOfflineManager.jsx';
 import { ThemeProvider } from './contexts/ThemeContext';
 import Login from './components/Login';
@@ -172,7 +172,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="flex flex-col min-h-screen bg-bg-primary transition-colors duration-300 safe-area-all ios-scroll-smooth">
+      <div className="flex flex-col min-h-screen bg-bg-primary transition-colors duration-ios safe-area-all">
         {/* Header */}
         <Header />
         
@@ -181,16 +181,16 @@ function App() {
         
         {/* Connection Status Indicator - Only show on admin page */}
         {isDemoMode && activeTab === 'admin' && (
-          <div className="bg-warning border-yellow-400 text-yellow-900 px-4 py-2 text-center text-sm font-medium" role="alert">
-            <span className="inline-flex items-center gap-2">
-              <span aria-hidden="true">⚠️</span>
-              Demo-Modus aktiv - Supabase CDN blockiert
-            </span>
+          <div className="bg-system-yellow/20 border-system-yellow/40 text-system-yellow px-4 py-3 text-center" role="alert">
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-lg">⚠️</span>
+              <span className="text-footnote font-medium">Demo-Modus aktiv - Supabase CDN blockiert</span>
+            </div>
           </div>
         )}
         
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto scroll-smooth ios-scroll-smooth" role="main">
+        <main className="flex-1 overflow-y-auto ios-scroll-smooth pb-20" role="main">
           <Suspense fallback={<LoadingSpinner message="Lade Tab..." />}>
             {tabLoading ? (
               <div className="flex items-center justify-center min-h-[50vh]">
@@ -216,30 +216,31 @@ function App() {
           toastOptions={{
             duration: 4000,
             style: {
-              background: 'var(--bg-secondary)',
+              background: 'var(--bg-elevated)',
               color: 'var(--text-primary)',
               borderRadius: '12px',
               padding: '16px',
-              fontSize: '14px',
-              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+              fontSize: '15px',
+              boxShadow: 'var(--shadow-lg)',
               border: '1px solid var(--border-light)',
+              backdropFilter: 'var(--blur-md)',
             },
             success: {
               iconTheme: {
-                primary: '#10B981',
-                secondary: 'var(--bg-secondary)',
+                primary: 'var(--system-green)',
+                secondary: 'var(--bg-elevated)',
               },
             },
             error: {
               iconTheme: {
-                primary: '#EF4444',
-                secondary: 'var(--bg-secondary)',
+                primary: 'var(--system-red)',
+                secondary: 'var(--bg-elevated)',
               },
             },
             loading: {
               iconTheme: {
-                primary: '#6B7280',
-                secondary: 'var(--bg-secondary)',
+                primary: 'var(--text-tertiary)',
+                secondary: 'var(--bg-elevated)',
               },
             },
           }}
@@ -260,7 +261,11 @@ function App() {
         {activeTab === 'admin' && <PerformanceMonitor />}
 
         {/* Global Notification System */}
-        <NotificationSystem />
+        <NotificationSystem onNavigate={(tab) => {
+          setActiveTab(tab);
+          // Could add additional navigation logic here if needed
+          // e.g., storing options in state for tab components to use
+        }} />
       </div>
     </ThemeProvider>
   );

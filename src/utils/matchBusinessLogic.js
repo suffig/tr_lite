@@ -1,6 +1,7 @@
 // Match Business Logic - Enhanced from tracker_full_v1
 import { supabaseDb } from './supabase';
 import { addShotsFromNewMatch } from './alcoholCalculatorPersistence';
+import { deleteMatch } from '../services/matchService';
 
 export class MatchBusinessLogic {
   /**
@@ -84,7 +85,7 @@ export class MatchBusinessLogic {
         throw new Error(`Match insert failed: ${matchResult.error.message}`);
       }
 
-      const matchId = matchResult.data.id;
+      const matchId = matchResult.data?.id;
       const now = new Date().toISOString().slice(0, 10);
 
       // 4. Update player goals (excluding own goals which start with "Eigentore_")
@@ -466,13 +467,8 @@ export class MatchBusinessLogic {
    * FIXED: Now uses the comprehensive deleteMatch function to ensure all data is properly cleaned up
    */
   static async deleteMatchTransactions(matchId) {
-    // Import and use the comprehensive deleteMatch function that handles:
-    // - Financial transaction reversal
-    // - Player goal adjustments  
-    // - Spieler des Spiels (SdS) count updates
-    // - Complete data cleanup with verification
+    // Use the modern deleteMatch service that handles comprehensive cleanup
     try {
-      const { deleteMatch } = await import('../../matches.js');
       await deleteMatch(matchId);
     } catch (error) {
       console.error(`Failed to delete match ${matchId} comprehensively:`, error);

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useSupabaseQuery } from '../../../hooks/useSupabase';
 import LoadingSpinner from '../../LoadingSpinner';
+import TeamLogo from '../../TeamLogo';
 
 // Helper function to calculate financial analytics
 function calculateFinancialAnalytics(players, matches, transactions, selectedTeam, timeframe) {
@@ -431,13 +432,13 @@ function ROIAnalysis({ data }) {
             title="AEK ROI"
             value={`${roi.aek}%`}
             benchmark={15}
-            icon="🔵"
+            icon={<TeamLogo team="aek" size="sm" />}
           />
           <ROIMetricCard 
             title="Real ROI"
             value={`${roi.real}%`}
             benchmark={15}
-            icon="🔴"
+            icon={<TeamLogo team="real" size="sm" />}
           />
           <ROIMetricCard 
             title="Investment Qualität"
@@ -453,7 +454,10 @@ function ROIAnalysis({ data }) {
         <h3 className="text-lg font-semibold mb-4">🏆 Top ROI Spieler</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium mb-3 text-primary-blue">🔵 AEK Athen</h4>
+            <h4 className="font-medium mb-3 text-primary-blue flex items-center gap-2">
+              <TeamLogo team="aek" size="sm" />
+              AEK Athen
+            </h4>
             <div className="space-y-2">
               {roi.topPlayers.aek.map((player, idx) => (
                 <PlayerROICard key={idx} player={player} rank={idx + 1} />
@@ -461,7 +465,10 @@ function ROIAnalysis({ data }) {
             </div>
           </div>
           <div>
-            <h4 className="font-medium mb-3 text-accent-red">🔴 Real Madrid</h4>
+            <h4 className="font-medium mb-3 text-accent-red flex items-center gap-2">
+              <TeamLogo team="real" size="sm" />
+              Real Madrid
+            </h4>
             <div className="space-y-2">
               {roi.topPlayers.real.map((player, idx) => (
                 <PlayerROICard key={idx} player={player} rank={idx + 1} />
@@ -554,7 +561,10 @@ function PlayerValuations({ data }) {
         <h3 className="text-lg font-semibold mb-4">🏆 Spieler-Marktwerte</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium mb-3 text-primary-blue">🔵 AEK Athen</h4>
+            <h4 className="font-medium mb-3 text-primary-blue flex items-center gap-2">
+              <TeamLogo team="aek" size="sm" />
+              AEK Athen
+            </h4>
             <div className="space-y-2">
               {valuations.aek.map((player, idx) => (
                 <PlayerValueCard key={idx} player={player} rank={idx + 1} />
@@ -562,7 +572,10 @@ function PlayerValuations({ data }) {
             </div>
           </div>
           <div>
-            <h4 className="font-medium mb-3 text-accent-red">🔴 Real Madrid</h4>
+            <h4 className="font-medium mb-3 text-accent-red flex items-center gap-2">
+              <TeamLogo team="real" size="sm" />
+              Real Madrid
+            </h4>
             <div className="space-y-2">
               {valuations.real.map((player, idx) => (
                 <PlayerValueCard key={idx} player={player} rank={idx + 1} />
@@ -656,7 +669,10 @@ function FinancialForecast({ data }) {
         <h3 className="text-lg font-semibold mb-4">💡 Budget-Empfehlungen</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium mb-3">🔵 AEK Empfehlungen</h4>
+            <h4 className="font-medium mb-3 flex items-center gap-2">
+              <TeamLogo team="aek" size="sm" />
+              AEK Empfehlungen
+            </h4>
             <div className="space-y-3">
               {recommendations.aek.map((rec, idx) => (
                 <RecommendationCard key={idx} recommendation={rec} />
@@ -664,7 +680,10 @@ function FinancialForecast({ data }) {
             </div>
           </div>
           <div>
-            <h4 className="font-medium mb-3">🔴 Real Empfehlungen</h4>
+            <h4 className="font-medium mb-3 flex items-center gap-2">
+              <TeamLogo team="real" size="sm" />
+              Real Empfehlungen
+            </h4>
             <div className="space-y-3">
               {recommendations.real.map((rec, idx) => (
                 <RecommendationCard key={idx} recommendation={rec} />
@@ -810,7 +829,7 @@ function ROIMetricCard({ title, value, benchmark, icon }) {
   return (
     <div className="modern-card">
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-xl">{icon}</span>
+        <span className="text-xl">{typeof icon === 'string' ? icon : icon}</span>
         <span className="text-sm font-medium">{title}</span>
       </div>
       <div className="text-2xl font-bold">{value}</div>

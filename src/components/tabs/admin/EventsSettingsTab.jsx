@@ -110,6 +110,91 @@ export default function EventsSettingsTab() {
         </div>
       </div>
 
+      {/* Quick Test Notifications */}
+      <div className="modern-card p-6">
+        <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center">
+          <span className="mr-2">🚀</span>
+          Schnell-Tests für Push-Benachrichtigungen
+        </h3>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            onClick={() => triggerNotification('match-result', {
+              goalsa: 3,
+              goalsb: 1,
+              manofthematch: 'Max Müller',
+              date: new Date().toISOString()
+            })}
+            className="btn-secondary text-sm py-3 px-4 card-hover-lift btn-spring-press flex items-center justify-center gap-2"
+          >
+            <span>⚽</span>
+            Spielergebnis-Test
+          </button>
+          
+          <button
+            onClick={() => triggerNotification('player-ban', {
+              playerName: 'Tom Schmidt',
+              games: 3
+            })}
+            className="btn-secondary text-sm py-3 px-4 card-hover-lift btn-spring-press flex items-center justify-center gap-2"
+          >
+            <span>🚫</span>
+            Spieler-Sperre
+          </button>
+          
+          <button
+            onClick={() => triggerNotification('financial-milestone', {
+              team: 'AEK Athen',
+              amount: 250
+            })}
+            className="btn-secondary text-sm py-3 px-4 card-hover-lift btn-spring-press flex items-center justify-center gap-2"
+          >
+            <span>💰</span>
+            Finanzmeilenstein
+          </button>
+          
+          <button
+            onClick={() => triggerNotification('achievement-unlocked', {
+              name: 'Torjäger',
+              description: '10 Tore in einer Saison'
+            })}
+            className="btn-secondary text-sm py-3 px-4 card-hover-lift btn-spring-press flex items-center justify-center gap-2"
+          >
+            <span>🏅</span>
+            Achievement
+          </button>
+          
+          <button
+            onClick={() => triggerNotification('system-update', {
+              message: 'Neue Funktionen verfügbar!'
+            })}
+            className="btn-secondary text-sm py-3 px-4 card-hover-lift btn-spring-press flex items-center justify-center gap-2"
+          >
+            <span>🔄</span>
+            System-Update
+          </button>
+          
+          <button
+            onClick={() => {
+              // Send multiple notifications to test stacking
+              setTimeout(() => triggerNotification('match-created', { date: new Date().toISOString() }), 0);
+              setTimeout(() => triggerNotification('player-ban', { playerName: 'Test Player', games: 1 }), 300);
+              setTimeout(() => triggerNotification('financial-milestone', { team: 'Real Madrid', amount: 100 }), 600);
+            }}
+            className="btn-secondary text-sm py-3 px-4 card-hover-lift btn-spring-press flex items-center justify-center gap-2"
+          >
+            <span>📚</span>
+            Mehrere Tests
+          </button>
+        </div>
+        
+        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+          <div className="text-sm text-blue-700 dark:text-blue-300">
+            <strong>Tipp:</strong> Diese Buttons testen die neuen Push-Up Benachrichtigungen mit realistischen Daten und Animationen.
+          </div>
+        </div>
+      </div>
+
       {/* Custom Notifications */}
       <div className="modern-card p-6">
         <h3 className="text-lg font-semibold text-text-primary mb-4 flex items-center">

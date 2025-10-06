@@ -27,22 +27,39 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
   // Load manager data from database
   const loadManagersFromDatabase = useCallback(async () => {
     try {
+      console.log('🔄 Loading managers from database...');
       const result = await dataManager.getManagers();
+      console.log('📊 Manager data result:', result);
       
-      if (result.data && result.data.length >= 2) {
+      if (result && result.data && Array.isArray(result.data) && result.data.length >= 2) {
+        console.log('✅ Manager data loaded successfully:', result.data);
         // Convert database format to component format
         // Assuming id=1 is AEK manager, id=2 is Real manager
         const aekManager = result.data.find(m => m.id === 1) || { name: 'Alexander', gewicht: 110 };
         const realManager = result.data.find(m => m.id === 2) || { name: 'Philip', gewicht: 105 };
         
+        console.log('👤 AEK Manager:', aekManager);
+        console.log('👤 Real Manager:', realManager);
+        
         setManagers({
           aek: { name: aekManager.name, age: 30, weight: aekManager.gewicht },
           real: { name: realManager.name, age: 30, weight: realManager.gewicht }
         });
+      } else {
+        console.warn('⚠️ No manager data found, using defaults. Result:', result);
+        // Use defaults if no data
+        setManagers({
+          aek: { name: 'Alexander', age: 30, weight: 110 },
+          real: { name: 'Philip', age: 30, weight: 105 }
+        });
       }
     } catch (error) {
-      console.error('Error loading manager settings from database:', error);
+      console.error('❌ Error loading manager settings from database:', error);
       // Fallback to defaults if database fails
+      setManagers({
+        aek: { name: 'Alexander', age: 30, weight: 110 },
+        real: { name: 'Philip', age: 30, weight: 105 }
+      });
     }
   }, []);
 
@@ -502,14 +519,20 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
 
   return (
     <div className="p-4 pb-24 mobile-safe-bottom">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-text-primary mb-4">
-          🍺🃏 Alkohol & Blackjack Tracker
-        </h2>
-        <p className="text-text-muted">
-          Alexander vs Philip - Getränke und Kartenspiele verfolgen
-        </p>
+      {/* Enhanced Header with iOS 26 Design - matching StatsTab */}
+      <div className="mb-6 animate-mobile-slide-in">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 bg-gradient-info rounded-ios-lg flex items-center justify-center">
+            <span className="text-white text-xl">🍺</span>
+          </div>
+          <div>
+            <h2 className="text-title1 font-bold text-text-primary">Alkohol & Blackjack</h2>
+            <p className="text-footnote text-text-secondary">Alexander vs Philip - Getränke und Kartenspiele verfolgen</p>
+          </div>
+        </div>
+        <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-info w-3/4 rounded-full animate-pulse-gentle"></div>
+        </div>
       </div>
 
       {/* Sub-Navigation */}
@@ -580,7 +603,7 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-bold text-lg text-blue-700 flex items-center gap-2">
               <span className="text-2xl">🔵</span>
-              <span>{managers.aek.name} (AEK Manager)</span>
+              <span>{managers.aek.name}</span>
             </h3>
             <div className="text-sm text-blue-600 bg-blue-200 px-3 py-1 rounded-full font-medium">
               {managers.aek.weight}kg
@@ -697,7 +720,7 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-bold text-lg text-green-700 flex items-center gap-2">
               <span className="text-2xl">🟢</span>
-              <span>{managers.real.name} (Real Manager)</span>
+              <span>{managers.real.name}</span>
             </h3>
             <div className="text-sm text-green-600 bg-green-200 px-3 py-1 rounded-full font-medium">
               {managers.real.weight}kg
@@ -810,37 +833,189 @@ export default function AlcoholTrackerTab({ onNavigate, showHints = false }) { /
         </div>
       </div>
 
-      {/* Summary */}
+      {/* Enhanced Summary */}
       <div className="modern-card mt-6">
-        <h3 className="font-bold text-lg mb-4">📊 Zusammenfassung</h3>
-        <div className="grid grid-cols-2 gap-4 text-center">
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <div className="text-xl font-bold text-text-primary">
-              {beerConsumption.alexander + beerConsumption.philip}
+        <h3 className="font-bold text-lg mb-4">📊 Erweiterte Statistiken</h3>
+        
+        {/* Current Session Stats */}
+        <div className="mb-6">
+          <h4 className="font-semibold text-md mb-3 text-text-primary">🍻 Aktuelle Session</h4>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <div className="text-xl font-bold text-text-primary">
+                {beerConsumption.alexander + beerConsumption.philip}
+              </div>
+              <div className="text-sm text-text-muted">Biere gesamt</div>
             </div>
-            <div className="text-sm text-text-muted">Biere gesamt</div>
-          </div>
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <div className="text-xl font-bold text-text-primary">
-              {((beerConsumption.alexander + beerConsumption.philip) * 0.5).toFixed(1)}L
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <div className="text-xl font-bold text-text-primary">
+                {((beerConsumption.alexander + beerConsumption.philip) * 0.5).toFixed(1)}L
+              </div>
+              <div className="text-sm text-text-muted">Biervolumen</div>
             </div>
-            <div className="text-sm text-text-muted">Biervolumen</div>
-          </div>
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <div className="text-xl font-bold text-text-primary">
-              {shotConsumption.alexander.shots20 + shotConsumption.alexander.shots40 + 
-               shotConsumption.philip.shots20 + shotConsumption.philip.shots40}
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <div className="text-xl font-bold text-text-primary">
+                {shotConsumption.alexander.shots20 + shotConsumption.alexander.shots40 + 
+                 shotConsumption.philip.shots20 + shotConsumption.philip.shots40}
+              </div>
+              <div className="text-sm text-text-muted">Shots gesamt</div>
             </div>
-            <div className="text-sm text-text-muted">Shots gesamt</div>
-          </div>
-          <div className="p-3 bg-gray-50 rounded-lg">
-            <div className="text-xl font-bold text-text-primary">
-              {((shotConsumption.alexander.shots20 + shotConsumption.alexander.shots40 + 
-                 shotConsumption.philip.shots20 + shotConsumption.philip.shots40) * 2)}cl
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <div className="text-xl font-bold text-text-primary">
+                {((shotConsumption.alexander.shots20 + shotConsumption.alexander.shots40 + 
+                   shotConsumption.philip.shots20 + shotConsumption.philip.shots40) * 2)}cl
+              </div>
+              <div className="text-sm text-text-muted">Shot-Volumen</div>
             </div>
-            <div className="text-sm text-text-muted">Shot-Volumen</div>
           </div>
         </div>
+
+        {/* Individual Player Stats */}
+        <div className="mb-6">
+          <h4 className="font-semibold text-md mb-3 text-text-primary">👥 Spieler-Vergleich</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Alexander Stats */}
+            <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <h5 className="font-semibold text-blue-700 mb-3 flex items-center gap-2">
+                <span className="text-xl">🔵</span>
+                {managers.aek.name}
+              </h5>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Biere:</span>
+                  <span className="font-semibold">{beerConsumption.alexander}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Shots (20%):</span>
+                  <span className="font-semibold">{shotConsumption.alexander.shots20}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Shots (40%):</span>
+                  <span className="font-semibold">{shotConsumption.alexander.shots40}</span>
+                </div>
+                <div className="flex justify-between border-t pt-2">
+                  <span>Aktueller BAK:</span>
+                  <span className="font-bold text-blue-700">
+                    {calculateBloodAlcohol(beerConsumption.alexander, shotConsumption.alexander, managers.aek, drinkingStartTime)}‰
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Alkohol-Volumen:</span>
+                  <span className="font-semibold">
+                    {(beerConsumption.alexander * 0.5 * 0.05 + 
+                      shotConsumption.alexander.shots20 * 0.02 * 0.20 +
+                      shotConsumption.alexander.shots40 * 0.02 * 0.40).toFixed(2)}L
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Philip Stats */}
+            <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+              <h5 className="font-semibold text-green-700 mb-3 flex items-center gap-2">
+                <span className="text-xl">🟢</span>
+                {managers.real.name}
+              </h5>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Biere:</span>
+                  <span className="font-semibold">{beerConsumption.philip}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Shots (20%):</span>
+                  <span className="font-semibold">{shotConsumption.philip.shots20}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Shots (40%):</span>
+                  <span className="font-semibold">{shotConsumption.philip.shots40}</span>
+                </div>
+                <div className="flex justify-between border-t pt-2">
+                  <span>Aktueller BAK:</span>
+                  <span className="font-bold text-green-700">
+                    {calculateBloodAlcohol(beerConsumption.philip, shotConsumption.philip, managers.real, drinkingStartTime)}‰
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Alkohol-Volumen:</span>
+                  <span className="font-semibold">
+                    {(beerConsumption.philip * 0.5 * 0.05 + 
+                      shotConsumption.philip.shots20 * 0.02 * 0.20 +
+                      shotConsumption.philip.shots40 * 0.02 * 0.40).toFixed(2)}L
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Session Information */}
+        {drinkingStartTime && (
+          <div className="mb-4">
+            <h4 className="font-semibold text-md mb-3 text-text-primary">⏰ Session-Info</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+              <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+                <div className="text-lg font-bold text-indigo-700">
+                  {getTimeSinceDrinking()}
+                </div>
+                <div className="text-sm text-indigo-600">Trinkdauer</div>
+              </div>
+              <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                <div className="text-lg font-bold text-purple-700">
+                  {Math.max(
+                    parseFloat(calculateBloodAlcohol(beerConsumption.alexander, shotConsumption.alexander, managers.aek, drinkingStartTime)),
+                    parseFloat(calculateBloodAlcohol(beerConsumption.philip, shotConsumption.philip, managers.real, drinkingStartTime))
+                  ).toFixed(2)}‰
+                </div>
+                <div className="text-sm text-purple-600">Höchster BAK</div>
+              </div>
+              <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                <div className="text-lg font-bold text-orange-700">
+                  {((beerConsumption.alexander + beerConsumption.philip) / 
+                    Math.max(1, parseFloat(getTimeSinceDrinking()?.split(' ')[0] || '1'))).toFixed(1)}
+                </div>
+                <div className="text-sm text-orange-600">Biere/Stunde</div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Sober Time Predictions */}
+        {drinkingStartTime && (beerConsumption.alexander > 0 || beerConsumption.philip > 0 || 
+          shotConsumption.alexander.shots20 > 0 || shotConsumption.alexander.shots40 > 0 ||
+          shotConsumption.philip.shots20 > 0 || shotConsumption.philip.shots40 > 0) && (
+          <div className="mt-4">
+            <h4 className="font-semibold text-md mb-3 text-text-primary">🕐 Nüchternzeit-Prognose</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {(() => {
+                const alexSoberTime = calculateSoberTime(beerConsumption.alexander, shotConsumption.alexander, managers.aek, drinkingStartTime);
+                const philipSoberTime = calculateSoberTime(beerConsumption.philip, shotConsumption.philip, managers.real, drinkingStartTime);
+                
+                return (
+                  <>
+                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200 text-center">
+                      <div className="text-sm font-medium text-blue-700 mb-1">{managers.aek.name}</div>
+                      <div className="text-lg font-bold text-blue-800">
+                        {alexSoberTime ? alexSoberTime.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : 'Bereits nüchtern'}
+                      </div>
+                      <div className="text-xs text-blue-600">
+                        {alexSoberTime ? `${Math.ceil((alexSoberTime - new Date()) / (1000 * 60 * 60))}h verbleibend` : '✅'}
+                      </div>
+                    </div>
+                    <div className="p-3 bg-green-50 rounded-lg border border-green-200 text-center">
+                      <div className="text-sm font-medium text-green-700 mb-1">{managers.real.name}</div>
+                      <div className="text-lg font-bold text-green-800">
+                        {philipSoberTime ? philipSoberTime.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : 'Bereits nüchtern'}
+                      </div>
+                      <div className="text-xs text-green-600">
+                        {philipSoberTime ? `${Math.ceil((philipSoberTime - new Date()) / (1000 * 60 * 60))}h verbleibend` : '✅'}
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Alcohol Progression Graph */}

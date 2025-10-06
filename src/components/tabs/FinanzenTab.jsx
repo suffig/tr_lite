@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
 import ExportImportManager from '../ExportImportManager';
+import HorizontalNavigation from '../HorizontalNavigation';
+import TeamLogo from '../TeamLogo';
 import toast from 'react-hot-toast';
+import '../../styles/match-animations.css';
 
 export default function FinanzenTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
   const [selectedTeam, setSelectedTeam] = useState('AEK');
@@ -69,6 +72,13 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
   const formatPlayerValue = (value) => {
     // Helper function for player values which are already stored in millions
     return `${(value || 0).toFixed(1)}M €`;
+  };
+
+  // Helper function to get color class for positive/negative amounts
+  const getAmountColorClass = (amount) => {
+    if (amount > 0) return 'text-green-600';
+    if (amount < 0) return 'text-red-600';
+    return 'text-gray-600';
   };
 
   const getTransactionIcon = (type) => {
@@ -166,6 +176,15 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
     return { matchGroups, nonMatchTransactions };
   };
 
+  // Define views for horizontal navigation
+  const views = [
+    { id: 'overview', label: 'Übersicht', icon: '💰' },
+    { id: 'aek', label: 'AEK', logoComponent: <TeamLogo team="aek" size="sm" /> },
+    { id: 'real', label: 'Real', logoComponent: <TeamLogo team="real" size="sm" /> },
+    { id: 'transactions', label: 'Transaktionen', icon: '💸' },
+    { id: 'analysis', label: 'Analyse', icon: '📊' },
+  ];
+
   if (loading) {
     return <LoadingSpinner message="Lade Finanzen..." />;
   }
@@ -180,42 +199,30 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
 
   return (
     <div className="p-4 pb-24 mobile-safe-bottom">
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-text-primary mb-2">
-          Finanzen
-        </h2>
-        <p className="text-text-muted">
-          Team-Budgets und Transaktionsübersicht
-        </p>
+      {/* Enhanced Header with iOS 26 Design - matching StatsTab */}
+      <div className="mb-6 animate-mobile-slide-in">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 bg-gradient-info rounded-ios-lg flex items-center justify-center">
+            <span className="text-white text-xl">💰</span>
+          </div>
+          <div>
+            <h2 className="text-title1 font-bold text-text-primary">Finanzen</h2>
+            <p className="text-footnote text-text-secondary">Team-Budgets und Transaktionsübersicht</p>
+          </div>
+        </div>
+        <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-info w-3/4 rounded-full animate-pulse-gentle"></div>
+        </div>
       </div>
 
-      {/* View Navigation */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        <button
-          onClick={() => setCurrentView('overview')}
-          className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-            currentView === 'overview'
-              ? 'bg-primary-blue text-white'
-              : 'bg-bg-secondary text-text-primary hover:bg-bg-tertiary'
-          }`}
-        >
-          <span>💰</span>
-          <span className="hidden sm:inline">Übersicht</span>
-        </button>
-        <button
-          onClick={() => setCurrentView('transactions')}
-          className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-            currentView === 'transactions'
-              ? 'bg-primary-red text-white'
-              : 'bg-bg-secondary text-text-primary hover:bg-bg-tertiary'
-          }`}
-        >
-          <span>📋</span>
-          <span className="hidden sm:inline">Transaktionen</span>
-        </button>
-      </div>
+      {/* Horizontal Navigation */}
+      <HorizontalNavigation
+        views={views}
+        selectedView={currentView}
+        onViewChange={setCurrentView}
+      />
 
-      {/* Conditional Content */}
+      {/* Conditional Content Based on currentView */}
       {currentView === 'transactions' ? (
         <div className="space-y-4">
           {/* Transactions List */}
@@ -259,31 +266,135 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
             </div>
           </div>
         </div>
+      ) : currentView === 'aek' ? (
+        <>
+          {/* AEK-only View */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="modern-card text-center border-l-4 border-blue-400 financial-card">
+              <div className="flex items-center justify-center mb-2">
+                <TeamLogo team="aek" size="lg" className="mr-2" />
+                <h3 className="font-semibold text-blue-600">AEK Athen</h3>
+              </div>
+              <div className="space-y-1 text-sm">
+                <div>Kontostand: <span className={`font-bold ${getAmountColorClass(aekFinances.balance)} animate-numberCount`}>{formatCurrency(aekFinances.balance)}</span></div>
+                <div>Kaderwert: <span className="font-bold text-blue-600">{formatPlayerValue(getTeamSquadValue('AEK'))}</span></div>
+                <div>Schulden: <span className={`font-bold ${getAmountColorClass(-(aekFinances.debt || 0))} animate-numberCount`}>{formatCurrency(aekFinances.debt || 0)}</span></div>
+              </div>
+            </div>
+            
+            <div className="modern-card text-center border-l-4 border-primary-green">
+              <div className="flex items-center justify-center mb-2">
+                <span className="text-2xl mr-2">💰</span>
+                <h3 className="font-semibold text-primary-green">AEK Gesamt</h3>
+              </div>
+              <div className="text-2xl font-bold text-text-primary">
+                {formatCurrency(aekFinances.balance + (getTeamSquadValue('AEK') * 1000000))}
+              </div>
+              <div className="text-sm text-text-muted">Gesamtkapital (Bargeld + Kaderwert)</div>
+            </div>
+          </div>
+
+          {/* AEK Team-specific Details */}
+          <div className="modern-card mb-6">
+            <h3 className="font-bold text-lg mb-4 flex items-center">
+              <TeamLogo team="aek" size="lg" className="mr-2" />
+              AEK Athen - Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-600">{formatCurrency(aekFinances.balance)}</div>
+                <div className="text-sm text-text-muted">Aktueller Kontostand</div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-xl font-bold text-green-600">{getTeamTransactions('AEK').filter(t => t.amount > 0).length}</div>
+                  <div className="text-sm text-text-muted">Einnahmen</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-red-600">{getTeamTransactions('AEK').filter(t => t.amount < 0).length}</div>
+                  <div className="text-sm text-text-muted">Ausgaben</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : currentView === 'real' ? (
+        <>
+          {/* Real-only View */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="modern-card text-center border-l-4 border-red-400 financial-card">
+              <div className="flex items-center justify-center mb-2">
+                <TeamLogo team="real" size="lg" className="mr-2" />
+                <h3 className="font-semibold text-red-600">Real Madrid</h3>
+              </div>
+              <div className="space-y-1 text-sm">
+                <div>Kontostand: <span className={`font-bold ${getAmountColorClass(realFinances.balance)} animate-numberCount`}>{formatCurrency(realFinances.balance)}</span></div>
+                <div>Kaderwert: <span className="font-bold text-red-600">{formatPlayerValue(getTeamSquadValue('Real'))}</span></div>
+                <div>Schulden: <span className={`font-bold ${getAmountColorClass(-(realFinances.debt || 0))} animate-numberCount`}>{formatCurrency(realFinances.debt || 0)}</span></div>
+              </div>
+            </div>
+            
+            <div className="modern-card text-center border-l-4 border-primary-green">
+              <div className="flex items-center justify-center mb-2">
+                <span className="text-2xl mr-2">💰</span>
+                <h3 className="font-semibold text-primary-green">Real Gesamt</h3>
+              </div>
+              <div className="text-2xl font-bold text-text-primary">
+                {formatCurrency(realFinances.balance + (getTeamSquadValue('Real') * 1000000))}
+              </div>
+              <div className="text-sm text-text-muted">Gesamtkapital (Bargeld + Kaderwert)</div>
+            </div>
+          </div>
+
+          {/* Real Team-specific Details */}
+          <div className="modern-card mb-6">
+            <h3 className="font-bold text-lg mb-4 flex items-center">
+              <TeamLogo team="real" size="lg" className="mr-2" />
+              Real Madrid - Details
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-red-600">{formatCurrency(realFinances.balance)}</div>
+                <div className="text-sm text-text-muted">Aktueller Kontostand</div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-center">
+                  <div className="text-xl font-bold text-green-600">{getTeamTransactions('Real').filter(t => t.amount > 0).length}</div>
+                  <div className="text-sm text-text-muted">Einnahmen</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-xl font-bold text-red-600">{getTeamTransactions('Real').filter(t => t.amount < 0).length}</div>
+                  <div className="text-sm text-text-muted">Ausgaben</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       ) : (
         <>
           {/* Original Overview Content */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="modern-card text-center border-l-4 border-blue-400">
+        <div className="modern-card text-center border-l-4 border-blue-400 financial-card">
           <div className="flex items-center justify-center mb-2">
-            <span className="text-2xl mr-2">🔵</span>
+            <TeamLogo team="aek" size="lg" className="mr-2" />
             <h3 className="font-semibold text-blue-600">AEK Athen</h3>
           </div>
           <div className="space-y-1 text-sm">
-            <div>Kontostand: <span className="font-bold text-blue-600">{formatCurrency(aekFinances.balance)}</span></div>
+            <div>Kontostand: <span className={`font-bold ${getAmountColorClass(aekFinances.balance)} animate-numberCount`}>{formatCurrency(aekFinances.balance)}</span></div>
             <div>Kaderwert: <span className="font-bold text-blue-600">{formatPlayerValue(getTeamSquadValue('AEK'))}</span></div>
-            <div>Schulden: <span className="font-bold text-blue-600">{formatCurrency(aekFinances.debt || 0)}</span></div>
+            <div>Schulden: <span className={`font-bold ${getAmountColorClass(-(aekFinances.debt || 0))} animate-numberCount`}>{formatCurrency(aekFinances.debt || 0)}</span></div>
           </div>
         </div>
 
-        <div className="modern-card text-center border-l-4 border-red-400">
+        <div className="modern-card text-center border-l-4 border-red-400 financial-card">
           <div className="flex items-center justify-center mb-2">
-            <span className="text-2xl mr-2">🔴</span>
+            <TeamLogo team="real" size="lg" className="mr-2" />
             <h3 className="font-semibold text-red-600">Real Madrid</h3>
           </div>
           <div className="space-y-1 text-sm">
-            <div>Kontostand: <span className="font-bold text-red-600">{formatCurrency(realFinances.balance)}</span></div>
+            <div>Kontostand: <span className={`font-bold ${getAmountColorClass(realFinances.balance)} animate-numberCount`}>{formatCurrency(realFinances.balance)}</span></div>
             <div>Kaderwert: <span className="font-bold text-red-600">{formatPlayerValue(getTeamSquadValue('Real'))}</span></div>
-            <div>Schulden: <span className="font-bold text-red-600">{formatCurrency(realFinances.debt || 0)}</span></div>
+            <div>Schulden: <span className={`font-bold ${getAmountColorClass(-(realFinances.debt || 0))} animate-numberCount`}>{formatCurrency(realFinances.debt || 0)}</span></div>
           </div>
         </div>
 
@@ -308,7 +419,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <button
             onClick={() => setShowExportImport(true)}
-            className="flex items-center justify-center space-x-2 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm"
+            className="flex items-center justify-center space-x-2 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors text-sm btn-spring"
           >
             <span>📥</span>
             <span>Export/Import</span>
@@ -327,7 +438,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
                 { duration: 5000 }
               );
             }}
-            className="flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+            className="flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors text-sm btn-spring"
           >
             <span>📊</span>
             <span>Finanz-Analyse</span>
@@ -349,7 +460,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
                 { duration: 6000 }
               );
             }}
-            className="flex items-center justify-center space-x-2 bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors text-sm"
+            className="flex items-center justify-center space-x-2 bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors text-sm btn-spring"
           >
             <span>📋</span>
             <span>Letzte Aktivitäten</span>
@@ -573,7 +684,7 @@ export default function FinanzenTab({ onNavigate, showHints = false }) { // esli
             {selectedTeam === 'AEK' ? '🔵 AEK Athen' : '🔴 Real Madrid'} - Details
           </h4>
           <div className="text-right">
-            <div className="text-lg font-bold text-text-primary">
+            <div className={`text-lg font-bold ${getAmountColorClass(selectedTeamFinances.balance)}`}>
               {formatCurrency(selectedTeamFinances.balance)}
             </div>
             <div className="text-sm text-text-muted">Aktueller Kontostand</div>

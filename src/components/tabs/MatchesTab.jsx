@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSupabaseQuery } from '../../hooks/useSupabase';
 import LoadingSpinner from '../LoadingSpinner';
+import HorizontalNavigation from '../HorizontalNavigation';
+import TeamLogo from '../TeamLogo';
 import '../../styles/match-animations.css';
 
 export default function MatchesTab({ onNavigate, showHints = false }) { // eslint-disable-line no-unused-vars
@@ -12,6 +14,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
   const [goalFilter, setGoalFilter] = useState('all'); // 'all', 'high-scoring', 'low-scoring'
   const [hoveredMatch, setHoveredMatch] = useState(null);
   const [animatingMatches, setAnimatingMatches] = useState(new Set());
+  const [activeView, setActiveView] = useState('overview');
   const animationTimeouts = useRef(new Map());
   
   const { data: allMatches, loading, error, refetch } = useSupabaseQuery(
@@ -46,10 +49,39 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
     
     let filtered = allMatches;
     
-    // Apply date filter if set (exact date)
-    if (dateFilter) {
+    // Apply horizontal navigation view filter first
+    switch (activeView) {
+      case 'aek-wins':
+        filtered = filtered.filter(match => {
+          const aekGoals = match.goalsa || 0;
+          const realGoals = match.goalsb || 0;
+          return aekGoals > realGoals;
+        });
+        break;
+      case 'real-wins':
+        filtered = filtered.filter(match => {
+          const aekGoals = match.goalsa || 0;
+          const realGoals = match.goalsb || 0;
+          return realGoals > aekGoals;
+        });
+        break;
+      case 'recent': {
+        // Show only the last 2 weeks
+        const twoWeeksAgo = new Date();
+        twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+        filtered = filtered.filter(match => new Date(match.date) >= twoWeeksAgo);
+        break;
+      }
+      case 'overview':
+      default:
+        // No additional filtering for overview
+        break;
+    }
+    
+    // Apply date filter if set (exact date) - only if not in horizontal nav filter mode
+    if (activeView === 'overview' && dateFilter) {
       filtered = filtered.filter(match => match.date === dateFilter);
-    } else if (timeFilter !== 'all') {
+    } else if (activeView === 'overview' && timeFilter !== 'all') {
       // Apply time period filter
       const filterDate = getTimeFilterDate();
       if (filterDate) {
@@ -57,8 +89,8 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
       }
     }
     
-    // Apply result filter
-    if (resultFilter !== 'all') {
+    // Apply result filter - only if not using horizontal nav for results
+    if (activeView === 'overview' && resultFilter !== 'all') {
       filtered = filtered.filter(match => {
         const aekGoals = match.goalsa || 0;
         const realGoals = match.goalsb || 0;
@@ -74,8 +106,8 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
       });
     }
     
-    // Apply goal filter
-    if (goalFilter !== 'all') {
+    // Apply goal filter - only if in overview mode
+    if (activeView === 'overview' && goalFilter !== 'all') {
       filtered = filtered.filter(match => {
         const totalGoals = (match.goalsa || 0) + (match.goalsb || 0);
         
@@ -96,6 +128,43 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
   const matches = getFilteredMatches();
   
   const isLoading = loading || playersLoading;
+
+  // Define views for horizontal navigation
+  const views = [
+    { id: 'overview', label: 'Übersicht', icon: '⚽' },
+    { id: 'recent', label: 'Letzte', icon: '📅' },
+    { id: 'aek-wins', label: 'AEK Siege', logoComponent: <TeamLogo team="aek" size="sm" /> },
+    { id: 'real-wins', label: 'Real Siege', logoComponent: <TeamLogo team="real" size="sm" /> },
+    { id: 'stats', label: 'Statistiken', icon: '📊' },
+  ];
+
+  // Sync horizontal navigation with dropdown filters
+  useEffect(() => {
+    switch (activeView) {
+      case 'aek-wins':
+        if (resultFilter !== 'aek-wins') {
+          setResultFilter('aek-wins');
+          setTimeFilter('all'); // Reset time filter when using specific view
+        }
+        break;
+      case 'real-wins':
+        if (resultFilter !== 'real-wins') {
+          setResultFilter('real-wins');
+          setTimeFilter('all'); // Reset time filter when using specific view
+        }
+        break;
+      case 'recent':
+        if (timeFilter !== '4weeks') {
+          setTimeFilter('4weeks');
+          setResultFilter('all'); // Reset result filter for recent view
+        }
+        break;
+      case 'overview':
+      default:
+        // Don't auto-change filters when in overview mode
+        break;
+    }
+  }, [activeView]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Helper function to get player name and value
   const getPlayerInfo = (playerId, playerName) => {
@@ -226,16 +295,30 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
 
   return (
     <div className="p-4 pb-24 mobile-safe-bottom">
-      <div className="mb-6">
-        <div className="flex justify-between items-center mb-2">
-          <h2 className="text-xl font-semibold text-text-primary">
-            Spiele-Übersicht
-          </h2>
+      {/* Enhanced Header with iOS 26 Design - matching StatsTab */}
+      <div className="mb-6 animate-mobile-slide-in">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-12 h-12 bg-gradient-info rounded-ios-lg flex items-center justify-center">
+            <span className="text-white text-xl">⚽</span>
+          </div>
+          <div>
+            <h2 className="text-title1 font-bold text-text-primary">Spiele</h2>
+            <p className="text-footnote text-text-secondary">
+              {matches?.length || 0} Spiele gefunden, gruppiert nach Datum
+            </p>
+          </div>
         </div>
-        <p className="text-text-muted">
-          {matches?.length || 0} Spiele gefunden, gruppiert nach Datum
-        </p>
+        <div className="w-full h-1 bg-bg-tertiary rounded-full overflow-hidden">
+          <div className="h-full bg-gradient-info w-3/4 rounded-full animate-pulse-gentle"></div>
+        </div>
       </div>
+
+      {/* Horizontal Navigation */}
+      <HorizontalNavigation
+        views={views}
+        selectedView={activeView}
+        onViewChange={setActiveView}
+      />
 
       {/* Enhanced Filter Controls */}
       <div className="mb-6 modern-card">
@@ -285,8 +368,8 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                 className="w-full px-3 py-2 bg-bg-secondary border border-border-light rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-blue transition-colors"
               >
                 <option value="all">Alle Ergebnisse</option>
-                <option value="aek-wins">🔵 AEK Siege</option>
-                <option value="real-wins">🔴 Real Siege</option>
+                <option value="aek-wins">AEK Siege</option>
+                <option value="real-wins">Real Siege</option>
               </select>
             </div>
             
@@ -427,8 +510,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                               
                               <div className="flex items-center gap-4">
                                 {/* Team A */}
-                                <div className="text-right">
-                                  <div className="text-lg font-bold text-blue-700">
+                                <div className="text-right flex flex-col items-center">
+                                  <TeamLogo team={match.teama || 'AEK'} size="lg" />
+                                  <div className="text-sm font-medium text-blue-700 mt-1">
                                     {match.teama || 'AEK'}
                                   </div>
                                 </div>
@@ -436,18 +520,16 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                 {/* Score */}
                                 <div className="bg-white/80 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg">
                                   <div className="text-2xl font-black text-gray-800">
-                                    <span className={winner === 'aek' ? 'text-blue-600' : 'text-gray-600'}>{aekGoals}</span>
+                                    <span className="text-blue-600">{aekGoals}</span>
                                     <span className="mx-2 text-gray-400">:</span>
-                                    <span className={winner === 'real' ? 'text-red-600' : 'text-gray-600'}>{realGoals}</span>
-                                  </div>
-                                  <div className="text-xs text-gray-500 text-center mt-1">
-                                    {aekGoals + realGoals} Tore insgesamt
+                                    <span className="text-red-600">{realGoals}</span>
                                   </div>
                                 </div>
                                 
                                 {/* Team B */}
-                                <div className="text-left">
-                                  <div className="text-lg font-bold text-red-700">
+                                <div className="text-left flex flex-col items-center">
+                                  <TeamLogo team={match.teamb || 'Real'} size="lg" />
+                                  <div className="text-sm font-medium text-red-700 mt-1">
                                     {match.teamb || 'Real'}
                                   </div>
                                 </div>
@@ -468,33 +550,16 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                             </div>
                           </div>
                           
-                          {/* Quick stats preview */}
-                          <div className="flex items-center gap-4">
-                            {/* Goals stats */}
-                            <div className="text-right">
-                              <div className="text-xs text-gray-500">Tore</div>
-                              <div className="text-sm font-semibold">{aekGoals + realGoals}</div>
-                            </div>
-                            
-                            {/* Cards stats */}
-                            <div className="text-right">
-                              <div className="text-xs text-gray-500">Karten</div>
-                              <div className="text-sm font-semibold">
-                                🟨{(match.yellowa || 0) + (match.yellowb || 0)} 🟥{(match.reda || 0) + (match.redb || 0)}
-                              </div>
-                            </div>
-                            
-                            {/* Expand indicator */}
-                            <div className="flex items-center gap-2 ml-4">
-                              <span className="text-xs text-gray-500 group-hover:text-gray-700 transition-colors">
-                                {isExpanded ? 'Weniger' : 'Details'}
-                              </span>
-                              <div className={`
-                                p-2 rounded-full bg-white/60 group-hover:bg-white/80 transition-all duration-300
-                                ${isExpanded ? 'rotate-90 bg-blue-100' : 'hover:scale-110'}
-                              `}>
-                                <span className="text-lg block">▶</span>
-                              </div>
+                          {/* Clean result overview - only show expand indicator */}
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 group-hover:text-gray-700 transition-colors">
+                              {isExpanded ? 'Weniger' : 'Details'}
+                            </span>
+                            <div className={`
+                              p-2 rounded-full bg-white/60 group-hover:bg-white/80 transition-all duration-300
+                              ${isExpanded ? 'rotate-90 bg-blue-100' : 'hover:scale-110'}
+                            `}>
+                              <span className="text-lg block">▶</span>
                             </div>
                           </div>
                         </button>
@@ -547,7 +612,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                       return goalsList && goalsList.length > 0 ? (
                                         <div className="space-y-2">
                                           <div className="flex items-center gap-2 text-sm font-medium text-blue-700">
-                                            🔵 AEK ({match.goalsa || 0} Tore)
+                                            <TeamLogo team="aek" size="xs" /> AEK ({match.goalsa || 0} Tore)
                                           </div>
                                           {goalsList.map((goal, idx) => {
                                             const isObject = typeof goal === 'object' && goal !== null;
@@ -579,7 +644,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                         </div>
                                       ) : (
                                         <div className="p-3 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                                          <p className="text-sm text-gray-500 text-center">🔵 AEK: Keine Tore erzielt</p>
+                                          <p className="text-sm text-gray-500 text-center"><TeamLogo team="aek" size="xs" /> AEK: Keine Tore erzielt</p>
                                         </div>
                                       );
                                     })()}
@@ -601,7 +666,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                       return goalsList && goalsList.length > 0 ? (
                                         <div className="space-y-2">
                                           <div className="flex items-center gap-2 text-sm font-medium text-red-700">
-                                            🔴 Real ({match.goalsb || 0} Tore)
+                                            <TeamLogo team="real" size="xs" /> Real ({match.goalsb || 0} Tore)
                                           </div>
                                           {goalsList.map((goal, idx) => {
                                             const isObject = typeof goal === 'object' && goal !== null;
@@ -633,7 +698,7 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                         </div>
                                       ) : (
                                         <div className="p-3 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
-                                          <p className="text-sm text-gray-500 text-center">🔴 Real: Keine Tore erzielt</p>
+                                          <p className="text-sm text-gray-500 text-center"><TeamLogo team="real" size="xs" /> Real: Keine Tore erzielt</p>
                                         </div>
                                       );
                                     })()}
@@ -692,7 +757,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                     <div className="grid grid-cols-2 gap-3">
                                       {/* AEK Cards */}
                                       <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                                        <div className="text-sm font-medium text-blue-700 mb-2">🔵 AEK</div>
+                                        <div className="text-sm font-medium text-blue-700 mb-2 flex items-center gap-2">
+                                          <TeamLogo team="aek" size="xs" /> AEK
+                                        </div>
                                         <div className="space-y-1">
                                           <div className="flex items-center justify-between">
                                             <span className="text-sm text-gray-600">🟨 Gelbe Karten</span>
@@ -707,7 +774,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                       
                                       {/* Real Cards */}
                                       <div className="p-3 bg-red-50 rounded-lg border border-red-200">
-                                        <div className="text-sm font-medium text-red-700 mb-2">🔴 Real</div>
+                                        <div className="text-sm font-medium text-red-700 mb-2 flex items-center gap-2">
+                                          <TeamLogo team="real" size="xs" /> Real
+                                        </div>
                                         <div className="space-y-1">
                                           <div className="flex items-center justify-between">
                                             <span className="text-sm text-gray-600">🟨 Gelbe Karten</span>
@@ -740,7 +809,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                       {/* AEK Prize */}
                                       <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
                                         <div className="flex items-center justify-between">
-                                          <span className="text-sm font-medium text-blue-700">🔵 AEK</span>
+                                          <span className="text-sm font-medium text-blue-700 flex items-center gap-2">
+                                            <TeamLogo team="aek" size="xs" /> AEK
+                                          </span>
                                           <span className={`font-bold text-lg ${(match.prizeaek || 0) > 0 ? 'text-green-600' : 'text-gray-500'}`}>
                                             €{match.prizeaek || 0}
                                           </span>
@@ -750,7 +821,9 @@ export default function MatchesTab({ onNavigate, showHints = false }) { // eslin
                                       {/* Real Prize */}
                                       <div className="p-3 bg-red-50 rounded-lg border border-red-200">
                                         <div className="flex items-center justify-between">
-                                          <span className="text-sm font-medium text-red-700">🔴 Real</span>
+                                          <span className="text-sm font-medium text-red-700 flex items-center gap-2">
+                                            <TeamLogo team="real" size="xs" /> Real
+                                          </span>
                                           <span className={`font-bold text-lg ${(match.prizereal || 0) > 0 ? 'text-green-600' : 'text-gray-500'}`}>
                                             €{match.prizereal || 0}
                                           </span>

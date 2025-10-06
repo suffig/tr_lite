@@ -144,7 +144,7 @@ const createFallbackClient = () => {
         
         return new Promise((resolve) => {
           setTimeout(() => {
-            // Enhanced validation for demo purposes
+            // Simplified validation for demo purposes - always allow login
             if (!email || !password) {
               resolve({ 
                 error: new Error('E-Mail und Passwort sind erforderlich.') 
@@ -159,12 +159,8 @@ const createFallbackClient = () => {
               return;
             }
             
-            if (password.length < 3) {
-              resolve({ 
-                error: new Error('Passwort zu kurz (mindestens 3 Zeichen für Demo).') 
-              });
-              return;
-            }
+            // Demo mode: always successful login
+            console.log('🔥 Creating demo session for:', email);
             
             // Create a mock session for demo mode
             fallbackSession = {
@@ -323,9 +319,14 @@ try {
 // Function to switch to fallback mode (can be called when CDN is detected as blocked)
 const switchToFallbackMode = () => {
   if (!usingFallback) {
-    console.warn('🔄 Switching to fallback mode globally');
+    console.warn('🔄 Switching to enhanced fallback mode globally');
     supabase = createFallbackClient();
     usingFallback = true;
+    
+    // Emit custom event to notify components
+    window.dispatchEvent(new CustomEvent('fifa-fallback-activated', {
+      detail: { reason: 'CDN blocked or connection failed' }
+    }));
   }
   return supabase;
 };
@@ -558,4 +559,20 @@ const createDatabaseOperations = (client) => {
 };
 
 export const supabaseDb = createDatabaseOperations(supabase);
+// Initialize and detect if CDN is blocked immediately
+const initializeSupabase = async () => {
+  // Check if CDN is blocked by looking for blocked resources
+  const cdnBlocked = document.querySelector('script[src*="supabase"]') === null ||
+                     window.location.hostname === 'localhost' ||
+                     window.location.hostname.includes('127.0.0.1');
+  
+  if (cdnBlocked) {
+    console.warn('🚫 Supabase CDN detected as blocked, switching to fallback immediately');
+    switchToFallbackMode();
+  }
+};
+
+// Initialize on load
+initializeSupabase();
+
 export { supabase, usingFallback, switchToFallbackMode };
